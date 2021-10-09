@@ -1,0 +1,27 @@
+Package: expirest
+Type: Package
+Title: Expiry Estimation Procedures
+Version: 0.0.0.9005
+Authors@R: c(person(given = "Pius",
+                    family = "Dahinden",
+                    role = c("aut", "cre"),
+                    email = "pius.dahinden@tillotts.com"),
+             person(given = "Tillotts Pharma AG",
+                    email = "tillotts@tillotts.com",
+                    role = c("cph", "fnd")))
+Description: This package supports shelf life estimation for chemically
+    derived medicines according to the worst-case scenario described in the
+    Australian Regulatory Guidelines for Prescription Medicines (ARGPM),
+    guidance on 'Stability testing for prescription medicines' (chapter 14.3.1).
+    According to this guidance, it is necessary to predict shelf life from
+    stability data, taking into account the worst case situation at batch
+    release. If a change over time is observed, a release limit needs to be
+    specified. This package supports finding a release limit and the associated
+    shelf life.
+Depends: R (>= 3.5)
+Imports: ggplot2
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+Suggests: testthat
+RoxygenNote: 7.1.1
