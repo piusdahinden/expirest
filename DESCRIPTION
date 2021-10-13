@@ -1,7 +1,18 @@
 Package: expirest
 Type: Package
+Version: 0.0.0.9006
 Title: Expiry Estimation Procedures
-Version: 0.0.0.9005
+Description: The Australian Regulatory Guidelines for Prescription Medicines
+    (ARGPM), guidance on "Stability testing for prescription medicines"
+    <url:https://www.tga.gov.au/stability-testing-prescription-medicines>,
+    recommends to predict the shelf life of chemically derived medicines from
+    stability data taking the worst case situation at batch release into
+    account. Consequently, if a change over time is observed, a release limit
+    needs to be specified. Finding a release limit and the associated shelf
+    life is supported, as well as the  standard approach that is recommended
+    by guidance Q1E "Evaluation of stability data" from the Internation Council
+    for Harmonisation (ICH)
+    <url:https://database.ich.org/sites/default/files/Q1E%20Guideline.pdf>.
 Authors@R: c(person(given = "Pius",
                     family = "Dahinden",
                     role = c("aut", "cre"),
@@ -9,19 +20,12 @@ Authors@R: c(person(given = "Pius",
              person(given = "Tillotts Pharma AG",
                     email = "tillotts@tillotts.com",
                     role = c("cph", "fnd")))
-Description: This package supports shelf life estimation for chemically
-    derived medicines according to the worst-case scenario described in the
-    Australian Regulatory Guidelines for Prescription Medicines (ARGPM),
-    guidance on 'Stability testing for prescription medicines' (chapter 14.3.1).
-    According to this guidance, it is necessary to predict shelf life from
-    stability data, taking into account the worst case situation at batch
-    release. If a change over time is observed, a release limit needs to be
-    specified. This package supports finding a release limit and the associated
-    shelf life.
 Depends: R (>= 3.5)
 Imports: ggplot2
-License: GPL (>= 2)
-Encoding: UTF-8
-LazyData: true
 Suggests: testthat
+License: GPL (>= 2)
+URL: https://github.com/piusdahinden/expirest
+BugReports: https://github.com/piusdahinden/expirest/issues
+LazyData: true
 RoxygenNote: 7.1.1
+Encoding: UTF-8
