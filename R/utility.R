@@ -5,7 +5,7 @@
 #'
 #' @param x_new A numeric value of \eqn{x} at which the upper or lower
 #'   confidence or prediction interval limit(s) should be calculated.
-#' @param model A linear model object of type \code{lm}.
+#' @param model A linear model object of type \sQuote{\code{lm}}.
 #' @inheritParams expirest_osle
 #'
 #' @details The function \code{get_intvl_limit()} calculates the upper or lower
@@ -134,7 +134,7 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
 #'   lines is sought, e.g. the distance of upper or lower confidence/prediction
 #'   interval limits from the upper or lower specification or expiry limits,
 #'   respectively.
-#' @param model A linear model object of type \code{lm}.
+#' @param model A linear model object of type \sQuote{\code{lm}}.
 #' @param sl A numeric variable specifying the \dQuote{specification limit} (SL)
 #'   or, for determinations according to ARGPM guidance \dQuote{Stability
 #'   testing for prescription medicines}, the \dQuote{expiry limit} (EL). The
@@ -228,11 +228,11 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
 #' The function \code{find_poi()} determines the point where the distance
 #' between two lines is minimal, e.g., the distance between a specification or
 #' expiry limit and a confidence or prediction interval. The estimation is done
-#' by aid of \code{uniroot()} from the \code{stats} package.
+#' by aid of \code{uniroot()} from the \sQuote{\code{stats}} package.
 #'
 #' @param srch_range A vector of length \code{2} specifying the end-points of
 #'   the (time) range within which the minimal distance is expected to be found.
-#' @param model A linear model object of type \code{lm}.
+#' @param model A linear model object of type \sQuote{\code{lm}}.
 #' @param sl A numeric variable specifying the \dQuote{specification limit}
 #'   (SL). Another kind of limit may be regarded as SL.
 #' @param alpha A numeric value specifying the significance level of the
@@ -242,14 +242,14 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
 #'   \code{uniroot()}.
 #' @inheritParams expirest_osle
 #'
-#' @details The function \code{find_poi()} (find the \sQuote{point of
+#' @details The function \code{find_poi()} (find the \dQuote{point of
 #' intersection}) estimates the value of \eqn{x} (e.g., the time) where the
 #' difference between the upper or lower confidence or prediction interval and
 #' the upper or lower acceptance criterion (e.g., the specification or the
 #' expiry limit) is minimal. Confidence or prediction intervals are calculated
 #' for the \code{model} provided. The POI is determined by aid of the
-#' \code{uniroot()} function from the \code{stats} package. The distance
-#' between the two lines of interest is calculated using the function
+#' \code{uniroot()} function from the \sQuote{\code{stats}} package. The
+#' distance between the two lines of interest is calculated using the function
 #' \code{get_distance()}, and it is this distance which \code{uniroot()}
 #' tries to minimise.
 #'
@@ -749,8 +749,7 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
 #' Australian Government, Australian Regulatory Guidelines for Prescription
 #' Medicines (ARGPM), Stability testing for prescription medicines,
 #' Version 1.1, March 2017 \cr
-#' \href{https://www.tga.gov.au/stability-testing-prescription-medicines}{%
-#'       ARGPM: Stability testing for prescription medicines}
+#' \url{https://www.tga.gov.au/stability-testing-prescription-medicines}
 #'
 #' @seealso \code{\link{expirest_wisle}}, \code{\link[stats]{lm}}.
 #'
@@ -947,7 +946,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 #' The function \code{get_icpt()} determines the intercept(s) of the provided
 #' model.
 #'
-#' @param model A linear model object of type \code{lm}.
+#' @param model A linear model object of type \sQuote{\code{lm}}.
 #' @param response_vbl A character string specifying the response variable name
 #'   that must be a column of the data frame that was used for model fitting.
 #' @param time_vbl A character string specifying the time variable name that
@@ -1097,8 +1096,9 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
 #' @details The function \code{print_val()} generates a string that is based on
 #' the provided information. The string is used as label of a corresponding
 #' graph element. For the number formatting, the \code{sprintf()} function from
-#' the \code{base} package is used. For concatenation of the various elements,
-#' the \code{paste()} function from the \code{base} package is used.
+#' the \sQuote{\code{base}} package is used. For concatenation of the various
+#' elements, the \code{paste()} function from the \sQuote{\code{base}} package
+#' is used.
 #'
 #' @return A single string of the form \dQuote{val_name: val_value (with
 #' the number of specified decimal places) val_unit}.

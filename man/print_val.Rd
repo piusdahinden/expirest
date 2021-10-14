@@ -37,8 +37,9 @@ a value on a plot (together with associated information).
 The function \code{print_val()} generates a string that is based on
 the provided information. The string is used as label of a corresponding
 graph element. For the number formatting, the \code{sprintf()} function from
-the \code{base} package is used. For concatenation of the various elements,
-the \code{paste()} function from the \code{base} package is used.
+the \sQuote{\code{base}} package is used. For concatenation of the various
+elements, the \code{paste()} function from the \sQuote{\code{base}} package
+is used.
 }
 \seealso{
 \code{\link[base]{formatC}}, \code{\link[base]{paste}}.

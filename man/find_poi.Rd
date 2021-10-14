@@ -19,7 +19,7 @@ find_poi(
 \item{srch_range}{A vector of length \code{2} specifying the end-points of
 the (time) range within which the minimal distance is expected to be found.}
 
-\item{model}{A linear model object of type \code{lm}.}
+\item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
 \item{sl}{A numeric variable specifying the \dQuote{specification limit}
 (SL). Another kind of limit may be regarded as SL.}
@@ -52,17 +52,17 @@ between the two lines of interest is minimal is returned.
 The function \code{find_poi()} determines the point where the distance
 between two lines is minimal, e.g., the distance between a specification or
 expiry limit and a confidence or prediction interval. The estimation is done
-by aid of \code{uniroot()} from the \code{stats} package.
+by aid of \code{uniroot()} from the \sQuote{\code{stats}} package.
 }
 \details{
-The function \code{find_poi()} (find the \sQuote{point of
+The function \code{find_poi()} (find the \dQuote{point of
 intersection}) estimates the value of \eqn{x} (e.g., the time) where the
 difference between the upper or lower confidence or prediction interval and
 the upper or lower acceptance criterion (e.g., the specification or the
 expiry limit) is minimal. Confidence or prediction intervals are calculated
 for the \code{model} provided. The POI is determined by aid of the
-\code{uniroot()} function from the \code{stats} package. The distance
-between the two lines of interest is calculated using the function
+\code{uniroot()} function from the \sQuote{\code{stats}} package. The
+distance between the two lines of interest is calculated using the function
 \code{get_distance()}, and it is this distance which \code{uniroot()}
 tries to minimise.
 
@@ -72,15 +72,14 @@ tries to minimise.
 Therapeutic Goods Administration (TGA) of the Department of Health of the
 Australian Government, Australian Regulatory Guidelines for Prescription
 Medicines (ARGPM), Stability testing for prescription medicines,
-Version 1.1, March 2017  \cr
-\href{https://www.tga.gov.au/stability-testing-prescription-medicines}{%
-      ARGPM: Stability testing for prescription medicines}
+Version 1.1, March 2017\cr
+\url{https://www.tga.gov.au/stability-testing-prescription-medicines}
 
-International Conference on Harmonisation of Technical Requirements for
+International Council for Harmonisation of Technical Requirements for
 Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
-Guideline, Evaluation of Stability Data Q1E, step 4 version 2003
-(CPMP/ICH/420/02).  \cr
-\href{https://www.ich.org/page/quality-guidelines}{ICH Quality Guidelines}
+Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
+(CPMP/ICH/420/02).\cr
+\url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
 }
 \seealso{
 \code{\link{get_distance}}, \code{\link[stats]{uniroot}},

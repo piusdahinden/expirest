@@ -88,8 +88,7 @@ Therapeutic Goods Administration (TGA) of the Department of Health of the
 Australian Government, Australian Regulatory Guidelines for Prescription
 Medicines (ARGPM), Stability testing for prescription medicines,
 Version 1.1, March 2017 \cr
-\href{https://www.tga.gov.au/stability-testing-prescription-medicines}{%
-      ARGPM: Stability testing for prescription medicines}
+\url{https://www.tga.gov.au/stability-testing-prescription-medicines}
 }
 \seealso{
 \code{\link{expirest_wisle}}, \code{\link[stats]{lm}}.

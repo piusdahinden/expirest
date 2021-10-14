@@ -15,7 +15,8 @@ A data frame with 36 observations and 3 variables:
 }
 }
 \source{
-\href{https://support.sas.com/documentation/onlinedoc/jmp/12.0/ReliabilitySurvivalMethods.pdf}{
+\href{https://support.sas.com/documentation/onlinedoc/jmp/12.0/
+ReliabilitySurvivalMethods.pdf}{
       JMP(R) 12 2015}
 }
 \usage{

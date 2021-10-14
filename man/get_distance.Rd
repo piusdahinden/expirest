@@ -20,7 +20,7 @@ lines is sought, e.g. the distance of upper or lower confidence/prediction
 interval limits from the upper or lower specification or expiry limits,
 respectively.}
 
-\item{model}{A linear model object of type \code{lm}.}
+\item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
 \item{sl}{A numeric variable specifying the \dQuote{specification limit} (SL)
 or, for determinations according to ARGPM guidance \dQuote{Stability
@@ -87,15 +87,14 @@ test batches or the intercept of the worst performing batch.
 Therapeutic Goods Administration (TGA) of the Department of Health of the
 Australian Government, Australian Regulatory Guidelines for Prescription
 Medicines (ARGPM), Stability testing for prescription medicines,
-Version 1.1, March 2017  \cr
-\href{https://www.tga.gov.au/stability-testing-prescription-medicines}{%
-      ARGPM: Stability testing for prescription medicines}
+Version 1.1, March 2017\cr
+\url{https://www.tga.gov.au/stability-testing-prescription-medicines}
 
-International Conference on Harmonisation of Technical Requirements for
+International Council for Harmonisation of Technical Requirements for
 Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
-Guideline, Evaluation of Stability Data Q1E, step 4 version 2003
-(CPMP/ICH/420/02).  \cr
-\href{https://www.ich.org/page/quality-guidelines}{ICH Quality Guidelines}
+Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
+(CPMP/ICH/420/02).\cr
+\url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
 }
 \seealso{
 \code{\link{find_poi}}, \code{\link{expirest_osle}},

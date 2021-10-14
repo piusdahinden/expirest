@@ -14,7 +14,7 @@ get_icpt(
 )
 }
 \arguments{
-\item{model}{A linear model object of type \code{lm}.}
+\item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
 \item{response_vbl}{A character string specifying the response variable name
 that must be a column of the data frame that was used for model fitting.}

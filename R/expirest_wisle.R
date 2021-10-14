@@ -5,8 +5,8 @@
 #' release and specification limit following the ARGPM guidance
 #' \dQuote{Stability testing for prescription medicines}. The abbreviation
 #' \dQuote{wisle} stands for \dQuote{what-if shelf life estimation} (because
-#' it estimates the shelf life (\sQuote{what}) for a given release limit
-#' (\sQuote{if})).
+#' it estimates the shelf life (\dQuote{what}) for a given release limit
+#' (\dQuote{if})).
 #'
 #' @param rl A numeric value or a numeric vector specifying the release
 #'   specification limit(s) for which the corresponding expiry should be
@@ -66,8 +66,8 @@
 #'
 #' @inheritSection expirest_osle Checking batch poolability
 #'
-#' @return An object of class \code{expirest_wisle} is returned, containing
-#' the following list elements:
+#' @return An object of class \sQuote{\code{expirest_wisle}} is returned,
+#' containing the following list elements:
 #' \item{Data}{Data frame of the original data including new columns with
 #'   transformed variables, if applicable.}
 #' \item{Parameters}{A list of the parameters with the elements \code{alpha},
@@ -84,10 +84,10 @@
 #'   element (\code{type.acronym}) is an acronym representing the first item.
 #'   The third to fifth elements contain the names of the model variables, i.e.
 #'   \code{response.vbl}, \code{time.vbl} and \code{batch.vbl}.}
-#' \item{Models}{A list of all possible models (i.e. \code{lm} objects) that are
-#'   relevant, i.e. \code{cics}, \code{dics} and \code{dids}. The second
-#'   element of the list is a string summarising the information in the first
-#'   element, i.e. either \code{cics}, \code{dics} or \code{dids}.}
+#' \item{Models}{A list of all possible models (i.e. \sQuote{\code{lm}}
+#'   objects) that are relevant, i.e. \code{cics}, \code{dics} and \code{dids}.
+#'   The second element of the list is a string summarising the information in
+#'   the first element, i.e. either \code{cics}, \code{dics} or \code{dids}.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
 #'   values of each of the three fitted models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
@@ -131,15 +131,14 @@
 #' Therapeutic Goods Administration (TGA) of the Department of Health of the
 #' Australian Government, Australian Regulatory Guidelines for Prescription
 #' Medicines (ARGPM), Stability testing for prescription medicines,
-#' Version 1.1, March 2017  \cr
-#' \href{https://www.tga.gov.au/stability-testing-prescription-medicines}{%
-#'       ARGPM: Stability testing for prescription medicines}
+#' Version 1.1, March 2017\cr
+#' \url{https://www.tga.gov.au/stability-testing-prescription-medicines}
 #'
-#' International Conference on Harmonisation of Technical Requirements for
+#' International Council for Harmonisation of Technical Requirements for
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
-#' Guideline, Evaluation of Stability Data Q1E, step 4 version 2003
-#' (CPMP/ICH/420/02).  \cr
-#' \href{https://www.ich.org/page/quality-guidelines}{ICH Quality Guidelines}
+#' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
+#' (CPMP/ICH/420/02).\cr
+#' \url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
 #'
 #' @seealso \code{\link{expirest_osle}}, \code{\link{find_poi}},
 #' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
@@ -795,8 +794,8 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' The function \code{print_expirest_wisle()} makes a graphical display of the
 #' shelf life estimate done by the \code{expirest_wisle()} function.
 #'
-#' @param model An \code{expirest_wisle} object, i.e. a list returned by the
-#'   \code{expirest_wisle()} function.
+#' @param model An \sQuote{\code{expirest_wisle}} object, i.e. a list returned
+#'   by the \code{expirest_wisle()} function.
 #' @param rl_index A positive integer specifying which of the release limit
 #'   values that have been handed over to \code{expirest_wisle()} should be
 #'   displayed. The default value is \code{1}.
@@ -821,18 +820,18 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' In addition, it shows features of the worst case scenario shelf life
 #' estimation as proposed in the Australian Regulatory Guidelines for
 #' Prescription Medicines (ARGPM).
-#' It uses the \code{\link[ggplot2]{ggplot}()} function from the \code{ggplot2}
-#' package for plotting. The various arguments can be used to control the
-#' appearance of the plot. The \code{ggplot2} object of the plot is contained
-#' in the \code{Graph} element of the list that is returned by
-#' \code{plot.expirest_wisle()} and can be used to modify the appearance of
-#' the graph.
+#' It uses the \code{\link[ggplot2]{ggplot}()} function from the
+#' \sQuote{\code{ggplot2}} package for plotting. The various arguments can be
+#' used to control the appearance of the plot. The \sQuote{\code{ggplot2}}
+#' object of the plot is contained in the \code{Graph} element of the list
+#' that is returned by \code{plot.expirest_wisle()} and can be used to modify
+#' the appearance of the graph.
 #'
 #' @return A list with the following elements is returned invisibly:
-#' \item{Model}{The \code{expirest_wisle} object that was passed via the
-#'   \code{model} argument.}
+#' \item{Model}{The \sQuote{\code{expirest_wisle}} object that was passed via
+#'   the \code{model} argument.}
 #' \item{Expiery}{A data frame of type \code{expiry}.}
-#' \item{Graph}{A \code{ggplot2} object for the graphical display.}
+#' \item{Graph}{A \sQuote{\code{ggplot2}} object for the graphical display.}
 #' \item{Prediction}{A data frame of the predicted values.}
 #' \item{text}{A data frame of the text elements on the plot.}
 #' \item{hlines}{A data frame of the horizontal line elements on the plot.}

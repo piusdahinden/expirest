@@ -117,8 +117,8 @@ a \dQuote{two sided} interval should be calculated, i.e. either
 \code{uniroot()}.}
 }
 \value{
-An object of class \code{expirest_wisle} is returned, containing
-the following list elements:
+An object of class \sQuote{\code{expirest_wisle}} is returned,
+containing the following list elements:
 \item{Data}{Data frame of the original data including new columns with
   transformed variables, if applicable.}
 \item{Parameters}{A list of the parameters with the elements \code{alpha},
@@ -135,10 +135,10 @@ the following list elements:
   element (\code{type.acronym}) is an acronym representing the first item.
   The third to fifth elements contain the names of the model variables, i.e.
   \code{response.vbl}, \code{time.vbl} and \code{batch.vbl}.}
-\item{Models}{A list of all possible models (i.e. \code{lm} objects) that are
-  relevant, i.e. \code{cics}, \code{dics} and \code{dids}. The second
-  element of the list is a string summarising the information in the first
-  element, i.e. either \code{cics}, \code{dics} or \code{dids}.}
+\item{Models}{A list of all possible models (i.e. \sQuote{\code{lm}}
+  objects) that are relevant, i.e. \code{cics}, \code{dics} and \code{dids}.
+  The second element of the list is a string summarising the information in
+  the first element, i.e. either \code{cics}, \code{dics} or \code{dids}.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
   values of each of the three fitted models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
@@ -184,8 +184,8 @@ function \code{expirest_wisle()} estimates the expiry for the specified
 release and specification limit following the ARGPM guidance
 \dQuote{Stability testing for prescription medicines}. The abbreviation
 \dQuote{wisle} stands for \dQuote{what-if shelf life estimation} (because
-it estimates the shelf life (\sQuote{what}) for a given release limit
-(\sQuote{if})).
+it estimates the shelf life (\dQuote{what}) for a given release limit
+(\dQuote{if})).
 }
 \details{
 For the shelf life estimation for submissions in Australia the
@@ -255,11 +255,11 @@ The \emph{common intercept / different slope} model is not of practical
 relevance because the corresponding model is missing an effect. If the slopes
 are significantly different, there is no point comparing intercepts.
 
-These requirements can be checked by aid of an \dQuote{ANalysis of COVAriance}
-(ANCOVA) including the batch variable as interaction term. The full ANCOVA
-model simultaneously tests all the effects, and non-significant effects can
-be identified and removed for fitting of the final regression model that is
-used for the estimation of the shelf life or retest period.
+These requirements can be checked by aid of an \dQuote{ANalysis of
+COVAriance} (ANCOVA) including the batch variable as interaction term. The
+full ANCOVA model simultaneously tests all the effects, and non-significant
+effects can be identified and removed for fitting of the final regression
+model that is used for the estimation of the shelf life or retest period.
 
 The significance level (\code{alpha_pool = 0.25}, Type I error) is used to
 increase the power of the test to detect cases where the data should not be
@@ -317,15 +317,14 @@ tmp <-
 Therapeutic Goods Administration (TGA) of the Department of Health of the
 Australian Government, Australian Regulatory Guidelines for Prescription
 Medicines (ARGPM), Stability testing for prescription medicines,
-Version 1.1, March 2017  \cr
-\href{https://www.tga.gov.au/stability-testing-prescription-medicines}{%
-      ARGPM: Stability testing for prescription medicines}
+Version 1.1, March 2017\cr
+\url{https://www.tga.gov.au/stability-testing-prescription-medicines}
 
-International Conference on Harmonisation of Technical Requirements for
+International Council for Harmonisation of Technical Requirements for
 Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
-Guideline, Evaluation of Stability Data Q1E, step 4 version 2003
-(CPMP/ICH/420/02).  \cr
-\href{https://www.ich.org/page/quality-guidelines}{ICH Quality Guidelines}
+Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
+(CPMP/ICH/420/02).\cr
+\url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
 }
 \seealso{
 \code{\link{expirest_osle}}, \code{\link{find_poi}},

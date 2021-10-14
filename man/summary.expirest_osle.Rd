@@ -7,23 +7,23 @@
 \method{summary}{expirest_osle}(object, ...)
 }
 \arguments{
-\item{object}{an \code{expirest_osle} object, i.e. a list returned by the
-\sQuote{expirest_osle()} function.}
+\item{object}{An \sQuote{\code{expirest_osle}} object, i.e. a list returned
+by the \code{expirest_osle()} function.}
 
-\item{...}{further arguments passed to or from other methods or arguments
-that can be passed down to the \code{\link[base]{formatC}} function.}
+\item{...}{Further arguments passed to or from other methods or arguments
+that can be passed down to the \code{\link[base]{formatC}()} function.}
 }
 \value{
-The \code{expirest_osle} object passed to the \code{model} parameter
-is returned invisibly.
+The \sQuote{\code{expirest_osle}} object passed to the
+\code{object} parameter is returned invisibly.
 }
 \description{
 This is a method for the function \code{summary()} for objects of class
-\code{expirest_osle}.
+\sQuote{\code{expirest_osle}}.
 }
 \details{
 The function \code{summary.expirest_osle()} prints the most
-relevant information in an \code{expirest_osle} object.
+relevant information in an \sQuote{\code{expirest_osle}} object.
 }
 \seealso{
 \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},

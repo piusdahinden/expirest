@@ -7,23 +7,23 @@
 \method{print}{expirest_wisle}(x, ...)
 }
 \arguments{
-\item{x}{an \code{expirest_wisle} object, i.e. a list returned by the
-\sQuote{expirest_wisle()} function.}
+\item{x}{an \sQuote{\code{expirest_wisle}} object, i.e. a list returned by
+the \code{expirest_wisle()} function.}
 
-\item{...}{further arguments passed to or from other methods or arguments
-that can be passed down to the \code{\link[base]{formatC}} function.}
+\item{...}{Further arguments passed to or from other methods or arguments
+that can be passed down to the \code{\link[base]{formatC}()} function.}
 }
 \value{
-The \code{expirest_wisle} object passed to the \code{model} parameter
-is returned invisibly.
+The \sQuote{\code{expirest_wisle}} object passed to the
+\code{object} parameter is returned invisibly.
 }
 \description{
 This is a method for the function \code{print()} for objects of class
-\code{expirest_wisle}.
+\sQuote{\code{expirest_wisle}}.
 }
 \details{
 The function \code{print.expirest_wisle()} prints the most relevant
-information in an \code{expirest_wisle} object.
+information in an \sQuote{\code{expirest_wisle}} object.
 }
 \seealso{
 \code{\link{expirest_wisle}}, \code{\link{expirest_osle}},

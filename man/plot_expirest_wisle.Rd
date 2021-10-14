@@ -17,8 +17,8 @@ plot_expirest_wisle(
 )
 }
 \arguments{
-\item{model}{An \code{expirest_wisle} object, i.e. a list returned by the
-\code{expirest_wisle()} function.}
+\item{model}{An \sQuote{\code{expirest_wisle}} object, i.e. a list returned
+by the \code{expirest_wisle()} function.}
 
 \item{rl_index}{A positive integer specifying which of the release limit
 values that have been handed over to \code{expirest_wisle()} should be
@@ -62,10 +62,10 @@ should be plotted as lines (option \code{line}) or as a shaded ribbon
 }
 \value{
 A list with the following elements is returned invisibly:
-\item{Model}{The \code{expirest_wisle} object that was passed via the
-  \code{model} argument.}
+\item{Model}{The \sQuote{\code{expirest_wisle}} object that was passed via
+  the \code{model} argument.}
 \item{Expiery}{A data frame of type \code{expiry}.}
-\item{Graph}{A \code{ggplot2} object for the graphical display.}
+\item{Graph}{A \sQuote{\code{ggplot2}} object for the graphical display.}
 \item{Prediction}{A data frame of the predicted values.}
 \item{text}{A data frame of the text elements on the plot.}
 \item{hlines}{A data frame of the horizontal line elements on the plot.}
@@ -86,12 +86,12 @@ fitted to the data and the associated confidence or prediction interval.
 In addition, it shows features of the worst case scenario shelf life
 estimation as proposed in the Australian Regulatory Guidelines for
 Prescription Medicines (ARGPM).
-It uses the \code{\link[ggplot2]{ggplot}()} function from the \code{ggplot2}
-package for plotting. The various arguments can be used to control the
-appearance of the plot. The \code{ggplot2} object of the plot is contained
-in the \code{Graph} element of the list that is returned by
-\code{plot.expirest_wisle()} and can be used to modify the appearance of
-the graph.
+It uses the \code{\link[ggplot2]{ggplot}()} function from the
+\sQuote{\code{ggplot2}} package for plotting. The various arguments can be
+used to control the appearance of the plot. The \sQuote{\code{ggplot2}}
+object of the plot is contained in the \code{Graph} element of the list
+that is returned by \code{plot.expirest_wisle()} and can be used to modify
+the appearance of the graph.
 }
 \examples{
 # Successful estimation

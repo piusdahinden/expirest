@@ -17,7 +17,7 @@ get_intvl_limit(
 \item{x_new}{A numeric value of \eqn{x} at which the upper or lower
 confidence or prediction interval limit(s) should be calculated.}
 
-\item{model}{A linear model object of type \code{lm}.}
+\item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
 \item{alpha}{A numeric value specifying the significance level for the
 calculation of confidence or prediction intervals. The default value is
