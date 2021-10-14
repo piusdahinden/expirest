@@ -120,8 +120,8 @@
 #' single batch to determine expiry when pooling batches would be more
 #' appropriate.
 #'
-#' @return An object of class \code{expirest_osle} is returned, containing
-#' the following list elements:
+#' @return An object of class \sQuote{\code{expirest_osle}} is returned,
+#' containing the following list elements:
 #' \item{Data}{Data frame of the original data including new columns with
 #'   transformed variables, if applicable.}
 #' \item{Parameters}{A list of the parameters with the elements \code{alpha},
@@ -138,10 +138,10 @@
 #'   element (\code{type.acronym}) is an acronym representing the first item.
 #'   The third to fifth elements contain the names of the model variables, i.e.
 #'   \code{response.vbl}, \code{time.vbl} and \code{batch.vbl}.}
-#' \item{Models}{A list of all possible models (i.e. \code{lm} objects) that are
-#'   relevant, i.e. \code{cics}, \code{dics} and \code{dids}. The second
-#'   element of the list is a string summarising the information in the first
-#'   element, i.e. either \code{cics}, \code{dics} or \code{dids}.}
+#' \item{Models}{A list of all possible models (i.e. \sQuote{\code{lm}}
+#'   objects) that are relevant, i.e. \code{cics}, \code{dics} and \code{dids}.
+#'   The second element of the list is a string summarising the information in
+#'   the first element, i.e. either \code{cics}, \code{dics} or \code{dids}.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
 #'   values of each of the three fitted models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
@@ -154,11 +154,11 @@
 #'   fitted models.}
 #'
 #' @references
-#' International Conference on Harmonisation of Technical Requirements for
+#' International Council for Harmonisation of Technical Requirements for
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 #' Guideline, Evaluation of Stability Data Q1E, step 4 version 2003
-#' (CPMP/ICH/420/02).  \cr
-#' \href{https://www.ich.org/page/quality-guidelines}{ICH Quality Guidelines}
+#' (CPMP/ICH/420/02).\cr
+#' \url{https://database.ich.org/sites/default/files/Q1E%20Guideline.pdf}
 #'
 #' @seealso \code{\link{expirest_wisle}}, \code{\link{find_poi}},
 #' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
@@ -659,8 +659,8 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #' The function \code{print_expirest_osle()} makes a graphical display of the
 #' shelf life estimate done by the \code{expirest_osle()} function.
 #'
-#' @param model An \code{expirest_osle} object, i.e. a list returned by the
-#'   \sQuote{expirest_osle()} function.
+#' @param model An \sQuote{\code{expirest_osle}} object, i.e. a list returned
+#'   by the \code{expirest_osle()} function.
 #' @param show_grouping A character string specifying if the grouping of the
 #'   data should be taken into account (\dQuote{yes}) or not (\dQuote{no}),
 #'   i.e. if the results of the most appropriate model should be shown or
@@ -693,18 +693,18 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #' fitted to the data and the associated confidence or prediction interval.
 #' In addition, it shows features of the shelf life estimation as proposed in
 #' ICH Guidance Q1E.
-#' It uses the \code{\link[ggplot2]{ggplot}()} function from the \code{ggplot2}
-#' package for plotting. The various arguments can be used to control the
-#' appearance of the plot. The \code{ggplot2} object of the plot is contained
-#' in the \code{Graph} element of the list that is returned by
-#' \code{plot.expirest_wisle()} and can be used to modify the appearance of
-#' the graph.
+#' It uses the \code{\link[ggplot2]{ggplot}()} function from the
+#' \sQuote{\code{ggplot2}} package for plotting. The various arguments can be
+#' used to control the appearance of the plot. The \sQuote{\code{ggplot2}}
+#' object of the plot is contained in the \code{Graph} element of the list
+#' that is returned by \code{plot.expirest_osle()} and can be used to modify
+#' the appearance of the graph.
 #'
 #' @return A list with the following elements is returned invisibly:
-#' \item{Model}{The \code{expirest_osle} object that was passed via the
-#'   \code{model} argument.}
+#' \item{Model}{The \sQuote{\code{expirest_osle}} object that was passed via
+#'   the \code{model} argument.}
 #' \item{Expiry}{A data frame of type \code{expiry}.}
-#' \item{Graph}{A \code{ggplot2} object for the graphical display.}
+#' \item{Graph}{A \sQuote{\code{ggplot2}} object for the graphical display.}
 #' \item{Prediction}{A data frame of the predicted values.}
 #' \item{text}{A data frame of the text elements on the plot.}
 #' \item{hlines}{A data frame of the horizontal line elements on the plot.}

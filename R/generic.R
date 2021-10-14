@@ -1,18 +1,18 @@
 #' Summary of the shelf life estimation (osle)
 #'
 #' This is a method for the function \code{summary()} for objects of class
-#' \code{expirest_osle}.
+#' \sQuote{\code{expirest_osle}}.
 #'
-#' @param object an \code{expirest_osle} object, i.e. a list returned by the
-#'   \sQuote{expirest_osle()} function.
-#' @param ... further arguments passed to or from other methods or arguments
-#'   that can be passed down to the \code{\link[base]{formatC}} function.
+#' @param object An \sQuote{\code{expirest_osle}} object, i.e. a list returned
+#'   by the \code{expirest_osle()} function.
+#' @param ... Further arguments passed to or from other methods or arguments
+#'   that can be passed down to the \code{\link[base]{formatC}()} function.
 #'
 #' @details The function \code{summary.expirest_osle()} prints the most
-#' relevant information in an \code{expirest_osle} object.
+#' relevant information in an \sQuote{\code{expirest_osle}} object.
 #'
-#' @return The \code{expirest_osle} object passed to the \code{model} parameter
-#' is returned invisibly.
+#' @return The \sQuote{\code{expirest_osle}} object passed to the
+#' \code{object} parameter is returned invisibly.
 #'
 #' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
 #' \code{\link[base]{formatC}}, \code{\link[utils]{methods}}.
@@ -67,14 +67,14 @@ summary.expirest_osle <- function(object, ...) {
 #' Print a summary of the shelf life estimation (osle)
 #'
 #' This is a method for the function \code{print()} for objects of class
-#' \code{expirest_osle}.
+#' \sQuote{\code{expirest_osle}}.
 #'
-#' @param x an \code{expirest_osle} object, i.e. a list returned by the
-#'   \sQuote{expirest_osle()} function.
+#' @param x An \sQuote{\code{expirest_osle} object, i.e. a list returned by the
+#'   \code{expirest_osle()} function.
 #' @inheritParams summary.expirest_osle
 #'
 #' @details The function \code{print.expirest_osle()} prints the most relevant
-#' information in an \code{expirest_osle} object.
+#' information in an \sQuote{\code{expirest_osle}} object.
 #'
 #' @inherit summary.expirest_osle return seealso
 #'
@@ -92,18 +92,18 @@ print.expirest_osle <- function(x, ...) {
 #' Summary of the what-if shelf life estimation (wisle)
 #'
 #' This is a method for the function \code{summary()} for objects of class
-#' \code{expirest_wisle}.
+#' \sQuote{\code{expirest_wisle}}.
 #'
-#' @param object an \code{expirest_wisle} object, i.e. a list returned by the
-#'   \sQuote{expirest_wisle()} function.
-#' @param ... further arguments passed to or from other methods or arguments
-#'   that can be passed down to the \code{\link[base]{formatC}} function.
+#' @param object An \sQuote{\code{expirest_wisle}} object, i.e. a list
+#'   returned by the \code{expirest_wisle()} function.
+#' @param ... Further arguments passed to or from other methods or arguments
+#'   that can be passed down to the \code{\link[base]{formatC}()} function.
 #'
 #' @details The function \code{summary.expirest_wisle()} prints the most
-#' relevant information in an \code{expirest_wisle} object.
+#' relevant information in an \sQuote{\code{expirest_wisle}} object.
 #'
-#' @return The \code{expirest_wisle} object passed to the \code{model} parameter
-#' is returned invisibly.
+#' @return The \sQuote{\code{expirest_wisle}} object passed to the
+#' \code{object} parameter is returned invisibly.
 #'
 #' @seealso \code{\link{expirest_wisle}}, \code{\link{expirest_osle}},
 #' \code{\link[base]{formatC}}, \code{\link[utils]{methods}}.
@@ -158,7 +158,7 @@ summary.expirest_wisle <- function(object, ...) {
   print(tmp, digits = digits)
   cat("\nAbbreviations:\n")
   cat("ARGPM: Australian Regulatory Guidelines for Prescription Medicines;",
-      "ICH: International Conference on Harmonisation;",
+      "ICH: International Council for Harmonisation;",
       "osle: Ordinary shelf life estimation (i.e. following the ICH guidance);",
       "RL: Release Limit;",
       "SL: Specification Limit;",
@@ -173,14 +173,14 @@ summary.expirest_wisle <- function(object, ...) {
 #' Print a summary of the what-if shelf life estimation (wisle)
 #'
 #' This is a method for the function \code{print()} for objects of class
-#' \code{expirest_wisle}.
+#' \sQuote{\code{expirest_wisle}}.
 #'
-#' @param x an \code{expirest_wisle} object, i.e. a list returned by the
-#'   \sQuote{expirest_wisle()} function.
+#' @param x an \sQuote{\code{expirest_wisle}} object, i.e. a list returned by
+#'   the \code{expirest_wisle()} function.
 #' @inheritParams summary.expirest_wisle
 #'
 #' @details The function \code{print.expirest_wisle()} prints the most relevant
-#' information in an \code{expirest_wisle} object.
+#' information in an \sQuote{\code{expirest_wisle}} object.
 #'
 #' @inherit summary.expirest_wisle return seealso
 #'
