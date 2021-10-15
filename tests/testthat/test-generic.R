@@ -12,7 +12,7 @@ test_that("summary.expirest_osle_succeeds", {
 
   # <-><-><-><->
 
-  expect_s3_class(summary(re), "expirest_osle")
+  expect_s3_class(expect_output(summary(re)), "expirest_osle")
   expect_output(summary(re), "cics")
   expect_output(summary(re), "b2")
 
@@ -32,7 +32,7 @@ test_that("print.expirest_osle_succeeds", {
 
   # <-><-><-><->
 
-  expect_s3_class(print(re), "expirest_osle")
+  expect_s3_class(expect_output(print(re)), "expirest_osle")
   expect_output(print(re), "cics")
   expect_output(print(re), "b2")
 
@@ -51,7 +51,7 @@ test_that("summary.expirest_wisle_succeeds", {
 
   # <-><-><-><->
 
-  expect_s3_class(summary(re), "expirest_wisle")
+  expect_s3_class(expect_output(summary(re)), "expirest_wisle")
   expect_output(summary(re), "cics")
   expect_output(summary(re), "b1")
 
@@ -69,7 +69,7 @@ test_that("print.expirest_wisle_succeeds", {
 
   # <-><-><-><->
 
-  expect_s3_class(print(re), "expirest_wisle")
+  expect_s3_class(expect_output(print(re)), "expirest_wisle")
   expect_output(print(re), "cics")
   expect_output(print(re), "b1")
 
