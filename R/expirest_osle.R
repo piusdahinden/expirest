@@ -156,15 +156,9 @@
 #' @references
 #' International Council for Harmonisation of Technical Requirements for
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
-<<<<<<< HEAD
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).\cr
 #' \url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
-=======
-#' Guideline, Evaluation of Stability Data Q1E, step 4 version 2003
-#' (CPMP/ICH/420/02).\cr
-#' \url{https://database.ich.org/sites/default/files/Q1E%20Guideline.pdf}
->>>>>>> c76ed324658ebe549a5521e33e82f3af23392fad
 #'
 #' @seealso \code{\link{expirest_wisle}}, \code{\link{find_poi}},
 #' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
@@ -428,15 +422,8 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # Determination of the Akaike Information Criterion (AIC) and Bayesian
   # Information Criterion (BIC) of each of the relevant models
 
-  t_AIC <- t_BIC <- numeric(3)
-
-  for(i in 1:(length(l_models) - 1)) {
-    t_AIC[i] <- AIC(l_models[[i]])
-    t_BIC[i] <- BIC(l_models[[i]])
-  }
-
-  names(t_AIC) <- c("cics", "dics", "dids")
-  names(t_BIC) <- c("cics", "dics", "dids")
+  t_AIC <- vapply(l_models[1:(length(l_models) - 1)], AIC, numeric(1))
+  t_BIC <- vapply(l_models[1:(length(l_models) - 1)], BIC, numeric(1))
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
@@ -489,15 +476,11 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of intercepts of all models
 
-  l_icpt <- vector(mode = "list", length = length(l_models) - 1)
-  names(l_icpt) <- names(l_models)[1:(length(l_models) - 1)]
-
-  for(i in 1:(length(l_models) - 1)) {
-    l_icpt[[i]] <-
-      get_icpt(model = l_models[[i]], response_vbl = response_vbl,
-               time_vbl = time_vbl, batch_vbl = batch_vbl,
-               xform = xform, shift = shift)
-  }
+  l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x)
+    list(get_icpt(model = x, response_vbl = response_vbl,
+                  time_vbl = time_vbl, batch_vbl = batch_vbl,
+                  xform = xform, shift = shift)),
+    list(1))
 
   # ---------
   # Check if determination was successful
@@ -510,9 +493,6 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 
   t_poi <- rep(NA, 3)
   names(t_poi) <- names(l_icpt)
-
-  t_poi_dids <- rep(NA, length(l_models[["individual"]]))
-  names(t_poi_dids) <- names(l_models[["individual"]])
 
   # ---------
   # Common Intercept / Common Slope
@@ -546,17 +526,19 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # batch_vbl * time_vbl interaction term). Instead, separate models are fitted
   # to the data of each individual batch and the POI values are determined for
   # each of these models. Of these POI values, the smallest is returned.
-  for(i in seq_along(l_models[["individual"]])) {
-    tmp <- try_get_model(
-      find_poi(srch_range = srch_range, model = l_models[["individual"]][[i]],
-               sl = sl, alpha = alpha, ivl_type = ivl_type, ivl_side = ivl_side,
-               ivl = ivl)
-    )
+  t_poi_dids <-
+    vapply(l_models[["individual"]],
+           function(x) {
+             tmp <- try_get_model(
+               find_poi(srch_range = srch_range,
+                        model = x,
+                        sl = sl, alpha = alpha, ivl_type = ivl_type,
+                        ivl_side = ivl_side, ivl = ivl)
+             )
 
-    if (is.null(tmp[["Error"]])) {
-      t_poi_dids[i] <- tmp[["Model"]]
-    }
-  }
+             ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
+           },
+           numeric(1))
 
   # ---------
   # Check if estimation was successful

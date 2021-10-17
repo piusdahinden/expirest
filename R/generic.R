@@ -69,13 +69,8 @@ summary.expirest_osle <- function(object, ...) {
 #' This is a method for the function \code{print()} for objects of class
 #' \sQuote{\code{expirest_osle}}.
 #'
-<<<<<<< HEAD
 #' @param x An \sQuote{\code{expirest_osle}} object, i.e. a list returned by
 #'   the \code{expirest_osle()} function.
-=======
-#' @param x An \sQuote{\code{expirest_osle} object, i.e. a list returned by the
-#'   \code{expirest_osle()} function.
->>>>>>> c76ed324658ebe549a5521e33e82f3af23392fad
 #' @inheritParams summary.expirest_osle
 #'
 #' @details The function \code{print.expirest_osle()} prints the most relevant

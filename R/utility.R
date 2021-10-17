@@ -42,6 +42,11 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
     stop("Please specify ivl_side either as \"lower\" or \"upper\".")
   }
 
+  # If x_new is NA, terminate with NA
+  if (is.na(x_new)) {
+    return(NA)
+  }
+
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   # Note: since the predict.lm() function from the 'stats' package always
@@ -81,19 +86,21 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
   } else {
     grouping_variables <-
       variable_names[attr(model$terms, which = "dataClasses") %in% "factor"]
-    x_length <- 1
 
-    for(i in seq_along(grouping_variables)) {
-      x_length <- x_length * nlevels(model$model[, grouping_variables[i]])
-    }
+    x_length <- vapply(grouping_variables,
+                       function(x)
+                         nlevels(model$model[, grouping_variables]),
+                       numeric(1))
+    x_length <- prod(x_length)
 
-    l_newdata <- vector(mode = "list", length = length(grouping_variables))
-    for(i in seq_along(grouping_variables)) {
-      l_newdata[[i]] <-
-        rep(levels(model$model[, grouping_variables[i]]),
-            each = x_length / nlevels(model$model[, grouping_variables[i]]) *
-              length(x_new))
-    }
+    l_newdata <-
+      vapply(grouping_variables,
+             function(x)
+               list(rep(levels(model$model[, grouping_variables]),
+                        each = x_length /
+                          nlevels(model$model[, grouping_variables]) *
+                          length(x_new))),
+             list(1))
     l_newdata[[length(l_newdata) + 1]] <- rep(x_new, x_length)
     names(l_newdata) <- c(grouping_variables,
                           variable_names[!(variable_names %in%
@@ -1172,21 +1179,19 @@ get_n_whole_part <- function(x) {
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determine n
 
-  n <- numeric(length(x))
-
-  for(i in seq_along(n)) {
-    if (is.na(x[i])) {
-      n[i] <- NA
+  check <- function(xx) {
+    if (is.na(xx)) {
+      NA
     } else {
-      if (x[i] <= 1 & x[i] >= -1) {
-        n[i] <- 1
+      if (xx <= 1 & xx >= -1) {
+        1
       } else {
-        n[i] <- floor(log10(abs(x[i]))) + 1
+        floor(log10(abs(xx))) + 1
       }
     }
   }
 
-  return(n)
+  vapply(x, function(xx) check(xx), numeric(1))
 }
 
 # <><><><><><><><><><><><><><><><><><><><><><><><><><><><>

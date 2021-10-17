@@ -136,15 +136,9 @@
 #'
 #' International Council for Harmonisation of Technical Requirements for
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
-<<<<<<< HEAD
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).\cr
 #' \url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
-=======
-#' Guideline, Evaluation of Stability Data Q1E, step 4 version 2003
-#' (CPMP/ICH/420/02).\cr
-#' \url{https://database.ich.org/sites/default/files/Q1E%20Guideline.pdf}
->>>>>>> c76ed324658ebe549a5521e33e82f3af23392fad
 #'
 #' @seealso \code{\link{expirest_osle}}, \code{\link{find_poi}},
 #' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
@@ -323,29 +317,10 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Results of ANCOVA done to figure out which kind of model suits the data best
-
-  common_icpt <- r_ret[["Model.Type"]][["type.spec"]][1]
-  common_slp <- r_ret[["Model.Type"]][["type.spec"]][2]
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Fit of all possible models that are relevant
+  # Fit of all possible models that are relevant and their intercepts
 
   l_models <- r_ret[["Models"]]
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of intercepts of all models
-
   l_icpt <- r_ret[["Intercepts"]]
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Calculation of POI values of all models (according to ICH), the worst case
-  # batch (wc_batch_ich) and its intercept (wc_icpt_ich)
-
-  t_poi <- r_ret[["POI"]]
-
-  wc_batch_ich <- r_ret[["wc.batch"]]
-  wc_icpt_ich <- r_ret[["wc.icpt"]]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
@@ -401,34 +376,27 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Calculation of POI values for all all models (according to ARGPM)
+  # Calculation of POI values for all models (according to ARGPM)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of worst case scenario (wcs) limits for all intercepts of
   # all models (on the transformed scale, if data have been transformed)
 
-  l_wcsl <- vector(mode = "list", length = length(l_icpt))
-
-  for(i in seq_along(l_icpt)) {
-    tmp <- matrix(NA, nrow = length(rl), ncol = length(l_icpt[[i]][["icpt"]]))
-    colnames(tmp) <- names(l_icpt[[i]][["icpt"]])
-
-    for(j in seq_along(rl)) {
-      for(k in seq_along(l_icpt[[i]][["icpt"]])) {
-        tmp[j, k] <- get_wcs_limit(rl = rl[j], sl = sl,
-                                   intercept = l_icpt[[i]][["icpt"]][k],
-                                   xform = xform, shift = shift,
-                                   ivl_side = ivl_side)[["wcs.lim"]]
-      }
-    }
-
-    l_wcsl[[i]] <- tmp
-  }
+  l_wcsl <- lapply(l_icpt, function(x) {
+    matrix(vapply(x[["icpt"]], function(xx) {
+      vapply(rl, function(j) {
+        get_wcs_limit(rl = j, sl = sl, intercept = xx,
+                      xform = xform, shift = shift,
+                      ivl_side = ivl_side)[["wcs.lim"]]
+      },
+      numeric(1))
+    }, numeric(length(rl))),
+    nrow = length(rl), ncol = length(x[[1]]),
+    dimnames = list(NULL, names(x[[1]])))
+  })
 
   if (sum(vapply(l_wcsl, is.null, logical(1))) > 0) {
     stop("Not all wcs limits for all models and intercepts calculated.")
-  } else {
-    names(l_wcsl) <- names(l_icpt)
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -598,23 +566,20 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # Determination of the batches with the confidence or prediction interval
   # limits that are closest to the respective specification limit for each
   # model and each POI
-  l_min_dist <- vector(mode = "list", length = length(l_prl))
-  names(l_min_dist) <- names(l_prl)
-
   switch(ivl_side,
          "lower" = {
-           for(i in seq_along(l_prl)) {
-             l_min_dist[[i]] <-
-               apply(l_prl[[i]], c(1, 2), function(x)
-                 ifelse(length(which.min(x)) != 0, which.min(x), NA))
-           }
+           l_min_dist <- lapply(l_prl, FUN = function(x) {
+             apply(x, c(1, 2), FUN = function(y) {
+               ifelse(length(which.min(y)) != 0, which.min(y), NA)
+             })
+           })
          },
          "upper" = {
-           for(i in seq_along(l_prl)) {
-             l_min_dist[[i]] <-
-               apply(l_prl[[i]], c(1, 2), function(x)
-                 ifelse(length(which.max(x)) != 0, which.max(x), NA))
-           }
+           l_min_dist <- lapply(l_prl, FUN = function(x) {
+             apply(x, c(1, 2), FUN = function(y) {
+               ifelse(length(which.max(y)) != 0, which.max(y), NA)
+             })
+           })
          })
 
   if (sum(vapply(l_min_dist, is.null, logical(1))) > 0) {
@@ -622,14 +587,11 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   }
 
   # Determination of the smallest POI value for each model and each rl value
-  l_min_poi <- vector(mode = "list", length = length(l_poi))
-  names(l_min_poi) <- names(l_poi)
-
-  for(i in seq_along(l_poi)) {
-    l_min_poi[[i]] <-
-      apply(l_poi[[i]], 1,
-            function(x) ifelse(length(which.min(x)) != 0, which.min(x), NA))
-  }
+  l_min_poi <- lapply(l_poi, FUN = function(x) {
+    apply(x, 1, function(y) {
+      ifelse(length(which.min(y)) != 0, which.min(y), NA)
+    })
+  })
 
   if (sum(vapply(l_min_poi, is.null, logical(1))) > 0) {
     stop("Not for all minimal POI limits for all POI limits determined.")
@@ -643,18 +605,13 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   names(l_wc_batch) <- names(l_min_poi)
 
   for(i in seq_along(l_min_dist)) {
-    tmp <- numeric()
-
-    for(j in seq_along(rl)) {
-      if (!is.na(l_min_poi[[i]][j])) {
-        tmp <- c(tmp, l_min_dist[[i]][j, l_min_poi[[i]][j]])
-      } else {
-        tmp <- c(tmp, NA)
-      }
-
-    }
-
-    l_wc_batch[[i]] <- tmp
+    l_wc_batch[[i]] <-
+      vapply(seq_along(rl), function(j) {
+        ifelse(!is.na(l_min_poi[[i]][j]),
+               l_min_dist[[i]][j, l_min_poi[[i]][j]],
+               NA)
+      },
+      numeric(1))
   }
 
   if (sum(vapply(l_wc_batch, is.null, logical(1))) > 0) {
@@ -669,11 +626,11 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   m_poi[, "cics"] <- l_poi[["cics"]]
 
   for(i in 2:length(l_poi)) {
-    for(j in seq_along(rl)) {
-      if (!is.na(l_wc_batch[[i]][j])) {
-        m_poi[j, i] <- l_poi[[i]][j, l_wc_batch[[i]][j]]
-      }
-    }
+    m_poi[, i] <- vapply(seq_along(rl), function(j) {
+      ifelse(!is.na(l_wc_batch[[i]][j]),
+             l_poi[[i]][j, l_wc_batch[[i]][j]],
+             NA)
+    }, numeric(1))
   }
 
   # Depending on the transformation of the time variable the POI values have to
@@ -701,20 +658,24 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   colnames(wc_icpt_argpm) <- names(l_wc_batch)
 
   if (xform[2] == "no") {
-    for(j in seq_along(l_wc_batch)) {
-      for(i in seq_along(l_wc_batch[[j]])) {
-        if (!is.na(l_wc_batch[[j]][i])) {
-          wc_icpt_argpm[i, j] <- l_icpt[[j]][["icpt"]][l_wc_batch[[j]][i]]
-        }
-      }
+    for(i in seq_along(l_wc_batch)) {
+      wc_icpt_argpm[, i] <-
+        vapply(seq_along(rl), function(j) {
+          ifelse(!is.na(l_wc_batch[[i]][j]),
+                 l_icpt[[i]][["icpt"]][l_wc_batch[[i]][j]],
+                 NA)
+        },
+        numeric(1))
     }
   } else {
-    for(j in seq_along(l_wc_batch)) {
-      for(i in seq_along(l_wc_batch[[j]])) {
-        if (!is.na(l_wc_batch[[j]][i])) {
-          wc_icpt_argpm[i, j] <- l_icpt[[j]][["icpt.orig"]][l_wc_batch[[j]][i]]
-        }
-      }
+    for(i in seq_along(l_wc_batch)) {
+      wc_icpt_argpm[, i] <-
+        vapply(seq_along(rl), function(j) {
+          ifelse(!is.na(l_wc_batch[[i]][j]),
+                 l_icpt[[i]][["icpt.orig"]][l_wc_batch[[i]][j]],
+                 NA)
+        },
+        numeric(1))
     }
   }
 
@@ -767,9 +728,9 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
     Shelf.Life.cics = m_poi[, "cics"],
     Shelf.Life.dics = m_poi[, "dics"],
     Shelf.Life.dids = m_poi[, "dids"],
-    POI.Model.cics = rep(t_poi["cics"], nrow(m_poi)),
-    POI.Model.dics = rep(t_poi["dics"], nrow(m_poi)),
-    POI.Model.dids = rep(t_poi["dids"], nrow(m_poi)))
+    POI.Model.cics = rep(r_ret[["POI"]]["cics"], nrow(m_poi)),
+    POI.Model.dics = rep(r_ret[["POI"]]["dics"], nrow(m_poi)),
+    POI.Model.dids = rep(r_ret[["POI"]]["dids"], nrow(m_poi)))
 
   if (xform[2] != "no") {
     d_poi[, "Exp.Spec"] <- rep(sl_bt, nrow(m_poi))
