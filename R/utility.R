@@ -745,11 +745,16 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
 #' \item{shift}{A vector of two values which has been added to the values of
 #'   the transformed \eqn{x} and/or \eqn{y} variables (specified via the
 #'   \code{xform} parameter).}
-#' \item{wcsl}{A numeric value or a numeric vector of the worst case scenario
-#'   limit(s) (wcsl) on the original scale.}
-#' \item{wcsl.trfmd}{An optional item containing the numeric value or a numeric
-#'   vector of the worst case scenario limit(s) (wcsl) on the transformed
+#' \item{delta.lim}{A numeric value or a numeric vector of the absolute
+#'   difference(s) between \code{rl} and {sl}, if \code{xform[2] != "no"} on
+#'   the transformed scale.}
+#' \item{delta.lim.orig}{A numeric value or a numeric vector of the absolute
+#'   difference(s) between \code{rl} and {sl} on the original scale.}
+#' \item{wcs.lim}{A numeric value or a numeric vector of the worst case
+#'   scenario (wcs) limit(s), if \code{xform[2] != "no"} on the transformed
 #'   scale.}
+#' \item{wcs.lim.orig}{A numeric value or a numeric vector of the worst case
+#'   scenario (wcs) limit(s) on the original scale.}
 #'
 #' @references
 #' Therapeutic Goods Administration (TGA) of the Department of Health of the
@@ -844,16 +849,20 @@ get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Collect and return the data
 
-  l_res <- list(xform = xform,
-                shift = shift,
-                delta.lim = delta_lim,
-                wcs.lim = wcs_lim)
-
-  if (xform[2] != "no") {
-    l_res[[length(l_res) + 1]] <- delta_lim_orig
-    names(l_res)[length(l_res)] <- "delta.lim.orig"
-    l_res[[length(l_res) + 1]] <- wcs_lim_orig
-    names(l_res)[length(l_res)] <- "wcs.lim.orig"
+  if (xform[2] == "no") {
+    l_res <- list(xform = xform,
+                  shift = shift,
+                  delta.lim = delta_lim,
+                  delta.lim.orig = delta_lim,
+                  wcs.lim = wcs_lim,
+                  wcs.lim.orig = wcs_lim)
+  } else {
+    l_res <- list(xform = xform,
+                  shift = shift,
+                  delta.lim = delta_lim,
+                  delta.lim.orig = delta_lim_orig,
+                  wcs.lim = wcs_lim,
+                  wcs.lim.orig = wcs_lim_orig)
   }
 
   return(l_res)

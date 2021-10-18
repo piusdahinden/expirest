@@ -55,11 +55,16 @@ A list with the following elements is returned:
 \item{shift}{A vector of two values which has been added to the values of
   the transformed \eqn{x} and/or \eqn{y} variables (specified via the
   \code{xform} parameter).}
-\item{wcsl}{A numeric value or a numeric vector of the worst case scenario
-  limit(s) (wcsl) on the original scale.}
-\item{wcsl.trfmd}{An optional item containing the numeric value or a numeric
-  vector of the worst case scenario limit(s) (wcsl) on the transformed
+\item{delta.lim}{A numeric value or a numeric vector of the absolute
+  difference(s) between \code{rl} and {sl}, if \code{xform[2] != "no"} on
+  the transformed scale.}
+\item{delta.lim.orig}{A numeric value or a numeric vector of the absolute
+  difference(s) between \code{rl} and {sl} on the original scale.}
+\item{wcs.lim}{A numeric value or a numeric vector of the worst case
+  scenario (wcs) limit(s), if \code{xform[2] != "no"} on the transformed
   scale.}
+\item{wcs.lim.orig}{A numeric value or a numeric vector of the worst case
+  scenario (wcs) limit(s) on the original scale.}
 }
 \description{
 The function \code{get_wcs_limit()} calculates \dQuote{worst case scenario}
