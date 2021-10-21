@@ -426,144 +426,90 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # lower specification limit so that their POI values are the POI values of
   # relevance.
 
+  # Note: in case of the "dids" model the POI is not determined using the model
+  # that was determined using the data from all batches (i.e. the full model
+  # with the batch_vbl * time_vbl interaction term). Instead, separate models
+  # are fitted to the data of each individual batch and the POI values are
+  # determined for each of these models. Of these POI values, the smallest is
+  # returned.
+
   l_poi <- vector(mode = "list", length = length(l_icpt))
   names(l_poi) <- c("cics", "dics", "dids")
 
   l_prl <- vector(mode = "list", length = length(l_icpt))
   names(l_prl) <- c("cics", "dics", "dids")
 
-  # ---------
-  # Common Intercept / Common Slope
-  m_poi <-
-    matrix(NA, nrow = length(rl), ncol = length(l_icpt[["cics"]][["icpt"]]))
-  colnames(m_poi) <- names(l_icpt[["cics"]][["icpt"]])
+  for(variety in names(l_icpt)) {
+    # Initialise empty arrays
+    m_poi <-
+      matrix(NA, nrow = length(rl), ncol = length(l_icpt[[variety]][["icpt"]]))
+    colnames(m_poi) <- names(l_icpt[[variety]][["icpt"]])
 
-  a_prl <- array(NA, dim = c(length(rl), length(l_icpt[["cics"]][["icpt"]]),
-                             length(l_icpt[["cics"]][["icpt"]])),
-                 dimnames = list(as.character(1:length(rl)),
-                                 names(l_icpt[["cics"]][["icpt"]]),
-                                 names(l_icpt[["cics"]][["icpt"]])))
+    a_prl <- array(NA, dim = c(length(rl), length(l_icpt[[variety]][["icpt"]]),
+                               length(l_icpt[[variety]][["icpt"]])),
+                   dimnames = list(as.character(1:length(rl)),
+                                   names(l_icpt[[variety]][["icpt"]]),
+                                   names(l_icpt[[variety]][["icpt"]])))
 
-  for(j in seq_along(rl)) {
-    for(k in 1:ncol(l_wcsl[["cics"]])) {
-      tmp_poi <- try_get_model(
-        find_poi(srch_range = srch_range, model = l_models[["cics"]],
-                 sl = l_wcsl[["cics"]][j, k], alpha = alpha,
-                 ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-      )
-
-      if (is.null(tmp_poi[["Error"]])) {
-        m_poi[j, k] <- tmp_poi[["Model"]]
-
-        tmp_prl <- try_get_model(
-          get_intvl_limit(
-            x_new = tmp_poi[["Model"]], model = l_models[["cics"]],
-            alpha = alpha, ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-        )
-
-        if (is.null(tmp_prl[["Error"]])) {
-          a_prl[j, k, ] <- tmp_prl[["Model"]]
+    # Fill arrays
+    for(j in seq_along(rl)) {
+      for(k in 1:ncol(l_wcsl[[variety]])) {
+        if (variety != "dids") {
+          tmp_poi <- try_get_model(
+            find_poi(srch_range = srch_range,
+                     model = l_models[[variety]],
+                     sl = l_wcsl[[variety]][j, k], alpha = alpha,
+                     ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
+        } else {
+          tmp_poi <- try_get_model(
+            find_poi(srch_range = srch_range,
+                     model = l_models[["individual"]][[k]],
+                     sl = l_wcsl[[variety]][j, k], alpha = alpha,
+                     ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
         }
-      }
-    }
-  }
 
-  l_poi[["cics"]] <- m_poi
-  l_prl[["cics"]] <- a_prl
 
-  # ---------
-  # Different Intercept / Common Slope
-  m_poi <-
-    matrix(NA, nrow = length(rl), ncol = length(l_icpt[["dics"]][["icpt"]]))
-  colnames(m_poi) <- names(l_icpt[["dics"]][["icpt"]])
+        if (is.null(tmp_poi[["Error"]])) {
+          m_poi[j, k] <- tmp_poi[["Model"]]
 
-  a_prl <- array(NA, dim = c(length(rl), length(l_icpt[["dics"]][["icpt"]]),
-                             length(l_icpt[["dics"]][["icpt"]])),
-                 dimnames = list(as.character(1:length(rl)),
-                                 names(l_icpt[["dics"]][["icpt"]]),
-                                 names(l_icpt[["dics"]][["icpt"]])))
 
-  for(j in seq_along(rl)) {
-    for(k in 1:ncol(l_wcsl[["dics"]])) {
-      tmp_poi <- try_get_model(
-        find_poi(srch_range = srch_range, model = l_models[["dics"]],
-                 sl = l_wcsl[["dics"]][j, k], alpha = alpha,
-                 ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-      )
+          if (variety != "dids") {
+            tmp_prl <- try_get_model(
+              get_intvl_limit(
+                x_new = tmp_poi[["Model"]],
+                model = l_models[[variety]], alpha = alpha,
+                ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
+            )
 
-      if (is.null(tmp_poi[["Error"]])) {
-        m_poi[j, k] <- tmp_poi[["Model"]]
+            if (is.null(tmp_prl[["Error"]])) {
+              a_prl[j, k, ] <- tmp_prl[["Model"]]
+            }
+          } else {
+            t_prl <- rep(NA, ncol(l_wcsl[[variety]]))
 
-        tmp_prl <- try_get_model(
-          get_intvl_limit(
-            x_new = tmp_poi[["Model"]], model = l_models[["dics"]],
-            alpha = alpha, ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-        )
+            for(kk in 1:ncol(l_wcsl[["dids"]])) {
+              tmp_prl <- try_get_model(
+                get_intvl_limit(
+                  x_new = tmp_poi[["Model"]],
+                  model = l_models[["individual"]][[kk]], alpha = alpha,
+                  ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
+              )
 
-        if (is.null(tmp_prl[["Error"]])) {
-          a_prl[j, k, ] <- tmp_prl[["Model"]]
-        }
-      }
-    }
-  }
+              if (is.null(tmp_prl[["Error"]])) {
+                t_prl[kk] <- tmp_prl[["Model"]]
+              }
+            }
 
-  l_poi[["dics"]] <- m_poi
-  l_prl[["dics"]] <- a_prl
-
-  # ---------
-  # Different Intercept / Different Slope (i.e. Individual)
-
-  # Note: in this case, the POI is not determined using the model that was
-  # determined using the data from all batches (i.e. the full model with the
-  # batch_vbl * time_vbl interaction term). Instead, separate models are fitted
-  # to the data of each individual batch and the POI values are determined for
-  # each of these models. Of these POI values, the smallest is returned.
-  m_poi <-
-    matrix(NA, nrow = length(rl), ncol = length(l_icpt[["dids"]][["icpt"]]))
-  colnames(m_poi) <- names(l_icpt[["dids"]][["icpt"]])
-
-  a_prl <- array(NA, dim = c(length(rl), length(l_icpt[["dids"]][["icpt"]]),
-                             length(l_icpt[["dids"]][["icpt"]])),
-                 dimnames = list(as.character(1:length(rl)),
-                                 names(l_icpt[["dids"]][["icpt"]]),
-                                 names(l_icpt[["dids"]][["icpt"]])))
-
-  for(j in seq_along(rl)) {
-    for(k in 1:ncol(l_wcsl[["dids"]])) {
-      tmp_poi <- try_get_model(
-        find_poi(srch_range = srch_range, model = l_models[["individual"]][[k]],
-                 sl = l_wcsl[["dids"]][j, k], alpha = alpha,
-                 ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-      )
-
-      if (is.null(tmp_poi[["Error"]])) {
-        m_poi[j, k] <- tmp_poi[["Model"]]
-
-        t_prl <- rep(NA, ncol(l_wcsl[["dids"]]))
-
-        for(kk in 1:ncol(l_wcsl[["dids"]])) {
-          tmp_prl <- try_get_model(
-            get_intvl_limit(
-              x_new = tmp_poi[["Model"]],
-              model = l_models[["individual"]][[kk]], alpha = alpha,
-              ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-          )
-
-          if (is.null(tmp_prl[["Error"]])) {
-            t_prl[kk] <- tmp_prl[["Model"]]
+            a_prl[j, k, ] <- t_prl
           }
         }
-
-        a_prl[j, k, ] <- t_prl
       }
     }
+
+    # Put the resulting arrays into the corresponding list entries
+    l_poi[[variety]] <- m_poi
+    l_prl[[variety]] <- a_prl
   }
-
-  l_poi[["dids"]] <- m_poi
-  l_prl[["dids"]] <- a_prl
-
-  # ---------
-  # Check if POI value and prediction limit determination was successful
 
   if (sum(vapply(l_poi, is.null, logical(1))) > 0) {
     stop("Not for all POI values for all wcs limits calculated.")
