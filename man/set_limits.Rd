@@ -22,7 +22,7 @@ the form \code{c(lower limit, upper limit)}.}
 
 \item{sl_sf}{A positive integer or a vector of positive integers specifying
 the number of \dQuote{significant figures} (sf) of \code{sl}. It must have
-the same length as \code{sf}.}
+the same length as \code{sl}.}
 
 \item{sf_option}{A character string specifying if the limits (\code{rl}
 or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
@@ -50,11 +50,7 @@ for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
 \eqn{x} variable and the second element to the \eqn{y} variable. The
 purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
-default is \code{c(0, 0)}. For transformation of the \eqn{x} variable
-\eqn{1} should be chosen as shift parameter in case of \code{log} and
-\eqn{0} in case of \code{sqrt} and \code{sq} transformation because
-then the intercept will be at \eqn{x = 0}. For transformation of the
-\eqn{y} variable any value can be chosen as shift parameter.}
+default is \code{c(0, 0)}.}
 
 \item{ivl_side}{A character string specifying if the \dQuote{upper} or the
 \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
@@ -72,20 +68,27 @@ A list with the following elements is returned:
 \item{rl.orig}{An optional element containing a numeric value or a numeric
   vector specifying the release limit(s) on the original scale.}
 \item{rl.sf}{An optional element containing a numeric value or a numeric
-  vector specifying the significant figures of the release  limit(s).}
+  vector specifying the significant figures of the release limit(s).}
 \item{rl}{An optional element containing a numeric value or a numeric vector
-  of the adjusted release limit(s).}
+  of the adjusted (as specified by the \code{sf.option} parameter) release
+  limit(s).}
+\item{rl.trfmd}{An optional element containing a numeric value or a numeric
+  vector of the adjusted and transformed, if applicable (as specified by the
+  the \code{sf.option} parameter and the second element of the \code{xform}
+  parameter, respectively), release limit(s), otherwise the same as
+  \code{rl}.}
 \item{sl.orig}{A numeric value or a numeric vector of length \code{2}
   specifying the specification limit(s) on the original scale.}
+\item{sl.sf}{A numeric value or a numeric vector of length \code{2}
+  specifying the significant figures of the specification limit(s).}
 \item{sl}{A numeric value or a numeric vector of length \code{2} of the
-  adjusted specification limit(s).}
-\item{rl.trfmd}{An optional element containing the numeric value or a numeric
-  vector of the adjusted and transformed (as specified by the second element
-  of the \code{xform} parameter) release limit(s).}
-\item{sl.trfmd}{An optional element containing the numeric value or a numeric
-  vector of length \code{2} of the adjusted and transformed (as specified
-  by the second element of the \code{xform} parameter) specification
+  adjusted (as specified by the \code{sf.option} parameter) specification
   limit(s).}
+\item{sl.trfmd}{A numeric value or a numeric vector of length \code{2} of
+  the adjusted and transformed, if applicable (as specified by the the
+  \code{sf.option} parameter and the second element of the \code{xform}
+  parameter, respectively) specification limit(s), otherwise the same as
+  \code{sl}.}
 }
 \description{
 The function \code{set_limits()} adjusts the limits according to the number

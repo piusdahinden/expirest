@@ -16,14 +16,14 @@ plot_expirest_osle(
 }
 \arguments{
 \item{model}{An \sQuote{\code{expirest_osle}} object, i.e. a list returned
-by the \code{expirest_osle()} function.}
+by the \code{\link{expirest_osle}()} function.}
 
 \item{show_grouping}{A character string specifying if the grouping of the
 data should be taken into account (\dQuote{yes}) or not (\dQuote{no}),
 i.e. if the results of the most appropriate model should be shown or
 the results from the marginal analysis ignoring the grouping (being
 equivalent with the \emph{common intercept / common slope case}). The
-default value is \code{yes}.}
+default is \code{"yes"}.}
 
 \item{response_vbl_unit}{A character string specifying the unit associated
 with the response variable. The default is \code{NULL}.}
@@ -36,17 +36,17 @@ the range of the time  variable to be plotted. The default is \code{NULL}
 and the \eqn{x} range is calculated automatically on the basis of the
 estimated shelf life.}
 
-\item{plot_option}{A character string of either \code{full} or \code{lean},
-i.e. specifying if all the information should be put out on the plot
-(option \code{full}) or only basic information (option \code{lean}),
-i.e. the data points, the fitted regression line with the confidence
-interval, the specification limit(s) and the estimated shelf life
-limit(s). The default is \code{full}.}
+\item{plot_option}{A character string of either \code{"full"} or
+\code{"lean"}, i.e. specifying if all the information should be put out
+on the plot (option \code{"full"}) or only basic information (option
+\code{"lean"}), i.e. the data points, the fitted regression line with
+the confidence interval, the specification limit(s) and the estimated
+shelf life limit(s). The default is \code{"full"}.}
 
-\item{ci_app}{A character string of either \code{line} or \code{ribbon},
+\item{ci_app}{A character string of either \code{"line"} or \code{"ribbon"},
 specifying the appearance of the confidence interval, i.e. if the limits
-should be plotted as lines (option \code{line}) or as a shaded ribbon
-(option \code{ribbon}). The default is \code{line}.}
+should be plotted as lines (option \code{"line"}) or as a shaded ribbon
+(option \code{"ribbon"}). The default is \code{"line"}.}
 }
 \value{
 A list with the following elements is returned invisibly:
@@ -60,23 +60,23 @@ A list with the following elements is returned invisibly:
 \item{vlines}{A data frame of the vertical line elements on the plot.}
 }
 \description{
-The function \code{print_expirest_osle()} makes a graphical display of the
-shelf life estimate done by the \code{expirest_osle()} function.
+The function \code{plot_expirest_osle()} makes a graphical display of the
+shelf life estimate done by the \code{\link{expirest_osle}()} function.
 }
 \details{
-The function \code{plot.expirest_osle()} uses the data and the
+The function \code{plot_expirest_osle()} uses the data and the
 information about the linear model that was used for the estimation of
 the shelf life by aid of the \code{\link{expirest_osle}()} function. It
 plots a graph of the time course of a parameter, a linear regression line
 fitted to the data and the associated confidence or prediction interval.
-In addition, it shows features of the shelf life estimation as proposed in
-ICH Guidance Q1E.
-It uses the \code{\link[ggplot2]{ggplot}()} function from the
-\sQuote{\code{ggplot2}} package for plotting. The various arguments can be
+In addition, it shows features of the shelf life estimation.
+
+For plotting, the \code{\link[ggplot2]{ggplot}()} function from the
+\sQuote{\code{ggplot2}} package is used. The various arguments can be
 used to control the appearance of the plot. The \sQuote{\code{ggplot2}}
-object of the plot is contained in the \code{Graph} element of the list
-that is returned by \code{plot.expirest_osle()} and can be used to modify
-the appearance of the graph.
+object of the generated plot is contained in the \code{Graph} element of
+the list that is returned by \code{\link{plot_expirest_osle}()} and can be
+used to modify the appearance of the graph.
 }
 \examples{
 # Successful estimation

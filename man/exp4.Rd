@@ -15,16 +15,15 @@ A data frame with 36 observations and 3 variables:
 }
 }
 \source{
-\href{https://support.sas.com/documentation/onlinedoc/jmp/12.0/
-ReliabilitySurvivalMethods.pdf}{
-      JMP(R) 12 2015}
+See reference: Example data set (Stability.jmp) used in chapter
+\emph{Stability Analysis}, p. 174-176.
 }
 \usage{
 data(exp4)
 }
 \description{
-A data set containing the concentration data (mg/kg) of four batches obtained
-over a 24 months period of a drug product.  A total of \eqn{n = 36}
+A data set containing the concentration data (mg/kg) of four batches
+obtained over a 24 months period of a drug product. A total of \eqn{n = 36}
 independent measurements are available (corresponding to the data set
 \emph{Reliability/Stability.jmp} in \emph{JMP(R) 12 Reliability and Survival
 Methods} manual).
@@ -34,8 +33,9 @@ Methods} manual).
 }
 \references{
 SAS Institute Inc. 2015. \emph{JMP(R) 12 Reliability and Survival Methods}.
-Cary, NC: SAS Institute Inc.
-Example data set (Stability.jmp) used in chapter \emph{Stability Analysis},
-p. 174-176.
+Cary, NC: SAS Institute Inc.\cr
+\cr
+\url{https://support.sas.com/documentation/onlinedoc/jmp/12.0/
+ReliabilitySurvivalMethods.pdf}
 }
 \keyword{datasets}

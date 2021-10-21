@@ -10,21 +10,20 @@ A data frame with 48 observations and 3 variables:
   \item{Batch}{Factor with levels \code{b4}, \code{b5} and \code{b8}}
   \item{Month}{Numeric representing the time points of testing from the
                start (0 months) to the end (24 months) of the study.}
-  \item{Related}{Numeric of the measured related substance level in \%LC}
+  \item{Related}{Numeric of the measured related substance levels in \%LC}
 }
 }
 \source{
-\href{http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}{
-      LeBlond \emph{et al}., \emph{J Valid Technol} 2011}
+See reference: Example data sets shown in Table XI.
 }
 \usage{
 data(exp2)
 }
 \description{
 A data set containing the related substance stability data (in \% of label
-claim (LC)) of three batches obtained over a 24 months period of a drug
-product. A total of \eqn{n = 24} independent measurements are available
-(corresponding to data shown in Table XI in LeBlond \emph{et al}).
+claim (LC)) of three batches of a drug product obtained over a 24 months
+period. A total of \eqn{n = 24} independent measurements are available
+(corresponding to data shown in Table XI in LeBlond et al. (2011)).
 }
 \examples{
 \dontrun{exp2}
@@ -32,6 +31,7 @@ product. A total of \eqn{n = 24} independent measurements are available
 \references{
 LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
-(2011) \strong{17}(3): 47-68.
+(2011) \strong{17}(3): 47-68.\cr
+\url{http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
 }
 \keyword{datasets}

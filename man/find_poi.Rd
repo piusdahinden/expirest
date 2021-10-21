@@ -22,7 +22,7 @@ the (time) range within which the minimal distance is expected to be found.}
 \item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
 \item{sl}{A numeric variable specifying the \dQuote{specification limit}
-(SL). Another kind of limit may be regarded as SL.}
+(SL). Another kind of acceptance criterion may be regarded as SL.}
 
 \item{alpha}{A numeric value specifying the significance level of the
 confidence or prediction interval that is calculated for the provided
@@ -42,7 +42,7 @@ a \dQuote{two sided} interval should be calculated, i.e. either
 \code{"lower"}, respectively. The default is \code{"lower"}.}
 
 \item{...}{Additional named or unnamed arguments passed on to
-\code{uniroot()}.}
+\code{\link[stats]{uniroot}()}.}
 }
 \value{
 A numeric value representing the value of \eqn{x} where the distance
@@ -52,7 +52,8 @@ between the two lines of interest is minimal is returned.
 The function \code{find_poi()} determines the point where the distance
 between two lines is minimal, e.g., the distance between a specification or
 expiry limit and a confidence or prediction interval. The estimation is done
-by aid of \code{uniroot()} from the \sQuote{\code{stats}} package.
+by aid of \code{\link[stats]{uniroot}()} from the \sQuote{\code{stats}}
+package.
 }
 \details{
 The function \code{find_poi()} (find the \dQuote{point of
@@ -61,10 +62,11 @@ difference between the upper or lower confidence or prediction interval and
 the upper or lower acceptance criterion (e.g., the specification or the
 expiry limit) is minimal. Confidence or prediction intervals are calculated
 for the \code{model} provided. The POI is determined by aid of the
-\code{uniroot()} function from the \sQuote{\code{stats}} package. The
-distance between the two lines of interest is calculated using the function
-\code{get_distance()}, and it is this distance which \code{uniroot()}
-tries to minimise.
+\code{\link[stats]{uniroot}()} function from the \sQuote{\code{stats}}
+package. The distance between the two lines of interest is calculated using
+the function \code{\link{get_distance}()}, and it is this distance which
+\code{uniroot()} tries to minimise. Recommendations on how to estimate shelf
+life or expiry can be found in the corresponding section below.
 
 #@inheritSection get_distance How to estimate shelf life or expiry
 }
@@ -79,7 +81,7 @@ International Council for Harmonisation of Technical Requirements for
 Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 (CPMP/ICH/420/02).\cr
-\url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
+\url{https://www.ich.org/page/quality-guidelines}
 }
 \seealso{
 \code{\link{get_distance}}, \code{\link[stats]{uniroot}},

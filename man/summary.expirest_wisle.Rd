@@ -7,8 +7,8 @@
 \method{summary}{expirest_wisle}(object, ...)
 }
 \arguments{
-\item{object}{An \sQuote{\code{expirest_wisle}} object, i.e. a list
-returned by the \code{expirest_wisle()} function.}
+\item{object}{An object of class \sQuote{\code{expirest_wisle}} returned
+by the \code{\link{expirest_wisle}()} function.}
 
 \item{...}{Further arguments passed to or from other methods or arguments
 that can be passed down to the \code{\link[base]{formatC}()} function.}
@@ -22,8 +22,27 @@ This is a method for the function \code{summary()} for objects of class
 \sQuote{\code{expirest_wisle}}.
 }
 \details{
-The function \code{summary.expirest_wisle()} prints the most
-relevant information in an \sQuote{\code{expirest_wisle}} object.
+The function \code{\link{expirest_wisle}()} estimates the expiry
+for the specified release and specification limit following the ARGPM
+guidance \dQuote{Stability testing for prescription medicines}. By default,
+batch poolability is checked as recommended by the ICH Q1E guideline at a
+significance level of 0.25. Other levels can be used, although not
+recommended, by changing the default of the \code{alpha_pool} parameter.
+Three possible models may be appropriate, i.e.
+\itemize{
+ \item a \emph{common intercept / common slope} model (cics),
+ \item a \emph{different intercept / common slope} model (dics) or
+ \item a \emph{different intercept / different slope} model (dids).
+}
+
+The worst case intercept is the intercept of the batch whose confidence
+limit is the first crossing the acceptance limit. As in case of the
+\code{cics} model type all batches have a common intercept and a common
+confidence interval, all batches can be regarded as equally worst case. In
+case of the \code{dids} model type, shelf life estimation is done using the
+models obtained from fitting the data of each batch individually. In
+addition to the shelf life estimated according to the ARGPM also the
+estimate according to ICH Q1E is shown.
 }
 \seealso{
 \code{\link{expirest_wisle}}, \code{\link{expirest_osle}},

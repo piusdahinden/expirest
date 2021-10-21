@@ -156,6 +156,8 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
 #' or lower acceptance criterion (i.e. the specification or the expiry limit)
 #' at a certain value of \code{x_new}. The confidence or prediction interval
 #' is calculated for the linear regression model provided by \code{model}.
+#' Recommendations on how to estimate shelf life or expiry can be found in the
+#' corresponding section below.
 #'
 #' @section How to estimate shelf life or expiry:
 #' ICH Q1E recommends that \dQuote{\emph{For an attribute known to decrease with
@@ -235,18 +237,19 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
 #' The function \code{find_poi()} determines the point where the distance
 #' between two lines is minimal, e.g., the distance between a specification or
 #' expiry limit and a confidence or prediction interval. The estimation is done
-#' by aid of \code{uniroot()} from the \sQuote{\code{stats}} package.
+#' by aid of \code{\link[stats]{uniroot}()} from the \sQuote{\code{stats}}
+#' package.
 #'
 #' @param srch_range A vector of length \code{2} specifying the end-points of
 #'   the (time) range within which the minimal distance is expected to be found.
 #' @param model A linear model object of type \sQuote{\code{lm}}.
 #' @param sl A numeric variable specifying the \dQuote{specification limit}
-#'   (SL). Another kind of limit may be regarded as SL.
+#'   (SL). Another kind of acceptance criterion may be regarded as SL.
 #' @param alpha A numeric value specifying the significance level of the
 #'   confidence or prediction interval that is calculated for the provided
 #'   linear model. The default value is \code{0.05}.
 #' @param ... Additional named or unnamed arguments passed on to
-#'   \code{uniroot()}.
+#'   \code{\link[stats]{uniroot}()}.
 #' @inheritParams expirest_osle
 #'
 #' @details The function \code{find_poi()} (find the \dQuote{point of
@@ -255,10 +258,11 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
 #' the upper or lower acceptance criterion (e.g., the specification or the
 #' expiry limit) is minimal. Confidence or prediction intervals are calculated
 #' for the \code{model} provided. The POI is determined by aid of the
-#' \code{uniroot()} function from the \sQuote{\code{stats}} package. The
-#' distance between the two lines of interest is calculated using the function
-#' \code{get_distance()}, and it is this distance which \code{uniroot()}
-#' tries to minimise.
+#' \code{\link[stats]{uniroot}()} function from the \sQuote{\code{stats}}
+#' package. The distance between the two lines of interest is calculated using
+#' the function \code{\link{get_distance}()}, and it is this distance which
+#' \code{uniroot()} tries to minimise. Recommendations on how to estimate shelf
+#' life or expiry can be found in the corresponding section below.
 #'
 #' #@inheritSection get_distance How to estimate shelf life or expiry
 #'
@@ -436,7 +440,7 @@ get_xformed_variables <- function(data, response_vbl, time_vbl,
 #' @details The function \code{get_variable_list()} makes a list of the
 #' variable names. If data have been transformed, the list comprises the
 #' original variable name(s) (with suffix .orig in the corresponding list
-#' element names) and of the transformed variable name(s).
+#' element names) and the transformed variable name(s).
 #'
 #' @return A list with the variable names. If the data have been transformed,
 #' the list element names of the original variables have the suffix
@@ -529,20 +533,27 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 #' \item{rl.orig}{An optional element containing a numeric value or a numeric
 #'   vector specifying the release limit(s) on the original scale.}
 #' \item{rl.sf}{An optional element containing a numeric value or a numeric
-#'   vector specifying the significant figures of the release  limit(s).}
+#'   vector specifying the significant figures of the release limit(s).}
 #' \item{rl}{An optional element containing a numeric value or a numeric vector
-#'   of the adjusted release limit(s).}
+#'   of the adjusted (as specified by the \code{sf.option} parameter) release
+#'   limit(s).}
+#' \item{rl.trfmd}{An optional element containing a numeric value or a numeric
+#'   vector of the adjusted and transformed, if applicable (as specified by the
+#'   the \code{sf.option} parameter and the second element of the \code{xform}
+#'   parameter, respectively), release limit(s), otherwise the same as
+#'   \code{rl}.}
 #' \item{sl.orig}{A numeric value or a numeric vector of length \code{2}
 #'   specifying the specification limit(s) on the original scale.}
+#' \item{sl.sf}{A numeric value or a numeric vector of length \code{2}
+#'   specifying the significant figures of the specification limit(s).}
 #' \item{sl}{A numeric value or a numeric vector of length \code{2} of the
-#'   adjusted specification limit(s).}
-#' \item{rl.trfmd}{An optional element containing the numeric value or a numeric
-#'   vector of the adjusted and transformed (as specified by the second element
-#'   of the \code{xform} parameter) release limit(s).}
-#' \item{sl.trfmd}{An optional element containing the numeric value or a numeric
-#'   vector of length \code{2} of the adjusted and transformed (as specified
-#'   by the second element of the \code{xform} parameter) specification
+#'   adjusted (as specified by the \code{sf.option} parameter) specification
 #'   limit(s).}
+#' \item{sl.trfmd}{A numeric value or a numeric vector of length \code{2} of
+#'   the adjusted and transformed, if applicable (as specified by the the
+#'   \code{sf.option} parameter and the second element of the \code{xform}
+#'   parameter, respectively) specification limit(s), otherwise the same as
+#'   \code{sl}.}
 #'
 #' @keywords internal
 
@@ -730,14 +741,13 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
 #' life or expiry limit is estimated as the point where the upper or lower
 #' limit of the 95\% confidence interval of the linear model fitted to the
 #' data intersects the wcs limit. The wcs limit is obtained by
-#' adding/subtracting the absolute difference of specification limit and the
+#' adding/subtracting the absolute difference of specification limit and
 #' release limit to/from the common intercept of the test batches or the
 #' intercept of the worst performing batch.
 #'
 #' If data have been linearised by transformation, all elements, i.e. \code{rl},
 #' \code{sl} and \code{intercept} must be on the same, i.e. transformed, scale.
-#' The results are returned on the transformed scale and also on the original
-#' scale.
+#' The results are returned on the transformed scale and on the original scale.
 #'
 #' @return A list with the following elements is returned:
 #' \item{xform}{A vector of two character strings specifying the transformation
@@ -979,7 +989,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 #' @return A list with a single element containing the numeric value or a
 #' numeric vector of the intercept(s) or, if the data have been transformed,
 #' a list with an additional element that contains the numeric value or numeric
-#' vector in the first element on the original scale.
+#' vector on the original scale.
 #'
 #' @importFrom stats coef
 #' @importFrom stats formula
@@ -1093,8 +1103,8 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
 
 #' Print value(s)
 #'
-#' The function \code{print_val()} generates a string for the purpose to print
-#' a value on a plot (together with associated information).
+#' The function \code{print_val()} generates a character string for the purpose
+#' to print a value on a plot (together with associated information).
 #'
 #' @param val_name A character string specifying the text preceding the value
 #'   of the parameter to be displayed.
@@ -1109,15 +1119,16 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
 #' @param suffix A character string at the end of the whole text. The default
 #'   is an empty string, i.e. \code{""}.
 #'
-#' @details The function \code{print_val()} generates a string that is based on
-#' the provided information. The string is used as label of a corresponding
-#' graph element. For the number formatting, the \code{sprintf()} function from
-#' the \sQuote{\code{base}} package is used. For concatenation of the various
-#' elements, the \code{paste()} function from the \sQuote{\code{base}} package
+#' @details The function \code{print_val()} generates a character string that
+#' is based on the provided information. The string is used as label of a
+#' corresponding graph element. For the number formatting, the
+#' \code{\link[base]{sprintf}()} function from the \sQuote{\code{base}} package
+#' is used. For concatenation of the various elements, the
+#' \code{\link[base]{paste}()} function from the \sQuote{\code{base}} package
 #' is used.
 #'
-#' @return A single string of the form \dQuote{val_name: val_value (with
-#' the number of specified decimal places) val_unit}.
+#' @return A single character string of the form \dQuote{val_name: val_value
+#' (with the number of specified decimal places) val_unit}.
 #'
 #' @seealso \code{\link[base]{formatC}}, \code{\link[base]{paste}}.
 #'

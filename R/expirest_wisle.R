@@ -1,12 +1,12 @@
 #' What-if (approach for) shelf life estimation (wisle)
 #'
 #' Based on a linear regression model fitted to a stability data set the
-#' function \code{expirest_wisle()} estimates the expiry for the specified
-#' release and specification limit following the ARGPM guidance
-#' \dQuote{Stability testing for prescription medicines}. The abbreviation
-#' \dQuote{wisle} stands for \dQuote{what-if shelf life estimation} (because
-#' it estimates the shelf life (\dQuote{what}) for a given release limit
-#' (\dQuote{if})).
+#' function \code{expirest_wisle()} estimates the shelf life, or retest period,
+#' for the specified release and specification limit following the ARGPM
+#' guidance \dQuote{Stability testing for prescription medicines}. The
+#' abbreviation \dQuote{wisle} stands for \dQuote{what-if shelf life estimation}
+#' (because it estimates the shelf life (\dQuote{what}) for a given release
+#' limit (\dQuote{if})).
 #'
 #' @param rl A numeric value or a numeric vector specifying the release
 #'   specification limit(s) for which the corresponding expiry should be
@@ -20,9 +20,9 @@
 #' Australian Regulatory Guidelines for Prescription Medicines (ARGPM), i.e.
 #' the guidance \dQuote{Stability testing for prescription medicines}, is
 #' binding. In chapter 14.3.1, \dQuote{Predicting shelf life from stability
-#' data}, it is described how the estimation should be done. It reads as
-#' follows: \cr
-#' Take into account the worst case situation at batch release. For example:
+#' data}, it is described how the estimation should be done. It recommends
+#' to take the worst case situation at batch release into account. The
+#' following examples are listed:
 #' \describe{
 #'  \item{1a)}{For medicine that has a lower Assay release limit of 95 per cent
 #'    and a lower assay expiry limit of 90 per cent, the maximum decrease in
@@ -44,8 +44,7 @@
 #'    0.3 per cent).}
 #' }
 #'
-#' Therefore, according to the ARGPM guidance \dQuote{Stability testing for
-#' prescription medicines}, it is necessary to define
+#' Consequently, it is necessary to define
 #' \itemize{
 #'  \item a release limit and
 #'  \item an expiry limit or shelf life limit (usually the specification limit).
@@ -64,17 +63,22 @@
 #' In this package, this point is called the \dQuote{point of intersection} or
 #' \dQuote{point of interest}, abbreviated POI.
 #'
+#' Before performing the retest period or shelf life estimation the most
+#' suitable model should be determined. It should particularly be verified
+#' if data of all test batches are poolable or not. Details on this are
+#' described in section \dQuote{Checking batch poolability} below.
+#'
 #' @inheritSection expirest_osle Checking batch poolability
 #'
 #' @return An object of class \sQuote{\code{expirest_wisle}} is returned,
-#' containing the following list elements:
+#' containing the following elements:
 #' \item{Data}{Data frame of the original data including new columns with
 #'   transformed variables, if applicable.}
 #' \item{Parameters}{A list of the parameters with the elements \code{alpha},
 #'   \code{alpha.pool}, \code{ivl}, \code{ivl.type} and \code{ivl.side}.}
 #' \item{Variables}{A list of the variable names, i.e. the original names of
-#'   the \code{batch_vbl}, the \code{time_vbl} and the \code{response_vbl} and,
-#'   if applicable, of the transformed variables.}
+#'   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
+#'   applicable, of the transformed variables.}
 #' \item{Model.Type}{A list of five elements specifying which model, based on
 #'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
 #'   is a numeric vector of length 2 specifying the best model accepted at the
@@ -84,10 +88,13 @@
 #'   element (\code{type.acronym}) is an acronym representing the first item.
 #'   The third to fifth elements contain the names of the model variables, i.e.
 #'   \code{response.vbl}, \code{time.vbl} and \code{batch.vbl}.}
-#' \item{Models}{A list of all possible models (i.e. \sQuote{\code{lm}}
-#'   objects) that are relevant, i.e. \code{cics}, \code{dics} and \code{dids}.
-#'   The second element of the list is a string summarising the information in
-#'   the first element, i.e. either \code{cics}, \code{dics} or \code{dids}.}
+#' \item{Models}{A list of four elements named \code{cics}, \code{dics},
+#'   \code{dids} and \code{individual}. The first three elements contain the
+#'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
+#'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
+#'   and \dQuote{different intercept / different slope} (\code{dids}) models.
+#'   The fourth element is a list of the \sQuote{\code{lm}} objects of the
+#'   models obtained from fitting the data of each batch individually.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
 #'   values of each of the three fitted models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
@@ -95,11 +102,15 @@
 #' \item{wc.icpt}{A data frame of the worst case intercepts of each of the
 #'   three fitted models.}
 #' \item{wc.batch}{A list of numeric value(s) of the worst case batch(es) per
-#'   model type.}
+#'   model type. In case of the \code{dids} model type, the estimation is done
+#'   using the models obtained from fitting the data of each batch
+#'   individually.}
 #' \item{Limits}{A list of all limits.}
 #' \item{POI}{A data frame of the intercepts, the differences between release
 #'   and shelf life limits, the WCSLs, the expiry and release specification
-#'   limits, the shelf lives and POI values.}
+#'   limits, the shelf lives and POI values. In case of the \code{dids} model
+#'   type, the estimation of the POI values is done using the models obtained
+#'   from fitting the data of each batch individually.}
 #'
 #' The \code{POI} data frame has the following columns:
 #' \item{Intercept.cics}{The intercept of the worst case batch for the cics
@@ -138,11 +149,11 @@
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).\cr
-#' \url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
+#' \url{https://www.ich.org/page/quality-guidelines}
 #'
 #' @seealso \code{\link{expirest_osle}}, \code{\link{find_poi}},
 #' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-#' \code{\link[stats]{AIC}}.
+#' \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 #'
 #' @example man/examples/examples_expirest_wisle.R
 #'
@@ -758,41 +769,41 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 
 #' Illustrating the what-if (approach for) shelf life estimate (wisle)
 #'
-#' The function \code{print_expirest_wisle()} makes a graphical display of the
-#' shelf life estimate done by the \code{expirest_wisle()} function.
+#' The function \code{plot_expirest_wisle()} makes a graphical display of the
+#' shelf life estimate done by the \code{\link{expirest_wisle}()} function.
 #'
 #' @param model An \sQuote{\code{expirest_wisle}} object, i.e. a list returned
-#'   by the \code{expirest_wisle()} function.
+#'   by the \code{\link{expirest_wisle}()} function.
 #' @param rl_index A positive integer specifying which of the release limit
-#'   values that have been handed over to \code{expirest_wisle()} should be
-#'   displayed. The default value is \code{1}.
+#'   values that have been handed over to \code{\link{expirest_wisle}()} should
+#'   be displayed. The default value is \code{1}.
 #' @param scenario A character string specifying if the plot should be extended
 #'   (with respect to the \eqn{x} axis) up to the \dQuote{standard scenario}
-#'   (\code{standard}) or up to the \dQuote{worst case scenario} (\code{worst}).
-#'   The default is \code{standard}.
-#' @param plot_option A character string of either \code{full}, \code{lean1},
-#'   \code{lean2}, \code{basic1} and \code{basic2}, specifying if all the
-#'   information should be shown in the plot (option \code{full}) or only basic
-#'   information (options \code{lean} and \code{basic}). Full means the data
-#'   points, the fitted regression line with the confidence or prediction
-#'   interval, the specification limit(s) and the estimated shelf life. The
-#'   default is \code{full}.
+#'   (\code{"standard"}) or up to the \dQuote{worst case scenario}
+#'   (\code{"worst"}). The default is \code{"standard"}.
+#' @param plot_option A character string of either \code{"full"},
+#'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
+#'   specifying if all the information should be shown in the plot (option
+#'   \code{"full"}) or only basic information (options \code{"lean"} and
+#'   \code{"basic"}). Full means the data points, the fitted regression line
+#'   with the confidence or prediction interval, the specification limit(s)
+#'   and the estimated shelf life. The default is \code{"full"}.
 #' @inheritParams plot_expirest_osle
 #'
-#' @details The function \code{plot.expirest_wisle()} uses the data and the
+#' @details The function \code{plot_expirest_wisle()} uses the data and the
 #' information about the linear model that was used for the estimation of
 #' the shelf life by aid of the \code{\link{expirest_wisle}()} function. It
 #' plots a graph of the time course of a parameter, a linear regression line
 #' fitted to the data and the associated confidence or prediction interval.
 #' In addition, it shows features of the worst case scenario shelf life
-#' estimation as proposed in the Australian Regulatory Guidelines for
-#' Prescription Medicines (ARGPM).
-#' It uses the \code{\link[ggplot2]{ggplot}()} function from the
-#' \sQuote{\code{ggplot2}} package for plotting. The various arguments can be
+#' estimation.
+#'
+#' For plotting, the \code{\link[ggplot2]{ggplot}()} function from the
+#' \sQuote{\code{ggplot2}} package is used. The various arguments can be
 #' used to control the appearance of the plot. The \sQuote{\code{ggplot2}}
-#' object of the plot is contained in the \code{Graph} element of the list
-#' that is returned by \code{plot.expirest_wisle()} and can be used to modify
-#' the appearance of the graph.
+#' object of the generated plot is contained in the \code{Graph} element of
+#' the list that is returned by \code{\link{plot_expirest_wisle}()} and can be
+#' used to modify the appearance of the graph.
 #'
 #' @return A list with the following elements is returned invisibly:
 #' \item{Model}{The \sQuote{\code{expirest_wisle}} object that was passed via

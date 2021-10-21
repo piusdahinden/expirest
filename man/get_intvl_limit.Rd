@@ -19,9 +19,9 @@ confidence or prediction interval limit(s) should be calculated.}
 
 \item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
-\item{alpha}{A numeric value specifying the significance level for the
-calculation of confidence or prediction intervals. The default value is
-\code{0.05}.}
+\item{alpha}{A numeric value between 0 and 1 specifying the significance
+level for the calculation of confidence or prediction intervals. The
+default is \code{0.05}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
 \code{"prediction"}, i.e. specifying the type of interval of interest.

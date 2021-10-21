@@ -26,19 +26,20 @@ default is an empty string, i.e. \code{""}.}
 is an empty string, i.e. \code{""}.}
 }
 \value{
-A single string of the form \dQuote{val_name: val_value (with
-the number of specified decimal places) val_unit}.
+A single character string of the form \dQuote{val_name: val_value
+(with the number of specified decimal places) val_unit}.
 }
 \description{
-The function \code{print_val()} generates a string for the purpose to print
-a value on a plot (together with associated information).
+The function \code{print_val()} generates a character string for the purpose
+to print a value on a plot (together with associated information).
 }
 \details{
-The function \code{print_val()} generates a string that is based on
-the provided information. The string is used as label of a corresponding
-graph element. For the number formatting, the \code{sprintf()} function from
-the \sQuote{\code{base}} package is used. For concatenation of the various
-elements, the \code{paste()} function from the \sQuote{\code{base}} package
+The function \code{print_val()} generates a character string that
+is based on the provided information. The string is used as label of a
+corresponding graph element. For the number formatting, the
+\code{\link[base]{sprintf}()} function from the \sQuote{\code{base}} package
+is used. For concatenation of the various elements, the
+\code{\link[base]{paste}()} function from the \sQuote{\code{base}} package
 is used.
 }
 \seealso{

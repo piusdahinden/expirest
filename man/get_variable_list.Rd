@@ -38,6 +38,6 @@ if applicable, the transformed variable names.
 The function \code{get_variable_list()} makes a list of the
 variable names. If data have been transformed, the list comprises the
 original variable name(s) (with suffix .orig in the corresponding list
-element names) and of the transformed variable name(s).
+element names) and the transformed variable name(s).
 }
 \keyword{internal}

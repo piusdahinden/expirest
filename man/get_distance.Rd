@@ -30,9 +30,9 @@ specification limit and the release limit (RL). If it is the upper limit
 which is the relevant limit, it is added (\code{+}) to the intercept,
 otherwise it is subtracted (\code{-}) from the intercept.}
 
-\item{alpha}{A numeric value specifying the significance level for the
-calculation of confidence or prediction intervals. The default value is
-\code{0.05}.}
+\item{alpha}{A numeric value between 0 and 1 specifying the significance
+level for the calculation of confidence or prediction intervals. The
+default is \code{0.05}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
 \code{"prediction"}, i.e. specifying the type of interval of interest.
@@ -61,6 +61,8 @@ between the upper or lower confidence or prediction interval and the upper
 or lower acceptance criterion (i.e. the specification or the expiry limit)
 at a certain value of \code{x_new}. The confidence or prediction interval
 is calculated for the linear regression model provided by \code{model}.
+Recommendations on how to estimate shelf life or expiry can be found in the
+corresponding section below.
 }
 \section{How to estimate shelf life or expiry}{
 
@@ -94,7 +96,7 @@ International Council for Harmonisation of Technical Requirements for
 Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 (CPMP/ICH/420/02).\cr
-\url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
+\url{https://www.ich.org/page/quality-guidelines}
 }
 \seealso{
 \code{\link{find_poi}}, \code{\link{expirest_osle}},

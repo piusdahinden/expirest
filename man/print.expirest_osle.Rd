@@ -7,23 +7,39 @@
 \method{print}{expirest_osle}(x, ...)
 }
 \arguments{
-\item{x}{An \sQuote{\code{expirest_osle}} object, i.e. a list returned by
-the \code{expirest_osle()} function.}
+\item{x}{An object of class \sQuote{\code{expirest_osle}} returned by
+the \code{\link{expirest_osle}()} function.}
 
 \item{...}{Further arguments passed to or from other methods or arguments
 that can be passed down to the \code{\link[base]{formatC}()} function.}
 }
 \value{
-The \sQuote{\code{expirest_osle}} object passed to the
-\code{object} parameter is returned invisibly.
+The \sQuote{\code{expirest_osle}} object passed to the \code{x}
+parameter is returned invisibly.
 }
 \description{
 This is a method for the function \code{print()} for objects of class
 \sQuote{\code{expirest_osle}}.
 }
 \details{
-The function \code{print.expirest_osle()} prints the most relevant
-information in an \sQuote{\code{expirest_osle}} object.
+The function \code{\link{expirest_osle}()} estimates the shelf
+life, or retest period, following the ICH Q1E guideline. By default, batch
+poolability is checked as recommended by the guideline at a significance
+level of 0.25. Other levels can be used, although not recommended, by
+changing the default of the \code{alpha_pool} parameter. Three possible
+models may be appropriate, i.e.
+\itemize{
+ \item a \emph{common intercept / common slope} model (cics),
+ \item a \emph{different intercept / common slope} model (dics) or
+ \item a \emph{different intercept / different slope} model (dids).
+}
+
+The worst case intercept is the intercept of the batch whose confidence
+limit is the first crossing the acceptance limit. As in case of the
+\code{cics} model type all batches have a common intercept and a common
+confidence interval, all batches can be regarded as equally worst case. In
+case of the \code{dids} model type, shelf life estimation is done using the
+models obtained from fitting the data of each batch individually.
 }
 \seealso{
 \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},

@@ -15,23 +15,21 @@ A data frame with 53 observations and 3 variables:
 }
 }
 \source{
-\href{http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}{
-      LeBlond \emph{et al}., \emph{J Valid Technol} 2011}
+See reference: Example data sets shown in Tables IV, VI and VIII.
 }
 \usage{
 data(exp1)
 }
 \description{
 A data set containing the potency stability data (in \% of label claim (LC))
-of five batches obtained over a 24 months period of a drug product. A total
+of five batches of a drug product obtained over a 24 months period. A total
 of \eqn{n = 53} independent measurements are available (corresponding to
-data shown in Tables IV, VI and VIII in LeBlond \emph{et al}). Data in Table
-IV of LeBlond \emph{et al} (batches \code{b2}, \code{b5} and \code{b7}) are
-compatible with a common intercept / common slope (cics) model, data in
-Table VI (batches \code{b3}, \code{b4} and \code{b5}) with a different
-intercept / common slope (dics) model  and data in Table VIII (bathes
-\code{b4}, \code{b5} and \code{b8}) with a different intercept / different
-slope (dids) model.
+data shown in Tables IV, VI and VIII in LeBlond et al. (2011)). Data in
+Table IV (batches \code{b2}, \code{b5} and \code{b7}) are compatible with a
+common intercept / common slope (cics) model, data in Table VI (batches
+\code{b3}, \code{b4} and \code{b5}) with a different intercept / common slope
+(dics) model  and data in Table VIII (bathes \code{b4}, \code{b5} and
+\code{b8}) with a different intercept / different slope (dids) model.
 }
 \examples{
 \dontrun{exp1}
@@ -39,6 +37,7 @@ slope (dids) model.
 \references{
 LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
-(2011) \strong{17}(3): 47-68.
+(2011) \strong{17}(3): 47-68.\cr
+\url{http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
 }
 \keyword{datasets}

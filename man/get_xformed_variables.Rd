@@ -36,11 +36,7 @@ for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
 \eqn{x} variable and the second element to the \eqn{y} variable. The
 purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
-default is \code{c(0, 0)}. For transformation of the \eqn{x} variable
-\eqn{1} should be chosen as shift parameter in case of \code{log} and
-\eqn{0} in case of \code{sqrt} and \code{sq} transformation because
-then the intercept will be at \eqn{x = 0}. For transformation of the
-\eqn{y} variable any value can be chosen as shift parameter.}
+default is \code{c(0, 0)}.}
 }
 \value{
 The provided data frame with (a) new column(s) of the transformed

@@ -3,16 +3,32 @@
 #' This is a method for the function \code{summary()} for objects of class
 #' \sQuote{\code{expirest_osle}}.
 #'
-#' @param object An \sQuote{\code{expirest_osle}} object, i.e. a list returned
-#'   by the \code{expirest_osle()} function.
+#' @param object An object of class \sQuote{\code{expirest_osle}} returned
+#'   by the \code{\link{expirest_osle}()} function.
 #' @param ... Further arguments passed to or from other methods or arguments
 #'   that can be passed down to the \code{\link[base]{formatC}()} function.
 #'
-#' @details The function \code{summary.expirest_osle()} prints the most
-#' relevant information in an \sQuote{\code{expirest_osle}} object.
+#' @details The function \code{\link{expirest_osle}()} estimates the shelf
+#' life, or retest period, following the ICH Q1E guideline. By default, batch
+#' poolability is checked as recommended by the guideline at a significance
+#' level of 0.25. Other levels can be used, although not recommended, by
+#' changing the default of the \code{alpha_pool} parameter. Three possible
+#' models may be appropriate, i.e.
+#' \itemize{
+#'  \item a \emph{common intercept / common slope} model (cics),
+#'  \item a \emph{different intercept / common slope} model (dics) or
+#'  \item a \emph{different intercept / different slope} model (dids).
+#' }
 #'
-#' @return The \sQuote{\code{expirest_osle}} object passed to the
-#' \code{object} parameter is returned invisibly.
+#' The worst case intercept is the intercept of the batch whose confidence
+#' limit is the first crossing the acceptance limit. As in case of the
+#' \code{cics} model type all batches have a common intercept and a common
+#' confidence interval, all batches can be regarded as equally worst case. In
+#' case of the \code{dids} model type, shelf life estimation is done using the
+#' models obtained from fitting the data of each batch individually.
+#'
+#' @return The \sQuote{\code{expirest_osle}} object passed to the \code{object}
+#' parameter is returned invisibly.
 #'
 #' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
 #' \code{\link[base]{formatC}}, \code{\link[utils]{methods}}.
@@ -69,14 +85,14 @@ summary.expirest_osle <- function(object, ...) {
 #' This is a method for the function \code{print()} for objects of class
 #' \sQuote{\code{expirest_osle}}.
 #'
-#' @param x An \sQuote{\code{expirest_osle}} object, i.e. a list returned by
-#'   the \code{expirest_osle()} function.
+#' @param x An object of class \sQuote{\code{expirest_osle}} returned by
+#'   the \code{\link{expirest_osle}()} function.
 #' @inheritParams summary.expirest_osle
 #'
-#' @details The function \code{print.expirest_osle()} prints the most relevant
-#' information in an \sQuote{\code{expirest_osle}} object.
+#' @return The \sQuote{\code{expirest_osle}} object passed to the \code{x}
+#' parameter is returned invisibly.
 #'
-#' @inherit summary.expirest_osle return seealso
+#' @inherit summary.expirest_osle details seealso
 #'
 #' @export
 
@@ -94,13 +110,32 @@ print.expirest_osle <- function(x, ...) {
 #' This is a method for the function \code{summary()} for objects of class
 #' \sQuote{\code{expirest_wisle}}.
 #'
-#' @param object An \sQuote{\code{expirest_wisle}} object, i.e. a list
-#'   returned by the \code{expirest_wisle()} function.
+#' @param object An object of class \sQuote{\code{expirest_wisle}} returned
+#'   by the \code{\link{expirest_wisle}()} function.
 #' @param ... Further arguments passed to or from other methods or arguments
 #'   that can be passed down to the \code{\link[base]{formatC}()} function.
 #'
-#' @details The function \code{summary.expirest_wisle()} prints the most
-#' relevant information in an \sQuote{\code{expirest_wisle}} object.
+#' @details The function \code{\link{expirest_wisle}()} estimates the expiry
+#' for the specified release and specification limit following the ARGPM
+#' guidance \dQuote{Stability testing for prescription medicines}. By default,
+#' batch poolability is checked as recommended by the ICH Q1E guideline at a
+#' significance level of 0.25. Other levels can be used, although not
+#' recommended, by changing the default of the \code{alpha_pool} parameter.
+#' Three possible models may be appropriate, i.e.
+#' \itemize{
+#'  \item a \emph{common intercept / common slope} model (cics),
+#'  \item a \emph{different intercept / common slope} model (dics) or
+#'  \item a \emph{different intercept / different slope} model (dids).
+#' }
+#'
+#' The worst case intercept is the intercept of the batch whose confidence
+#' limit is the first crossing the acceptance limit. As in case of the
+#' \code{cics} model type all batches have a common intercept and a common
+#' confidence interval, all batches can be regarded as equally worst case. In
+#' case of the \code{dids} model type, shelf life estimation is done using the
+#' models obtained from fitting the data of each batch individually. In
+#' addition to the shelf life estimated according to the ARGPM also the
+#' estimate according to ICH Q1E is shown.
 #'
 #' @return The \sQuote{\code{expirest_wisle}} object passed to the
 #' \code{object} parameter is returned invisibly.
@@ -175,14 +210,14 @@ summary.expirest_wisle <- function(object, ...) {
 #' This is a method for the function \code{print()} for objects of class
 #' \sQuote{\code{expirest_wisle}}.
 #'
-#' @param x an \sQuote{\code{expirest_wisle}} object, i.e. a list returned by
+#' @param x An object of class \sQuote{\code{expirest_wisle}} returned by
 #'   the \code{expirest_wisle()} function.
 #' @inheritParams summary.expirest_wisle
 #'
-#' @details The function \code{print.expirest_wisle()} prints the most relevant
-#' information in an \sQuote{\code{expirest_wisle}} object.
+#' @return The \sQuote{\code{expirest_wisle}} object passed to the
+#' \code{x} parameter is returned invisibly.
 #'
-#' @inherit summary.expirest_wisle return seealso
+#' @inherit summary.expirest_wisle details seealso
 #'
 #' @export
 

@@ -53,20 +53,20 @@ the form \code{c(lower limit, upper limit)}.}
 
 \item{sl_sf}{A positive integer or a vector of positive integers specifying
 the number of \dQuote{significant figures} (sf) of \code{sl}. It must have
-the same length as \code{sf}.}
+the same length as \code{sl}.}
 
 \item{srch_range}{A vector of length \code{2} specifying the end-points of
 the (time) range that is supposed to contain the shelf life or retest
 period.}
 
-\item{alpha}{A numeric value specifying the significance level for the
-calculation of confidence or prediction intervals. The default value is
-\code{0.05}.}
+\item{alpha}{A numeric value between 0 and 1 specifying the significance
+level for the calculation of confidence or prediction intervals. The
+default is \code{0.05}.}
 
-\item{alpha_pool}{A numeric value specifying the type I error rate for the
-test of the poolability of the batches. The default value is \code{0.25},
-following ICH Q1E guideline. The value should not be changed unless
-supported by well-founded reasons.}
+\item{alpha_pool}{A numeric value between 0 and 1 specifying the type I
+error rate for the test of the poolability of the batches. The default
+is \code{0.25}, following ICH Q1E guideline. The value should not be
+changed unless supported by well-founded reasons.}
 
 \item{xform}{A vector of two character strings specifying the transformation
 of the response and the time variable. The default is \dQuote{no}
@@ -82,11 +82,7 @@ for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
 \eqn{x} variable and the second element to the \eqn{y} variable. The
 purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
-default is \code{c(0, 0)}. For transformation of the \eqn{x} variable
-\eqn{1} should be chosen as shift parameter in case of \code{log} and
-\eqn{0} in case of \code{sqrt} and \code{sq} transformation because
-then the intercept will be at \eqn{x = 0}. For transformation of the
-\eqn{y} variable any value can be chosen as shift parameter.}
+default is \code{c(0, 0)}.}
 
 \item{sf_option}{A character string specifying if the limits (\code{rl}
 or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
@@ -118,14 +114,14 @@ a \dQuote{two sided} interval should be calculated, i.e. either
 }
 \value{
 An object of class \sQuote{\code{expirest_wisle}} is returned,
-containing the following list elements:
+containing the following elements:
 \item{Data}{Data frame of the original data including new columns with
   transformed variables, if applicable.}
 \item{Parameters}{A list of the parameters with the elements \code{alpha},
   \code{alpha.pool}, \code{ivl}, \code{ivl.type} and \code{ivl.side}.}
 \item{Variables}{A list of the variable names, i.e. the original names of
-  the \code{batch_vbl}, the \code{time_vbl} and the \code{response_vbl} and,
-  if applicable, of the transformed variables.}
+  \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
+  applicable, of the transformed variables.}
 \item{Model.Type}{A list of five elements specifying which model, based on
   the ANCOVA analysis, suits best. The first element (\code{type.spec})
   is a numeric vector of length 2 specifying the best model accepted at the
@@ -135,10 +131,13 @@ containing the following list elements:
   element (\code{type.acronym}) is an acronym representing the first item.
   The third to fifth elements contain the names of the model variables, i.e.
   \code{response.vbl}, \code{time.vbl} and \code{batch.vbl}.}
-\item{Models}{A list of all possible models (i.e. \sQuote{\code{lm}}
-  objects) that are relevant, i.e. \code{cics}, \code{dics} and \code{dids}.
-  The second element of the list is a string summarising the information in
-  the first element, i.e. either \code{cics}, \code{dics} or \code{dids}.}
+\item{Models}{A list of four elements named \code{cics}, \code{dics},
+  \code{dids} and \code{individual}. The first three elements contain the
+  \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
+  (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
+  and \dQuote{different intercept / different slope} (\code{dids}) models.
+  The fourth element is a list of the \sQuote{\code{lm}} objects of the
+  models obtained from fitting the data of each batch individually.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
   values of each of the three fitted models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
@@ -146,11 +145,15 @@ containing the following list elements:
 \item{wc.icpt}{A data frame of the worst case intercepts of each of the
   three fitted models.}
 \item{wc.batch}{A list of numeric value(s) of the worst case batch(es) per
-  model type.}
+  model type. In case of the \code{dids} model type, the estimation is done
+  using the models obtained from fitting the data of each batch
+  individually.}
 \item{Limits}{A list of all limits.}
 \item{POI}{A data frame of the intercepts, the differences between release
   and shelf life limits, the WCSLs, the expiry and release specification
-  limits, the shelf lives and POI values.}
+  limits, the shelf lives and POI values. In case of the \code{dids} model
+  type, the estimation of the POI values is done using the models obtained
+  from fitting the data of each batch individually.}
 
 The \code{POI} data frame has the following columns:
 \item{Intercept.cics}{The intercept of the worst case batch for the cics
@@ -180,21 +183,21 @@ The \code{POI} data frame has the following columns:
 }
 \description{
 Based on a linear regression model fitted to a stability data set the
-function \code{expirest_wisle()} estimates the expiry for the specified
-release and specification limit following the ARGPM guidance
-\dQuote{Stability testing for prescription medicines}. The abbreviation
-\dQuote{wisle} stands for \dQuote{what-if shelf life estimation} (because
-it estimates the shelf life (\dQuote{what}) for a given release limit
-(\dQuote{if})).
+function \code{expirest_wisle()} estimates the shelf life, or retest period,
+for the specified release and specification limit following the ARGPM
+guidance \dQuote{Stability testing for prescription medicines}. The
+abbreviation \dQuote{wisle} stands for \dQuote{what-if shelf life estimation}
+(because it estimates the shelf life (\dQuote{what}) for a given release
+limit (\dQuote{if})).
 }
 \details{
 For the shelf life estimation for submissions in Australia the
 Australian Regulatory Guidelines for Prescription Medicines (ARGPM), i.e.
 the guidance \dQuote{Stability testing for prescription medicines}, is
 binding. In chapter 14.3.1, \dQuote{Predicting shelf life from stability
-data}, it is described how the estimation should be done. It reads as
-follows: \cr
-Take into account the worst case situation at batch release. For example:
+data}, it is described how the estimation should be done. It recommends
+to take the worst case situation at batch release into account. The
+following examples are listed:
 \describe{
  \item{1a)}{For medicine that has a lower Assay release limit of 95 per cent
    and a lower assay expiry limit of 90 per cent, the maximum decrease in
@@ -216,8 +219,7 @@ Take into account the worst case situation at batch release. For example:
    0.3 per cent).}
 }
 
-Therefore, according to the ARGPM guidance \dQuote{Stability testing for
-prescription medicines}, it is necessary to define
+Consequently, it is necessary to define
 \itemize{
  \item a release limit and
  \item an expiry limit or shelf life limit (usually the specification limit).
@@ -235,6 +237,11 @@ release limit, where this differences is added (\eqn{+}) if the upper limit
 is relevant or it is subtracted (\eqn{-}) if the lower limit is relevant.
 In this package, this point is called the \dQuote{point of intersection} or
 \dQuote{point of interest}, abbreviated POI.
+
+Before performing the retest period or shelf life estimation the most
+suitable model should be determined. It should particularly be verified
+if data of all test batches are poolable or not. Details on this are
+described in section \dQuote{Checking batch poolability} below.
 }
 \section{Checking batch poolability}{
 
@@ -324,10 +331,10 @@ International Council for Harmonisation of Technical Requirements for
 Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 (CPMP/ICH/420/02).\cr
-\url{https://database.ich.org/sites/default/files/Q1E\%20Guideline.pdf}
+\url{https://www.ich.org/page/quality-guidelines}
 }
 \seealso{
 \code{\link{expirest_osle}}, \code{\link{find_poi}},
 \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-\code{\link[stats]{AIC}}.
+\code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 }

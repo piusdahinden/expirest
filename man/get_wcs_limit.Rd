@@ -38,11 +38,7 @@ for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
 \eqn{x} variable and the second element to the \eqn{y} variable. The
 purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
-default is \code{c(0, 0)}. For transformation of the \eqn{x} variable
-\eqn{1} should be chosen as shift parameter in case of \code{log} and
-\eqn{0} in case of \code{sqrt} and \code{sq} transformation because
-then the intercept will be at \eqn{x = 0}. For transformation of the
-\eqn{y} variable any value can be chosen as shift parameter.}
+default is \code{c(0, 0)}.}
 
 \item{ivl_side}{A character string specifying if the \dQuote{upper} or the
 \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
@@ -79,14 +75,13 @@ testing for prescription medicines}. According to this guideline, the shelf
 life or expiry limit is estimated as the point where the upper or lower
 limit of the 95\% confidence interval of the linear model fitted to the
 data intersects the wcs limit. The wcs limit is obtained by
-adding/subtracting the absolute difference of specification limit and the
+adding/subtracting the absolute difference of specification limit and
 release limit to/from the common intercept of the test batches or the
 intercept of the worst performing batch.
 
 If data have been linearised by transformation, all elements, i.e. \code{rl},
 \code{sl} and \code{intercept} must be on the same, i.e. transformed, scale.
-The results are returned on the transformed scale and also on the original
-scale.
+The results are returned on the transformed scale and on the original scale.
 }
 \references{
 Therapeutic Goods Administration (TGA) of the Department of Health of the

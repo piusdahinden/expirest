@@ -1,17 +1,17 @@
 Package: expirest
 Type: Package
-Version: 0.0.0.9006
+Version: 0.0.0.9007
 Title: Expiry Estimation Procedures
 Description: The Australian Regulatory Guidelines for Prescription Medicines
-    (ARGPM), guidance on "Stability testing for prescription medicines"
+    (ARGPM), guidance on \"Stability testing for prescription medicines\"
     <url:https://www.tga.gov.au/stability-testing-prescription-medicines>,
     recommends to predict the shelf life of chemically derived medicines from
-    stability data taking the worst case situation at batch release into
+    stability data by taking the worst case situation at batch release into
     account. Consequently, if a change over time is observed, a release limit
     needs to be specified. Finding a release limit and the associated shelf
     life is supported, as well as the  standard approach that is recommended
-    by guidance Q1E "Evaluation of stability data" from the Internation Council
-    for Harmonisation (ICH)
+    by guidance Q1E \"Evaluation of stability data\" from the Internation
+    Council for Harmonisation (ICH)
     <url:https://database.ich.org/sites/default/files/Q1E%20Guideline.pdf>.
 Authors@R: c(person(given = "Pius",
                     family = "Dahinden",
