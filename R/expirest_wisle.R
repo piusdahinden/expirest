@@ -512,17 +512,18 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   }
 
   if (sum(vapply(l_poi, is.null, logical(1))) > 0) {
-    stop("Not for all POI values for all wcs limits calculated.")
+    stop("Not all POI values for all wcs limits calculated.")
   }
 
   if (sum(vapply(l_prl, is.null, logical(1))) > 0) {
-    stop("Not for all prediction limits for all POI limits calculated.")
+    stop("Not all prediction limits for all POI values calculated.")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of the batches with the confidence or prediction interval
   # limits that are closest to the respective specification limit for each
   # model and each POI
+
   switch(ivl_side,
          "lower" = {
            l_min_dist <- lapply(l_prl, FUN = function(x) {
@@ -539,8 +540,8 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
            })
          })
 
-  if (sum(vapply(l_min_dist, is.null, logical(1))) > 0) {
-    stop("Not for all worst case predicted limits determined.")
+  if (sum(!(names(l_prl) %in% names(l_min_dist))) > 0) {
+    stop("Not all minimal distances (interval - specification) determined.")
   }
 
   # Determination of the smallest POI value for each model and each rl value
@@ -550,48 +551,59 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
     })
   })
 
-  if (sum(vapply(l_min_poi, is.null, logical(1))) > 0) {
-    stop("Not for all minimal POI limits for all POI limits determined.")
+  if (sum(!(names(l_poi) %in% names(l_min_poi))) > 0) {
+    stop("Not all minimal POI values determined.")
   }
 
-  # Determination of the worst case batches for each model and each rl value
-  # The worst case batches are the ones with the confidence or prediction
-  # interval limits that are closest to the respective specification limit
-  # where the POI values are smallest.
+  # Determination of the worst case batches for each model and each rl value:
+  #   The worst case batches are the ones with the confidence or prediction
+  #   interval limits that are closest to the respective specification limit
+  #   where the POI values are smallest.
+  # In case of cics model: wc_icpt_ich is the common intercept of all batches
+  #   and none of the batches is the worst case batch.
+
   l_wc_batch <- vector(mode = "list", length = length(l_min_poi))
   names(l_wc_batch) <- names(l_min_poi)
 
   for(i in seq_along(l_min_dist)) {
-    l_wc_batch[[i]] <-
-      vapply(seq_along(rl), function(j) {
-        ifelse(!is.na(l_min_poi[[i]][j]),
-               l_min_dist[[i]][j, l_min_poi[[i]][j]],
-               NA)
-      },
-      numeric(1))
+    if (names(l_min_dist)[i] == "cics") {
+      l_wc_batch[[i]] <- rep(NA, length(rl))
+    } else {
+      l_wc_batch[[i]] <-
+        vapply(seq_along(rl), function(j) {
+          ifelse(!is.na(l_min_poi[[i]][j]),
+                 l_min_dist[[i]][j, l_min_poi[[i]][j]],
+                 NA)
+        },
+        numeric(1))
+    }
   }
 
   if (sum(vapply(l_wc_batch, is.null, logical(1))) > 0) {
-    stop("Not all worst case batches for all minimal POI limits determined.")
+    stop("Not all worst case batches for all minimal POI values determined.")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Matrix of the worst case POI values for each model and each rl value
+
   m_poi <- matrix(NA, nrow = length(rl), ncol = length(l_poi))
   colnames(m_poi) <- names(l_poi)
 
-  m_poi[, "cics"] <- l_poi[["cics"]]
-
-  for(i in 2:length(l_poi)) {
-    m_poi[, i] <- vapply(seq_along(rl), function(j) {
-      ifelse(!is.na(l_wc_batch[[i]][j]),
-             l_poi[[i]][j, l_wc_batch[[i]][j]],
-             NA)
-    }, numeric(1))
+  for(i in seq_along(l_poi)) {
+    if (names(l_poi)[i] == "cics") {
+      m_poi[, "cics"] <- l_poi[["cics"]]
+    } else {
+      m_poi[, i] <- vapply(seq_along(rl), function(j) {
+        ifelse(!is.na(l_wc_batch[[i]][j]),
+               l_poi[[i]][j, l_wc_batch[[i]][j]],
+               NA)
+      }, numeric(1))
+    }
   }
 
   # Depending on the transformation of the time variable the POI values have to
   # be back-transformed.
+
   if (xform[1] != "no") {
     switch(xform[1],
            "log" = {
@@ -611,43 +623,54 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 
   # ---------
   # Worst case intercepts (wc_icpt_argpm) (on the original scale)
+
   wc_icpt_argpm <- matrix(NA, nrow = length(rl), ncol = length(l_wc_batch))
   colnames(wc_icpt_argpm) <- names(l_wc_batch)
 
   if (xform[2] == "no") {
     for(i in seq_along(l_wc_batch)) {
-      wc_icpt_argpm[, i] <-
-        vapply(seq_along(rl), function(j) {
-          ifelse(!is.na(l_wc_batch[[i]][j]),
-                 l_icpt[[i]][["icpt"]][l_wc_batch[[i]][j]],
-                 NA)
-        },
-        numeric(1))
+      if (names(l_wc_batch)[i] == "cics") {
+        wc_icpt_argpm[, i] <-
+          rep(unname(l_icpt[[i]][["icpt"]]), length(rl))
+      } else {
+        wc_icpt_argpm[, i] <-
+          vapply(seq_along(rl), function(j) {
+            ifelse(!is.na(l_wc_batch[[i]][j]),
+                   l_icpt[[i]][["icpt"]][l_wc_batch[[i]][j]],
+                   NA)
+          },
+          numeric(1))
+      }
     }
   } else {
     for(i in seq_along(l_wc_batch)) {
-      wc_icpt_argpm[, i] <-
-        vapply(seq_along(rl), function(j) {
-          ifelse(!is.na(l_wc_batch[[i]][j]),
-                 l_icpt[[i]][["icpt.orig"]][l_wc_batch[[i]][j]],
-                 NA)
-        },
-        numeric(1))
+      if (names(l_wc_batch)[i] == "cics") {
+        wc_icpt_argpm[, i] <-
+          rep(unname(l_icpt[[i]][["icpt.orig"]]), length(rl))
+      } else {
+        wc_icpt_argpm[, i] <-
+          vapply(seq_along(rl), function(j) {
+            ifelse(!is.na(l_wc_batch[[i]][j]),
+                   l_icpt[[i]][["icpt.orig"]][l_wc_batch[[i]][j]],
+                   NA)
+          },
+          numeric(1))
+      }
     }
   }
 
   # ---------
   # Delta and WCSL
+
   m_delta <- matrix(NA, nrow = length(rl), ncol = length(l_wc_batch))
   colnames(m_delta) <- names(l_wc_batch)
   m_wcsl <- m_delta
 
   for(j in seq_along(l_wc_batch)) {
     for(i in seq_along(rl)) {
-      if (!is.na(l_wc_batch[[j]][i])) {
+      if (names(l_wc_batch)[j] == "cics") {
         tmp <-
-          get_wcs_limit(rl = rl[i], sl = sl, intercept =
-                          l_icpt[[j]][["icpt"]][l_wc_batch[[j]]][i],
+          get_wcs_limit(rl = rl[i], sl = sl, intercept = l_icpt[[j]][["icpt"]],
                         xform = xform, shift = shift, ivl_side = ivl_side)
 
         if (xform[2] == "no") {
@@ -659,8 +682,24 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
           m_wcsl[i, j] <- tmp[["wcs.lim.orig"]]
         }
       } else {
-        m_delta[i, j] <- NA
-        m_wcsl[i, j] <- NA
+        if (!is.na(l_wc_batch[[j]][i])) {
+          tmp <-
+            get_wcs_limit(rl = rl[i], sl = sl, intercept =
+                            l_icpt[[j]][["icpt"]][l_wc_batch[[j]]][i],
+                          xform = xform, shift = shift, ivl_side = ivl_side)
+
+          if (xform[2] == "no") {
+            m_delta[i, j] <- tmp[["delta.lim"]]
+            m_wcsl[i, j] <- tmp[["wcs.lim"]]
+
+          } else {
+            m_delta[i, j] <- tmp[["delta.lim.orig"]]
+            m_wcsl[i, j] <- tmp[["wcs.lim.orig"]]
+          }
+        } else {
+          m_delta[i, j] <- NA
+          m_wcsl[i, j] <- NA
+        }
       }
     }
   }
@@ -834,7 +873,7 @@ plot_expirest_wisle <- function(
   }
   if (!(plot_option %in% c("full", "lean1", "lean2", "basic1", "basic2"))) {
     stop("Please specify plot_option either as \"full\", \"lean1\", ",
-         "\"lean2\", \"basic1\" and \"basic2\".")
+         "\"lean2\", \"basic1\" or \"basic2\".")
   }
   if (!(ci_app %in% c("line", "ribbon"))) {
     stop("Please specify ci_app either as \"line\" or \"ribbon\".")
@@ -1669,3 +1708,4 @@ plot_expirest_wisle <- function(
 }
 
 # <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+

@@ -489,6 +489,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 
   # ---------
   # Check if determination was successful
+
   if (sum(vapply(l_icpt, is.null, logical(1))) > 0) {
     stop("Not for all models intercepts extracted.")
   }
@@ -517,21 +518,22 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
         t_poi[variety] <- tmp[["Model"]]
       }
     } else {
-      tmp <- vapply(l_models[["individual"]],
-                    function(x) {
-                      tmp <- try_get_model(
-                        find_poi(srch_range = srch_range,
-                                 model = x,
-                                 sl = sl, alpha = alpha, ivl_type = ivl_type,
-                                 ivl_side = ivl_side, ivl = ivl)
-                      )
+      t_poi_dids <-
+        vapply(l_models[["individual"]],
+               function(x) {
+                 tmp <- try_get_model(
+                   find_poi(srch_range = srch_range,
+                            model = x,
+                            sl = sl, alpha = alpha, ivl_type = ivl_type,
+                            ivl_side = ivl_side, ivl = ivl)
+                 )
 
-                      ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
-                    },
-                    numeric(1))
+                 ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
+               },
+               numeric(1))
 
-      if (sum(is.na(tmp)) == 0) {
-        t_poi[variety] <- as.numeric((tmp[which.min(tmp)]))
+      if (sum(is.na(t_poi_dids)) == 0) {
+        t_poi[variety] <- as.numeric((t_poi_dids[which.min(t_poi_dids)]))
       }
     }
   }
@@ -541,56 +543,67 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
             "Possibly, changing srch_range could solve the issue.")
   }
 
-  # ---------
-  # Determination of upper or lower confidence or prediction interval limits at
-  # t_poi of the best fitting model in order to determine the worst case batch
-  # (wc_batch_ich) and its intercept (wc_icpt_ich). If the cics model should be
-  # the best fitting model, wc_icpt_ich is the common intercept of all batches.
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Determination of worst case batch (wc_batch_ich)
+  #   and its intercept (wc_icpt_ich)
+
+  # In case of cics model: wc_icpt_ich is the common intercept of all batches
+  #   and none of the batches is the worst case batch.
+  # In case of dids model: wc_batch_ich needs to be determined using the
+  #   models fitted to the data of each batch individually.
 
   if (!is.na(t_poi[l_model_type[[2]]])) {
-    pred_lim <- get_intvl_limit(x_new = t_poi[l_model_type[[2]]],
-                                model = l_models[[l_model_type[[2]]]],
-                                alpha = alpha, ivl_type = ivl_type,
-                                ivl_side = ivl_side, ivl = ivl)
-  } else {
-    pred_lim <- NA
-  }
+    switch(l_model_type[[2]],
+           "cics" = {
+             wc_batch_ich <- NA
 
-  # ---------
-  # Check if estimation was successful
-  if (sum(is.na(pred_lim)) == 0) {
-    wc_batch_ich <- which.min(abs(sl - pred_lim))
+             if (xform[2] != "no") {
+               wc_icpt_ich <- l_icpt[["cics"]][["icpt.orig"]]
+             } else {
+               wc_icpt_ich <- l_icpt[["cics"]][["icpt"]]
+             }
+           },
+           "dics" = {
+             pred_lim <- get_intvl_limit(x_new = t_poi["dics"],
+                                         model = l_models[["dics"]],
+                                         alpha = alpha, ivl_type = ivl_type,
+                                         ivl_side = ivl_side, ivl = ivl)
+
+             if (sum(is.na(pred_lim)) == 0) {
+               wc_batch_ich <- which.min(abs(sl - pred_lim))
+
+               if (xform[2] != "no") {
+                 wc_icpt_ich <- l_icpt[["dics"]][["icpt.orig"]][wc_batch_ich]
+               } else {
+                 wc_icpt_ich <- l_icpt[["dics"]][["icpt"]][wc_batch_ich]
+               }
+             } else {
+               wc_batch_ich <- NA
+               wc_icpt_ich <- NA
+             }
+           },
+           "dids" = {
+             if (sum(is.na(t_poi_dids)) == 0) {
+               wc_batch_ich <- which.min(t_poi_dids)
+
+               if (xform[2] != "no") {
+                 wc_icpt_ich <- l_icpt[["dids"]][["icpt.orig"]][wc_batch_ich]
+               } else {
+                 wc_icpt_ich <- l_icpt[["dids"]][["icpt"]][wc_batch_ich]
+               }
+             } else {
+               wc_batch_ich <- NA
+               wc_icpt_ich <- NA
+             }
+           })
   } else {
     wc_batch_ich <- NA
-  }
-
-  # Note: if the model type of the best fitting model is dids, the batch
-  # determined as worst case batch may not be the correct batch because it
-  # was determined using the model that is based on the data of all batches
-  # (i.e. the full model with the batch_vbl * time_vbl interaction term).
-  # Therefore, the corresponding wc_batch_ich number is replaced by the number
-  # of the batch that had the smallest POI when separate models were fitted to
-  # the data of each individual batch.
-
-  if (!is.na(t_poi[l_model_type[[2]]]) & t_poi[l_model_type[[2]]] == "dids") {
-    if (sum(is.na(t_poi_dids)) == 0) {
-      wc_batch_ich <- which.min(t_poi_dids)
-    }
-  }
-
-  # Getting wc_icpt_ich in the original scale, if necessary
-  if (!is.na(wc_batch_ich)) {
-    if (xform[2] != "no") {
-      wc_icpt_ich <- l_icpt[[l_model_type[[2]]]][["icpt.orig"]][wc_batch_ich]
-    } else {
-      wc_icpt_ich <- l_icpt[[l_model_type[[2]]]][["icpt"]][wc_batch_ich]
-    }
-  } else {
     wc_icpt_ich <- NA
   }
 
-  # ---------
-  # Back-transformation of POI values, if the time variable has been transformed
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Back-transformation of POI values, if necessary
+
   if (xform[1] != "no") {
     switch(xform[1],
            "log" = {

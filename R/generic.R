@@ -63,8 +63,10 @@ summary.expirest_osle <- function(object, ...) {
              formatC(as.numeric(object$wc.icpt), digits = digits)))
 
   cat("\nWorst case batch:",
-      levels(object[["Data"]]
-             [, object[["Variables"]]$batch])[object[["wc.batch"]]])
+      ifelse(is.na(object$wc.batch),
+             NA,
+             levels(object[["Data"]]
+                    [, object[["Variables"]]$batch])[object$wc.batch]))
 
   cat("\n\nEstimated shelf life for",
       object[["Model.Type"]]$type.acronym,
@@ -184,8 +186,10 @@ summary.expirest_wisle <- function(object, ...) {
                      digits = digits)))
 
   cat("\nWorst case batch(es):",
-      levels(object[["Data"]][, object[["Variables"]]$batch])
-      [object[["wc.batch"]][[object[["Model.Type"]]$type.acronym]]])
+      ifelse(is.na(object$wc.batch[[object[["Model.Type"]]$type.acronym]]),
+             NA,
+             levels(object[["Data"]][[object[["Variables"]]$batch]])
+             [object$wc.batch[[object[["Model.Type"]]$type.acronym]]]))
 
   cat("\n\nEstimated shelf life (lives) for",
       object[["Model.Type"]]$type.acronym,
