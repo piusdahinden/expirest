@@ -435,8 +435,6 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
 
-  # Check if rl and rl_sf have been handed over via the three dot ellipsis
-  # (...) argument.
   if (mrl > 0 & mrlsf > 0) {
     l_lim <-
       set_limits(rl = mf[[mrl]], rl_sf = mf[[mrlsf]], sl = sl, sl_sf = sl_sf,
@@ -498,60 +496,46 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Calculation of POI values for all three model types
 
+  # Note: in case of the dids model type, the POI is not determined using the
+  # model that was determined using the data from all batches (i.e. the full
+  # model with the batch_vbl * time_vbl interaction term). Instead, separate
+  # models are fitted to the data of each individual batch and the POI values
+  # are determined for each of these models.
+
   t_poi <- rep(NA, 3)
   names(t_poi) <- names(l_icpt)
 
-  # ---------
-  # Common Intercept / Common Slope
-  tmp <- try_get_model(
-    find_poi(srch_range = srch_range, model = l_models[["cics"]], sl = sl,
-             alpha = alpha, ivl_type = ivl_type, ivl_side = ivl_side,
-             ivl = ivl)
-  )
+  for(variety in names(t_poi)) {
+    if (variety != "dids") {
+      tmp <- try_get_model(
+        find_poi(srch_range = srch_range, model = l_models[[variety]], sl = sl,
+                 alpha = alpha, ivl_type = ivl_type, ivl_side = ivl_side,
+                 ivl = ivl)
+      )
 
-  if (is.null(tmp[["Error"]])) {
-    t_poi["cics"] <- tmp[["Model"]]
+      if (is.null(tmp[["Error"]])) {
+        t_poi[variety] <- tmp[["Model"]]
+      }
+    } else {
+      tmp <- vapply(l_models[["individual"]],
+                    function(x) {
+                      tmp <- try_get_model(
+                        find_poi(srch_range = srch_range,
+                                 model = x,
+                                 sl = sl, alpha = alpha, ivl_type = ivl_type,
+                                 ivl_side = ivl_side, ivl = ivl)
+                      )
+
+                      ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
+                    },
+                    numeric(1))
+
+      if (sum(is.na(tmp)) == 0) {
+        t_poi[variety] <- as.numeric((tmp[which.min(tmp)]))
+      }
+    }
   }
 
-  # ---------
-  # Different Intercept / Common Slope
-  tmp <- try_get_model(
-    find_poi(srch_range = srch_range, model = l_models[["dics"]], sl = sl,
-             alpha = alpha, ivl_type = ivl_type, ivl_side = ivl_side,
-             ivl = ivl)
-  )
-
-  if (is.null(tmp[["Error"]])) {
-    t_poi["dics"] <- tmp[["Model"]]
-  }
-
-  # ---------
-  # Different Intercept / Different Slope (i.e. Individual)
-
-  # Note: in this case, the POI is not determined using the model that was
-  # determined using the data from all batches (i.e. the full model with the
-  # batch_vbl * time_vbl interaction term). Instead, separate models are fitted
-  # to the data of each individual batch and the POI values are determined for
-  # each of these models. Of these POI values, the smallest is returned.
-  t_poi_dids <-
-    vapply(l_models[["individual"]],
-           function(x) {
-             tmp <- try_get_model(
-               find_poi(srch_range = srch_range,
-                        model = x,
-                        sl = sl, alpha = alpha, ivl_type = ivl_type,
-                        ivl_side = ivl_side, ivl = ivl)
-             )
-
-             ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
-           },
-           numeric(1))
-
-  # ---------
-  # Check if estimation was successful
-  if (sum(is.na(t_poi_dids)) == 0) {
-    t_poi["dids"] <- as.numeric((t_poi_dids[which.min(t_poi_dids)]))
-  }
   if (sum(is.na(t_poi)) != 0) {
     warning("Not for all model types POI values obtained. ",
             "Possibly, changing srch_range could solve the issue.")
