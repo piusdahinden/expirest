@@ -6,7 +6,7 @@ context("Ordinary shelf life estimation")
 # Shelf Life Estimation Using Analysis of Covariance. J Valid Technol (2011)
 # 17(3): 47-68.
 
-test_that("retest_results_match_LeBlond_2011", {
+test_that("expirest_osle_results_match_LeBlond_2011", {
   re <-
     expirest_osle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                   response_vbl = "Potency", time_vbl = "Month",
@@ -235,7 +235,7 @@ test_that("retest_results_match_LeBlond_2011", {
 # on p. 174-176 of the manual, i.e. in SAS Institute Inc. 2015. JMP(R) 12
 # Reliability and Survival Methods. Cary, NC: SAS Institute Inc.
 
-test_that("retest_results_match_JMP_reliability_and_survival_methods_manual", {
+test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_manual", {
   re <-
     expirest_osle(data = exp4, response_vbl = "Conc", time_vbl = "Month",
                   batch_vbl = "Batch", sl = 95, sl_sf = 2,
@@ -348,7 +348,7 @@ test_that("retest_results_match_JMP_reliability_and_survival_methods_manual", {
   # Slope	     4_14                -0.19615
 })
 
-test_that("retest_period_estimation_succeeds_for_poi", {
+test_that("expirest_osle_succeeds_for_poi", {
   usl <- 4.5
   lsl <- 0.5
 
@@ -420,7 +420,7 @@ test_that("retest_period_estimation_succeeds_for_poi", {
                  95.4652197782, 79.6924982370, 82.6037890116, 67.2979863914))
 })
 
-test_that("retest_period_estimation_succeeds_with_transformations", {
+test_that("expirest_osle_succeeds_with_transformations", {
   tmp <- rep(NA, 7)
 
   # <-><-><-><->
@@ -488,7 +488,7 @@ test_that("retest_period_estimation_succeeds_with_transformations", {
                  31.8950504925, 37.1116679193, 33.9520528257))
 })
 
-test_that("retest_period_estimation_succeeds_for_model_type", {
+test_that("expirest_osle_succeeds_for_model_type", {
   t_dat1 <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dat2 <- exp1[exp1$Batch %in% c("b3", "b5", "b5"), ]
   t_dat3 <- exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]
@@ -531,7 +531,7 @@ test_that("retest_period_estimation_succeeds_for_model_type", {
   expect_equivalent(r_ret3[["Model.Type"]][[1]], c(0, 0))
 })
 
-test_that("retest_period_estimation_succeeds_for_variables", {
+test_that("expirest_osle_succeeds_for_variables", {
   tmp1 <-
     expirest_osle(
       data = exp2, response_vbl = "Related", time_vbl = "Month",
@@ -584,7 +584,7 @@ test_that("retest_period_estimation_succeeds_for_variables", {
   expect_equal(tmp4[["batch"]], "Batch")
 })
 
-test_that("retest_period_estimation_warns", {
+test_that("expirest_osle_warns", {
   usl <- 3.5
   lsl <- 1.5
 
@@ -641,7 +641,7 @@ test_that("retest_period_estimation_warns", {
     "You specified ivl_side = \"lower\".")
 })
 
-test_that("retest_period_estimation_fails_with_warning_tight_spec_limits", {
+test_that("expirest_osle_fails_with_warning_tight_spec_limits", {
   usl <- 3.5
   lsl <- 1.5
 
@@ -672,7 +672,7 @@ test_that("retest_period_estimation_fails_with_warning_tight_spec_limits", {
   expect_equal(is.na(tmp[2]), TRUE)
 })
 
-test_that("retest_period_estimation_fails_with_warning_tight_uniroot_interval", {
+test_that("expirest_osle_fails_with_warning_tight_uniroot_interval", {
   t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
 
   usl <- 105
@@ -723,7 +723,7 @@ test_that("retest_period_estimation_fails_with_warning_tight_uniroot_interval", 
   expect_equal(is.na(tmp[4]), TRUE)
 })
 
-test_that("retest_period_estimation_fails_with_error", {
+test_that("expirest_osle_fails_with_error", {
   t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dal <- t_dat
   t_dal$Batch <- as.character(t_dal$Batch)

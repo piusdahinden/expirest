@@ -317,7 +317,7 @@ test_that("plot_expirest_osle_fails", {
       ivl_side = "lower")
 
   ree <- re1
-  names(ree)[length(ree)] <- "Estimates"
+  class(ree) <- "expirest"
 
   re2 <- suppressWarnings(
     expirest_osle(

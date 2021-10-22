@@ -737,8 +737,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 plot_expirest_osle <- function(
   model, show_grouping = "yes", response_vbl_unit = NULL, y_range,
   x_range = NULL, plot_option = "full", ci_app = "line") {
-  if (sum(names(model) %in% c("Data", "Parameters", "Model.Type", "Models",
-                              "AIC", "BIC", "wc.icpt", "Limits", "POI")) != 9) {
+  if (class(model) != "expirest_osle") {
     stop("The model must be an object of class expirest_osle.")
   }
   if (!(show_grouping %in% c("yes", "no"))) {

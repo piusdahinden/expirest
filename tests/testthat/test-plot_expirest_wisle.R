@@ -548,8 +548,9 @@ test_that("plot_expirest_wisle_fails", {
       alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
       sf_option = "loose", ivl = "confidence", ivl_type = "one.sided",
       ivl_side = "lower")
+
   ree <- re1
-  names(ree)[length(ree)] <- "Estimates"
+  class(ree) <- "expirest"
 
   re2 <- suppressWarnings(
     expirest_wisle(

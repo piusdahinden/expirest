@@ -1,6 +1,6 @@
 context("What-if (approach for) shelf life estimation")
 
-test_that("expiry_estimation_succeeds_for_poi", {
+test_that("expirest_wisle_estimation_succeeds_for_poi", {
   usl <- 4.5
   lsl <- 0.5
   lrl <- 2.0
@@ -83,7 +83,7 @@ test_that("expiry_estimation_succeeds_for_poi", {
                  28.4323876929, NA, 31.149707448336, NA))
 })
 
-test_that("expiry_estimation_succeeds_with_transformations", {
+test_that("expirest_wisle_estimation_succeeds_with_transformations", {
   tmp <- rep(NA, 7)
 
   # <-><-><-><->
@@ -153,7 +153,7 @@ test_that("expiry_estimation_succeeds_with_transformations", {
                  26.9485678209, 33.2240413518, 29.2139414080))
 })
 
-test_that("expiry_estimation_succeeds_for_model_type", {
+test_that("expirest_wisle_estimation_succeeds_for_model_type", {
   t_dat1 <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dat2 <- exp1[exp1$Batch %in% c("b3", "b5", "b5"), ]
   t_dat3 <- exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]
@@ -201,7 +201,7 @@ test_that("expiry_estimation_succeeds_for_model_type", {
   expect_equivalent(r_exp3[["Model.Type"]][[1]], c(0, 0))
 })
 
-test_that("expiry_estimation_warns", {
+test_that("expirest_wisle_warns", {
   usl <- 3.5
   lsl <- 1.5
   lrl <- 2.0
@@ -226,7 +226,7 @@ test_that("expiry_estimation_warns", {
     "Not for all model types POI values obtained.")
 })
 
-test_that("expiry_estimation_fails_with_warning_tight_spec_limits", {
+test_that("expirest_wisle_fails_with_warning_tight_spec_limits", {
   usl <- 3.5
   lsl <- 1.5
   url <- 3.0
@@ -260,7 +260,7 @@ test_that("expiry_estimation_fails_with_warning_tight_spec_limits", {
   expect_equal(is.na(tmp), rep(TRUE, 2))
 })
 
-test_that("expirest_estimation_fails_with_warning_tight_uniroot_interval", {
+test_that("expirest_wisle_fails_with_warning_tight_uniroot_interval", {
   t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
 
   usl <- 105
@@ -314,7 +314,7 @@ test_that("expirest_estimation_fails_with_warning_tight_uniroot_interval", {
   expect_equal(is.na(tmp), rep(TRUE, 4))
 })
 
-test_that("expirest_estimation_fails_with_error", {
+test_that("expirest_wisle_fails_with_error", {
   t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dal <- t_dat
   t_dal$Batch <- as.character(t_dal$Batch)
