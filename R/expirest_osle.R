@@ -246,15 +246,6 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (xform[1] == "log" & shift[1] != 1) {
-    stop("For log transformation of x select a shift of 1.")
-  }
-  if (xform[1] == "sqrt" & shift[1] != 0) {
-    stop("For sqrt transformation of x select a shift of 0.")
-  }
-  if (xform[1] == "sq" & shift[1] != 0) {
-    stop("For sq transformation of x select a shift of 0.")
-  }
   if (length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }

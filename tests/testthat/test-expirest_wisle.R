@@ -559,30 +559,6 @@ test_that("expirest_wisle_fails_with_error", {
       data = t_dat, response_vbl = "Potency", time_vbl = "Month",
       batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95, sl_sf = 3,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
-      xform = c("log", "no"), shift = c(0, 0), sf_option = "loose",
-      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower"),
-    "log transformation of x")
-  expect_error(
-    expirest_wisle(
-      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95, sl_sf = 3,
-      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
-      xform = c("sqrt", "no"), shift = c(1, 0), sf_option = "loose",
-      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower"),
-    "sqrt transformation of x")
-  expect_error(
-    expirest_wisle(
-      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95, sl_sf = 3,
-      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
-      xform = c("sq", "no"), shift = c(1, 0), sf_option = "loose",
-      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower"),
-    "sq transformation of x")
-  expect_error(
-    expirest_wisle(
-      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95, sl_sf = 3,
-      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c("no", "no"), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower"),
     "shift must be a numeric vector of length 2")

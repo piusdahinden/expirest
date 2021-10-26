@@ -362,15 +362,6 @@ get_xformed_variables <- function(data, response_vbl, time_vbl,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (xform[1] == "log" & shift[1] != 1) {
-    stop("For log xform of x select a shift of 1.")
-  }
-  if (xform[1] == "sqrt" & shift[1] != 0) {
-    stop("For sqrt xform of x select a shift of 0.")
-  }
-  if (xform[1] == "sq" & shift[1] != 0) {
-    stop("For sq xform of x select a shift of 0.")
-  }
   if (!is.numeric(shift) | length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
@@ -469,40 +460,56 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  l_variables <- as.list(c(batch_vbl, response_vbl, time_vbl))
-  names(l_variables) <- c("batch", "response", "time")
-
   if (xform[1] != "no") {
     switch(xform[1],
            "log" = {
-             time_vbl <- paste("log", time_vbl, sep = ".")
+             new_time_vbl <- paste("log", time_vbl, sep = ".")
            },
            "sqrt" = {
-             time_vbl <- paste("sqrt", time_vbl, sep = ".")
+             new_time_vbl <- paste("sqrt", time_vbl, sep = ".")
            },
            "sq" = {
-             time_vbl <- paste("sq", time_vbl, sep = ".")
+             new_time_vbl <- paste("sq", time_vbl, sep = ".")
            })
-
-    l_variables[[length(l_variables) + 1]] <- time_vbl
-    names(l_variables)[3] <- "time.orig"
-    names(l_variables)[length(l_variables)] <- "time"
   }
   if (xform[2] != "no") {
     switch(xform[2],
            "log" = {
-             response_vbl <- paste("log", response_vbl, sep = ".")
+             new_response_vbl <- paste("log", response_vbl, sep = ".")
            },
            "sqrt" = {
-             response_vbl <- paste("sqrt", response_vbl, sep = ".")
+             new_response_vbl <- paste("sqrt", response_vbl, sep = ".")
            },
            "sq" = {
-             response_vbl <- paste("sq", response_vbl, sep = ".")
+             new_response_vbl <- paste("sq", response_vbl, sep = ".")
            })
+  }
 
-    l_variables[[length(l_variables) + 1]] <- response_vbl
-    names(l_variables)[2] <- "response.orig"
-    names(l_variables)[length(l_variables)] <- "response"
+  if (xform[1] == "no" & xform[2] == "no") {
+    l_variables <- list(batch = batch_vbl,
+                        response = response_vbl,
+                        time = time_vbl)
+  }
+
+  if (xform[1] != "no" & xform[2] != "no") {
+    l_variables <- list(batch = batch_vbl,
+                        response.orig = response_vbl,
+                        response = new_response_vbl,
+                        time.orig = time_vbl,
+                        time = new_time_vbl)
+  } else {
+    if (xform[1] != "no") {
+      l_variables <- list(batch = batch_vbl,
+                          response = response_vbl,
+                          time.orig = time_vbl,
+                          time = new_time_vbl)
+    }
+    if (xform[2] != "no") {
+      l_variables <- list(batch = batch_vbl,
+                          response.orig = response_vbl,
+                          response = new_response_vbl,
+                          time = time_vbl)
+    }
   }
 
   return(l_variables)
@@ -605,15 +612,6 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (xform[1] == "log" & shift[1] != 1) {
-    stop("For log xform of x select a shift of 1.")
-  }
-  if (xform[1] == "sqrt" & shift[1] != 0) {
-    stop("For sqrt xform of x select a shift of 0.")
-  }
-  if (xform[1] == "sq" & shift[1] != 0) {
-    stop("For sq xform of x select a shift of 0.")
-  }
   if (!is.numeric(shift) | length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
@@ -685,33 +683,50 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Collect and return the data
 
-  if (all(!is.na(rl))) {
-    l_res <- list(sf.option = sf_option,
-                  xform = xform,
-                  shift = shift,
-                  rl.orig = rl_orig,
-                  rl.sf = rl_sf,
-                  rl = rl,
-                  sl.orig = sl_orig,
-                  sl.sf = sl_sf,
-                  sl = sl)
-  } else {
-    l_res <- list(sf.option = sf_option,
-                  xform = xform,
-                  shift = shift,
-                  sl.orig = sl_orig,
-                  sl.sf = sl_sf,
-                  sl = sl)
-  }
-
-  if (xform[2] != "no") {
-    if (all(!is.na(rl))) {
-      l_res[[length(l_res) + 1]] <- rl_trfmd
-      names(l_res)[length(l_res)] <- "rl.trfmd"
+  if (all(is.na(rl))) {
+    if (xform[2] != "no") {
+      l_res <- list(sf.option = sf_option,
+                    xform = xform,
+                    shift = shift,
+                    sl.orig = sl_orig,
+                    sl.sf = sl_sf,
+                    sl = sl,
+                    sl.trfmd = sl_trfmd)
+    } else {
+      l_res <- list(sf.option = sf_option,
+                    xform = xform,
+                    shift = shift,
+                    sl.orig = sl_orig,
+                    sl.sf = sl_sf,
+                    sl = sl,
+                    sl.trfmd = sl)
     }
-
-    l_res[[length(l_res) + 1]] <- sl_trfmd
-    names(l_res)[length(l_res)] <- "sl.trfmd"
+  } else {
+    if (xform[2] != "no") {
+      l_res <- list(sf.option = sf_option,
+                    xform = xform,
+                    shift = shift,
+                    rl.orig = rl_orig,
+                    rl.sf = rl_sf,
+                    rl = rl,
+                    rl.trfmd = rl_trfmd,
+                    sl.orig = sl_orig,
+                    sl.sf = sl_sf,
+                    sl = sl,
+                    sl.trfmd = sl_trfmd)
+    } else {
+      l_res <- list(sf.option = sf_option,
+                    xform = xform,
+                    shift = shift,
+                    rl.orig = rl_orig,
+                    rl.sf = rl_sf,
+                    rl = rl,
+                    rl.trfmd = rl,
+                    sl.orig = sl_orig,
+                    sl.sf = sl_sf,
+                    sl = sl,
+                    sl.trfmd = sl)
+    }
   }
 
   return(l_res)
@@ -794,15 +809,6 @@ get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
   if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
-  }
-  if (xform[1] == "log" & shift[1] != 1) {
-    stop("For log xform of x select a shift of 1.")
-  }
-  if (xform[1] == "sqrt" & shift[1] != 0) {
-    stop("For sqrt xform of x select a shift of 0.")
-  }
-  if (xform[1] == "sq" & shift[1] != 0) {
-    stop("For sq xform of x select a shift of 0.")
   }
   if (!is.numeric(shift) | length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
@@ -1028,15 +1034,6 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (xform[1] == "log" & shift[1] != 1) {
-    stop("For log xform of x select a shift of 1.")
-  }
-  if (xform[1] == "sqrt" & shift[1] != 0) {
-    stop("For sqrt xform of x select a shift of 0.")
-  }
-  if (xform[1] == "sq" & shift[1] != 0) {
-    stop("For sq xform of x select a shift of 0.")
-  }
   if (!is.numeric(shift) | length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
@@ -1089,11 +1086,11 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Return of the intercept(s)
 
-  l_res <- list(icpt = intercept)
-
-  if (xform[2] != "no") {
-    l_res[[length(l_res) + 1]] <- icpt_orig
-    names(l_res)[length(l_res)] <- "icpt.orig"
+  if (xform[2] == "no") {
+    l_res <- list(icpt = intercept)
+  } else {
+    l_res <- list(icpt = intercept,
+                  icpt.orig = icpt_orig)
   }
 
   return(l_res)

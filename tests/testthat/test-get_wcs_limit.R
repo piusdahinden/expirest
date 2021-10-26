@@ -73,18 +73,6 @@ test_that("get_wcs_limit_fails", {
     "specify xform appropriately")
   expect_error(
     get_wcs_limit(rl = 96.995, sl = 94.95, intercept = 100,
-                  xform = c("log", "no"), shift = c(2, 0), ivl_side = "lower"),
-    "log xform of x")
-  expect_error(
-    get_wcs_limit(rl = 96.995, sl = 94.95, intercept = 100,
-                  xform = c("sqrt", "no"), shift = c(2, 0), ivl_side = "lower"),
-    "sqrt xform of x")
-  expect_error(
-    get_wcs_limit(rl = 96.995, sl = 94.95, intercept = 100,
-                  xform = c("sq", "no"), shift = c(2, 0), ivl_side = "lower"),
-    "sq xform of x")
-  expect_error(
-    get_wcs_limit(rl = 96.995, sl = 94.95, intercept = 100,
                   xform = c("no", "no"), shift = "no", ivl_side = "lower"),
     "shift must be a numeric vector of length 2")
   expect_error(

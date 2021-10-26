@@ -141,21 +141,6 @@ test_that("set_limits_fails", {
     "specify xform appropriately")
   expect_error(
     set_limits(rl = 97.0, rl_sf = 3, sl = c(95.0, 105.0), sl_sf = c(3, 3),
-               sf_option = "tight", xform = c("log", "no"), shift = c(2, 0),
-               ivl_side = "lower"),
-    "log xform of x")
-  expect_error(
-    set_limits(rl = 97.0, rl_sf = 3, sl = c(95.0, 105.0), sl_sf = c(3, 3),
-               sf_option = "tight", xform = c("sqrt", "no"), shift = c(2, 0),
-               ivl_side = "lower"),
-    "sqrt xform of x")
-  expect_error(
-    set_limits(rl = 97.0, rl_sf = 3, sl = c(95.0, 105.0), sl_sf = c(3, 3),
-               sf_option = "tight", xform = c("sq", "no"), shift = c(2, 0),
-               ivl_side = "lower"),
-    "sq xform of x")
-  expect_error(
-    set_limits(rl = 97.0, rl_sf = 3, sl = c(95.0, 105.0), sl_sf = c(3, 3),
                sf_option = "tight", xform = c("no", "no"), shift = "no",
                ivl_side = "lower"),
     "shift must be a numeric vector of length 2")

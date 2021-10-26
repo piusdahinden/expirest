@@ -162,21 +162,6 @@ test_that("get_icpt_fails", {
     "specify xform appropriately")
   expect_error(
     get_icpt(model = r_potency, response_vbl = "Potency", time_vbl = "Month",
-             batch_vbl = "Batch", xform = c("log", "no"),
-             shift = c(2, 0)),
-    "log xform of x")
-  expect_error(
-    get_icpt(model = r_potency, response_vbl = "Potency", time_vbl = "Month",
-             batch_vbl = "Batch", xform = c("sqrt", "no"),
-             shift = c(2, 0)),
-    "sqrt xform of x")
-  expect_error(
-    get_icpt(model = r_potency, response_vbl = "Potency", time_vbl = "Month",
-             batch_vbl = "Batch", xform = c("sq", "no"),
-             shift = c(2, 0)),
-    "sq xform of x")
-  expect_error(
-    get_icpt(model = r_potency, response_vbl = "Potency", time_vbl = "Month",
              batch_vbl = "Batch", xform = c("no", "no"),
              shift = "no"),
     "shift must be a numeric vector of length 2")
