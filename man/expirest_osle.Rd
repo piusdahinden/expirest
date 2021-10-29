@@ -118,9 +118,7 @@ containing the following elements:
   significance level of 0.25. The first number represents the decision on
   the intercept and the second on the slope, where \code{1} stands for
   \dQuote{common} and \code{2} stands for \dQuote{different}. The second
-  element (\code{type.acronym}) is an acronym representing the first item.
-  The third to fifth elements contain the names of the model variables, i.e.
-  \code{response.vbl}, \code{time.vbl} and \code{batch.vbl}.}
+  element (\code{type.acronym}) is an acronym representing the first item.}
 \item{Models}{A list of four elements named \code{cics}, \code{dics},
   \code{dids} and \code{individual}. The first three elements contain the
   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}

@@ -135,9 +135,7 @@
 #'   significance level of 0.25. The first number represents the decision on
 #'   the intercept and the second on the slope, where \code{1} stands for
 #'   \dQuote{common} and \code{2} stands for \dQuote{different}. The second
-#'   element (\code{type.acronym}) is an acronym representing the first item.
-#'   The third to fifth elements contain the names of the model variables, i.e.
-#'   \code{response.vbl}, \code{time.vbl} and \code{batch.vbl}.}
+#'   element (\code{type.acronym}) is an acronym representing the first item.}
 #' \item{Models}{A list of four elements named \code{cics}, \code{dics},
 #'   \code{dids} and \code{individual}. The first three elements contain the
 #'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
@@ -344,46 +342,6 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
                        type.acronym =
                          paste0(c("di", "ci")[common_icpt + 1],
                                 c("ds", "cs")[common_slp + 1]))
-
-  if (sum(xform %in% "no") == 2) {
-    l_model_type[[length(l_model_type) + 1]] <- l_variables[["response"]]
-    l_model_type[[length(l_model_type) + 1]] <- l_variables[["time"]]
-    l_model_type[[length(l_model_type) + 1]] <- l_variables[["batch"]]
-
-    names(l_model_type) <- c("type.spec", "type.acronym", "response.vbl",
-                             "time.vbl", "batch.vbl")
-  }
-  if (sum(xform %in% "no") == 0) {
-    l_model_type[[length(l_model_type) + 1]] <- l_variables[["response.orig"]]
-    l_model_type[[length(l_model_type) + 1]] <- l_variables[["response"]]
-    l_model_type[[length(l_model_type) + 1]] <- l_variables[["time.orig"]]
-    l_model_type[[length(l_model_type) + 1]] <- l_variables[["time"]]
-    l_model_type[[length(l_model_type) + 1]] <- l_variables[["batch"]]
-
-    names(l_model_type) <- c("type.spec", "type.acronym", "response.vbl.orig",
-                             "response.vbl", "time.vbl.orig", "time.vbl",
-                             "batch.vbl")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      l_model_type[[length(l_model_type) + 1]] <- l_variables[["response"]]
-      l_model_type[[length(l_model_type) + 1]] <- l_variables[["time.orig"]]
-      l_model_type[[length(l_model_type) + 1]] <- l_variables[["time"]]
-      l_model_type[[length(l_model_type) + 1]] <- l_variables[["batch"]]
-
-      names(l_model_type) <- c("type.spec", "type.acronym", "response.vbl",
-                               "time.vbl.orig", "time.vbl", "batch.vbl")
-    }
-    if (xform[2] != "no") {
-      l_model_type[[length(l_model_type) + 1]] <- l_variables[["response.orig"]]
-      l_model_type[[length(l_model_type) + 1]] <- l_variables[["response"]]
-      l_model_type[[length(l_model_type) + 1]] <- l_variables[["time"]]
-      l_model_type[[length(l_model_type) + 1]] <- l_variables[["batch"]]
-
-      names(l_model_type) <- c("type.spec", "type.acronym", "response.vbl.orig",
-                               "response.vbl", "time.vbl", "batch.vbl")
-    }
-  }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Fitting of all possible models that are relevant
@@ -815,29 +773,29 @@ plot_expirest_osle <- function(
   shift <- expob[["Limits"]][["shift"]]
 
   if (sum(xform %in% "no") == 2) {
-    response_vbl <- expob[["Model.Type"]][["response.vbl"]]
-    time_vbl <- expob[["Model.Type"]][["time.vbl"]]
-    batch_vbl <- expob[["Model.Type"]][["batch.vbl"]]
+    response_vbl <- expob[["Variables"]][["response"]]
+    time_vbl <- expob[["Variables"]][["time"]]
+    batch_vbl <- expob[["Variables"]][["batch"]]
   }
   if (sum(xform %in% "no") == 0) {
-    old_response_vbl <- expob[["Model.Type"]][["response.vbl.orig"]]
-    response_vbl <- expob[["Model.Type"]][["response.vbl"]]
-    old_time_vbl <- expob[["Model.Type"]][["time.vbl.orig"]]
-    time_vbl <- expob[["Model.Type"]][["time.vbl"]]
-    batch_vbl <- expob[["Model.Type"]][["batch.vbl"]]
+    old_response_vbl <- expob[["Variables"]][["response.orig"]]
+    response_vbl <- expob[["Variables"]][["response"]]
+    old_time_vbl <- expob[["Variables"]][["time.orig"]]
+    time_vbl <- expob[["Variables"]][["time"]]
+    batch_vbl <- expob[["Variables"]][["batch"]]
   }
   if (sum(xform %in% "no") == 1) {
     if (xform[1] != "no") {
-      response_vbl <- expob[["Model.Type"]][["response.vbl"]]
-      old_time_vbl <- expob[["Model.Type"]][["time.vbl.orig"]]
-      time_vbl <- expob[["Model.Type"]][["time.vbl"]]
-      batch_vbl <- expob[["Model.Type"]][["batch.vbl"]]
+      response_vbl <- expob[["Variables"]][["response"]]
+      old_time_vbl <- expob[["Variables"]][["time.orig"]]
+      time_vbl <- expob[["Variables"]][["time"]]
+      batch_vbl <- expob[["Variables"]][["batch"]]
     }
     if (xform[2] != "no") {
-      old_response_vbl <- expob[["Model.Type"]][["response.vbl.orig"]]
-      response_vbl <- expob[["Model.Type"]][["response.vbl"]]
-      time_vbl <- expob[["Model.Type"]][["time.vbl"]]
-      batch_vbl <- expob[["Model.Type"]][["batch.vbl"]]
+      old_response_vbl <- expob[["Variables"]][["response.orig"]]
+      response_vbl <- expob[["Variables"]][["response"]]
+      time_vbl <- expob[["Variables"]][["time"]]
+      batch_vbl <- expob[["Variables"]][["batch"]]
     }
   }
 
