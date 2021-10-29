@@ -1098,6 +1098,177 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+#' Extract information from \dQuote{worst case scenario} (wcs) limit lists list
+#'
+#' The function \code{extract_from_ll_wcsl()} extracts specific elements from
+#' a list of lists returned by the \code{\link{get_wcs_limit}()} function.
+#'
+#' @param ll A list of lists returned by the \code{\link{get_wcs_limit}()}
+#'   function. The list must have three elements named \code{"cics"},
+#'   \code{"dics"} and \code{"dids"}. Each of these elements have a sub-list
+#'   of the same length as the number of intercepts. Each of these sub-lists
+#'   has a sub-sub-list of the same length as the number of release limits
+#'   (\code{rl}).
+#' @param element A character string specifying the element to be extracted,
+#'   i.e. either one of  \code{"delta.lim"}, \code{"delta.lim.orig"},
+#'   \code{"wcs.lim"} or \code{"wcs.lim.orig"}.
+#'
+#' @details Information in a bulk list of lists that has been obtained by
+#' aid of the function \code{\link{get_wcs_limit}()} for a set of release
+#' limit values (\code{rl}) and intercepts.
+#'
+#' @return A list of the same length as \code{ll_wcsl} is returned. The
+#' individual elements of the list are matrices of the values specified by
+#' \code{element} that have been extracted from \code{x}.
+#'
+#' @seealso \code{\link{get_wcs_limit}()}.
+#'
+#' @keywords internal
+
+extract_from_ll_wcsl <- function(ll, element) {
+  if (sum(names(ll) %in% c("cics", "dics", "dids")) != 3) {
+    stop("The list ll must have three elements named \"cics\", \"dics\" ",
+         "and \"dids\".")
+  }
+  if (sum(vapply(ll, function(x) !is.list(x), logical(1))) > 0) {
+    stop("The elements of ll must be matrices or list of one vector.")
+  }
+  if (!(element %in%
+        c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig"))) {
+    stop("Please specify element either as \"delta.lim\", \"delta.lim.orig\", ",
+         "\"wcs.lim\" or \"wcs.lim.orig\".")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Determination of worst case scenario (wcs) limit(s)
+
+  l_res <- lapply(seq_along(ll), function(i) {
+    if (i == 1) {
+      matrix(vapply(seq_along(ll[[i]][[1]]), function(j) {
+        ll[[i]][[1]][[j]][[element]]
+      },
+      numeric(1)),
+      nrow = length(ll[[i]][[1]]), ncol = length(ll[[i]]),
+      dimnames = list(NULL, names(ll[[i]])))
+    } else {
+      matrix(vapply(seq_along(ll[[i]]), function(bb) {
+        vapply(seq_along(ll[[i]][[1]]), function(j) {
+          ll[[i]][[bb]][[j]][[element]]
+        },
+        numeric(1))
+      }, numeric(length(ll[[i]][[1]]))),
+      nrow = length(ll[[i]][[1]]), ncol = length(ll[[i]]),
+      dimnames = list(NULL, names(ll[[i]])))
+    }
+  })
+
+  if (!is.null(names(ll))) {
+    names(l_res) <- names(ll)
+  }
+
+  return(l_res)
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#' Extract worst case x value
+#'
+#' The function \code{extract_wc_x()} extracts the worst case \eqn{x} value
+#' from a list of matrices of possible \eqn{x} values based on a list of
+#' vectors of indices which specify the worst case elements.
+#'
+#' @param l1 A list of matrices of \eqn{x} values or a list of lists of one
+#'   element being a numeric vector. The list must have three elements named
+#'   \code{"cics"}, \code{"dics"} and \code{"dids"}.
+#' @param l2 A list of vectors of indices which specify the worst case elements.
+#'   The list must have three elements named \code{"cics"}, \code{"dics"} and
+#'   \code{"dids"}. The length of \code{l2} must be equal to the length of
+#'   \code{l1} and the length of the vectors of \code{l2} must be equal to the
+#'   number of rows of the matrices in \code{l1}.
+#'
+#' @details Information from a list of matrices of values or list of list of
+#' one vector by aid of a list of vectors of indices which specify which
+#' elements in row of each matrix or which elements of the vectors are the
+#' worst case elements.
+#'
+#' @return A matrix of the worst case values with the number of rows
+#' corresponding to the length of the vectors in \code{l2} and the number of
+#' columns corresponding to the length of \code{l1} or \code{l2} is returned.
+#'
+#' @keywords internal
+
+extract_wc_x <- function(l1, l2) {
+  if (!is.list(l1)) {
+    stop("Parameter l1 must be a list.")
+  }
+  if (!is.list(l2)) {
+    stop("Parameter l2 must be a list.")
+  }
+  if (sum(names(l1) %in% c("cics", "dics", "dids")) != 3) {
+    stop("The list l1 must have three elements named \"cics\", \"dics\" ",
+         "and \"dids\".")
+  }
+  if (sum(names(l2) %in% c("cics", "dics", "dids")) != 3) {
+    stop("The list l2 must have three elements named \"cics\", \"dics\" ",
+         "and \"dids\".")
+  }
+  if (length(l1) != length(l2)) {
+    stop("The two lists l1 and l2 must have the same length.")
+  }
+  if (sum(vapply(l1, function(x) !is.matrix(x) &
+                 !is.vector(x[[1]]), logical(1))) > 0) {
+    stop("The elements of l1 must be matrices or list of one vector.")
+  }
+  if (sum(vapply(l2, function(x)
+    !is.numeric(x) & !is.logical(x), logical(1))) > 0) {
+    stop("The elements of l2 must be numeric vectors or vectors of NA.")
+  }
+  if (sum(vapply(l1, function(x) is.matrix(x), logical(1))) == 3) {
+    if (!isTRUE(all.equal(vapply(l1, function(x) nrow(x), numeric(1)),
+                          vapply(l2, function(x) length(x), numeric(1))))) {
+      stop("The number of rows of the matrices in l1 must be equal ",
+           "to the length of the vectors in l2.")
+    }
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  m_res <- matrix(NA, nrow = length(l2[[1]]), ncol = length(l1))
+  colnames(m_res) <- names(l1)
+
+  for(i in seq_along(l1)) {
+    if (names(l1)[i] == "cics") {
+      if (is.matrix(l1[["cics"]])) {
+        m_res[, "cics"] <- l1[["cics"]]
+      }
+      if (is.vector(l1[["cics"]][[1]]) & length(l1[["cics"]][[1]]) == 1) {
+        m_res[, "cics"] <- rep(unname(l1[[i]][[1]]), length(l2[[1]]))
+      }
+    } else {
+      if (is.matrix(l1[[i]])) {
+        m_res[, i] <- vapply(seq_along(l2[[1]]), function(j) {
+          ifelse(!is.na(l2[[i]][j]),
+                 l1[[i]][j, l2[[i]][j]],
+                 NA)
+        }, numeric(1))
+      } else {
+        if (is.list(l1[[i]])) {
+          m_res[, i] <- vapply(seq_along(l2[[1]]), function(j) {
+            ifelse(!is.na(l2[[i]][j]),
+                   l1[[i]][[1]][l2[[i]][j]],
+                   NA)
+          },
+          numeric(1))
+        }
+      }
+    }
+  }
+
+  return(m_res)
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #' Print value(s)
 #'
 #' The function \code{print_val()} generates a character string for the purpose

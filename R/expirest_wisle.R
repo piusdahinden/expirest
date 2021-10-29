@@ -381,22 +381,19 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # Determination of worst case scenario (wcs) limits for all intercepts of
   # all models (on the transformed scale, if data have been transformed)
 
-  l_wcsl <- lapply(l_icpt, function(x) {
-    matrix(vapply(x[["icpt"]], function(xx) {
-      vapply(rl, function(j) {
+  # List of all wcs_limit lists
+  ll_wcsl <- lapply(seq_along(l_icpt), function(i) {
+    lapply(l_icpt[[i]]$icpt, function(xx) {
+      lapply(rl, function(j) {
         get_wcs_limit(rl = j, sl = sl, intercept = xx,
                       xform = xform, shift = shift,
-                      ivl_side = ivl_side)[["wcs.lim"]]
-      },
-      numeric(1))
-    }, numeric(length(rl))),
-    nrow = length(rl), ncol = length(x[[1]]),
-    dimnames = list(NULL, names(x[[1]])))
+                      ivl_side = ivl_side)
+      })
+    })
   })
+  names(ll_wcsl) <- names(l_icpt)
 
-  if (sum(vapply(l_wcsl, is.null, logical(1))) > 0) {
-    stop("Not all wcs limits for all models and intercepts calculated.")
-  }
+  l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Calculation of POI values for all wcs limits
@@ -572,20 +569,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Matrix of the worst case POI values for each model and each rl value
 
-  m_poi <- matrix(NA, nrow = length(rl), ncol = length(l_poi))
-  colnames(m_poi) <- names(l_poi)
-
-  for(i in seq_along(l_poi)) {
-    if (names(l_poi)[i] == "cics") {
-      m_poi[, "cics"] <- l_poi[["cics"]]
-    } else {
-      m_poi[, i] <- vapply(seq_along(rl), function(j) {
-        ifelse(!is.na(l_wc_batch[[i]][j]),
-               l_poi[[i]][j, l_wc_batch[[i]][j]],
-               NA)
-      }, numeric(1))
-    }
-  }
+  m_poi <- extract_wc_x(l1 = l_poi, l2 = l_wc_batch)
 
   # Depending on the transformation of the time variable the POI values have to
   # be back-transformed.
@@ -610,84 +594,28 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # ---------
   # Worst case intercepts (wc_icpt_argpm) (on the original scale)
 
-  wc_icpt_argpm <- matrix(NA, nrow = length(rl), ncol = length(l_wc_batch))
-  colnames(wc_icpt_argpm) <- names(l_wc_batch)
-
   if (xform[2] == "no") {
-    for(i in seq_along(l_wc_batch)) {
-      if (names(l_wc_batch)[i] == "cics") {
-        wc_icpt_argpm[, i] <-
-          rep(unname(l_icpt[[i]][["icpt"]]), length(rl))
-      } else {
-        wc_icpt_argpm[, i] <-
-          vapply(seq_along(rl), function(j) {
-            ifelse(!is.na(l_wc_batch[[i]][j]),
-                   l_icpt[[i]][["icpt"]][l_wc_batch[[i]][j]],
-                   NA)
-          },
-          numeric(1))
-      }
-    }
+    wc_icpt_argpm <- extract_wc_x(l1 = l_icpt, l2 = l_wc_batch)
   } else {
-    for(i in seq_along(l_wc_batch)) {
-      if (names(l_wc_batch)[i] == "cics") {
-        wc_icpt_argpm[, i] <-
-          rep(unname(l_icpt[[i]][["icpt.orig"]]), length(rl))
-      } else {
-        wc_icpt_argpm[, i] <-
-          vapply(seq_along(rl), function(j) {
-            ifelse(!is.na(l_wc_batch[[i]][j]),
-                   l_icpt[[i]][["icpt.orig"]][l_wc_batch[[i]][j]],
-                   NA)
-          },
-          numeric(1))
-      }
-    }
+    l_icpt_sub <- lapply(l_icpt, function(x) list(x$icpt.orig))
+    wc_icpt_argpm <- extract_wc_x(l1 = l_icpt_sub, l2 = l_wc_batch)
   }
 
   # ---------
   # Delta and WCSL
 
-  m_delta <- matrix(NA, nrow = length(rl), ncol = length(l_wc_batch))
-  colnames(m_delta) <- names(l_wc_batch)
-  m_wcsl <- m_delta
+  if (xform[2] == "no") {
+    l_delta <- extract_from_ll_wcsl(ll_wcsl, "delta.lim")
+    l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
 
-  for(j in seq_along(l_wc_batch)) {
-    for(i in seq_along(rl)) {
-      if (names(l_wc_batch)[j] == "cics") {
-        tmp <-
-          get_wcs_limit(rl = rl[i], sl = sl, intercept = l_icpt[[j]][["icpt"]],
-                        xform = xform, shift = shift, ivl_side = ivl_side)
+    m_delta <- extract_wc_x(l1 = l_delta, l2 = l_wc_batch)
+    m_wcsl <- extract_wc_x(l1 = l_wcsl, l2 = l_wc_batch)
+  } else {
+    l_delta_orig <- extract_from_ll_wcsl(ll_wcsl, "delta.lim.orig")
+    l_wcsl_orig <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim.orig")
 
-        if (xform[2] == "no") {
-          m_delta[i, j] <- tmp[["delta.lim"]]
-          m_wcsl[i, j] <- tmp[["wcs.lim"]]
-
-        } else {
-          m_delta[i, j] <- tmp[["delta.lim.orig"]]
-          m_wcsl[i, j] <- tmp[["wcs.lim.orig"]]
-        }
-      } else {
-        if (!is.na(l_wc_batch[[j]][i])) {
-          tmp <-
-            get_wcs_limit(rl = rl[i], sl = sl, intercept =
-                            l_icpt[[j]][["icpt"]][l_wc_batch[[j]]][i],
-                          xform = xform, shift = shift, ivl_side = ivl_side)
-
-          if (xform[2] == "no") {
-            m_delta[i, j] <- tmp[["delta.lim"]]
-            m_wcsl[i, j] <- tmp[["wcs.lim"]]
-
-          } else {
-            m_delta[i, j] <- tmp[["delta.lim.orig"]]
-            m_wcsl[i, j] <- tmp[["wcs.lim.orig"]]
-          }
-        } else {
-          m_delta[i, j] <- NA
-          m_wcsl[i, j] <- NA
-        }
-      }
-    }
+    m_delta <- extract_wc_x(l1 = l_delta_orig, l2 = l_wc_batch)
+    m_wcsl <- extract_wc_x(l1 = l_wcsl_orig, l2 = l_wc_batch)
   }
 
   # ---------

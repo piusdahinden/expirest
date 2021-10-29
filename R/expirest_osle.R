@@ -436,13 +436,6 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
                   xform = xform, shift = shift)),
     list(1))
 
-  # ---------
-  # Check if determination was successful
-
-  if (sum(vapply(l_icpt, is.null, logical(1))) > 0) {
-    stop("Not for all models intercepts extracted.")
-  }
-
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Calculation of POI values for all three model types
 
