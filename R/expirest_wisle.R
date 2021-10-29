@@ -456,10 +456,8 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
                      ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
         }
 
-
         if (is.null(tmp_poi[["Error"]])) {
           m_poi[j, k] <- tmp_poi[["Model"]]
-
 
           if (variety != "dids") {
             tmp_prl <- try_get_model(
@@ -516,14 +514,14 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
          "lower" = {
            l_min_dist <- lapply(l_prl, FUN = function(x) {
              apply(x, c(1, 2), FUN = function(y) {
-               ifelse(length(which.min(y)) != 0, which.min(y), NA)
+               ifelse(length(which.min(y)) != 0, which.min(abs(y)), NA)
              })
            })
          },
          "upper" = {
            l_min_dist <- lapply(l_prl, FUN = function(x) {
              apply(x, c(1, 2), FUN = function(y) {
-               ifelse(length(which.max(y)) != 0, which.max(y), NA)
+               ifelse(length(which.max(y)) != 0, which.max(abs(y)), NA)
              })
            })
          })
