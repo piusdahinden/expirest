@@ -61,7 +61,8 @@ should be plotted as lines (option \code{"line"}) or as a shaded ribbon
 (option \code{"ribbon"}). The default is \code{"line"}.}
 }
 \value{
-A list with the following elements is returned invisibly:
+An object of class \sQuote{\code{plot_expirest_wisle}} is returned
+invisibly consisting of the following elements:
 \item{Model}{The \sQuote{\code{expirest_wisle}} object that was passed via
   the \code{model} argument.}
 \item{Expiery}{A data frame of type \code{expiry}.}
