@@ -704,7 +704,8 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' the list that is returned by \code{\link{plot_expirest_wisle}()} and can be
 #' used to modify the appearance of the graph.
 #'
-#' @return A list with the following elements is returned invisibly:
+#' @return An object of class \sQuote{\code{plot_expirest_wisle}} is returned
+#' invisibly consisting of the following elements:
 #' \item{Model}{The \sQuote{\code{expirest_wisle}} object that was passed via
 #'   the \code{model} argument.}
 #' \item{Expiery}{A data frame of type \code{expiry}.}
@@ -1609,15 +1610,16 @@ plot_expirest_wisle <- function(
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Collecting the results
 
-  invisible(list(Model = model,
-                 Expiry = t_exp,
-                 Graph = ggraph,
-                 Prediction = d_pred,
-                 text = d_text,
-                 hlines = d_hlines,
-                 vlines = d_vlines,
-                 segments = d_seg,
-                 arrow = d_arr))
+  invisible(structure(list(Model = model,
+                           Expiry = t_exp,
+                           Graph = ggraph,
+                           Prediction = d_pred,
+                           text = d_text,
+                           hlines = d_hlines,
+                           vlines = d_vlines,
+                           segments = d_seg,
+                           arrow = d_arr),
+                      class = "plot_expirest_wisle"))
 }
 
 # <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
