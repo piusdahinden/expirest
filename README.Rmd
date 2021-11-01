@@ -1,0 +1,102 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# expirest
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The package supports shelf life estimation for chemically derived medicines, either following the standard method proposed by the International Council for Harmonisation (ICH), in quality guideline [Q1E Evaluation of Stability Data](https://www.ich.org/)) or following the worst-case scenario consideration (what-if analysis) described in the Australian Regulatory Guidelines for Prescription Medicines (ARGPM), guidance on ([Stability testing for prescription medicines](https://www.tga.gov.au/stability-testing-prescription-medicines)).
+
+
+## Installation
+
+**So far, the package has not yet been submitted to CRAN.** The development version of is available from [GitHub](https://github.com/piusdahinden/expirest). Installation from this source is easily done by using 'install_github()' function from the 'devtools' package:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("piusdahinden/expirest")
+```
+
+## Example
+
+### Example 1
+This is a basic example which shows you how to solve a common problem using a data set containing the moisture stability data (% (w/w)) of three batches obtained over a 24 months period of a drug product. A total of *n* = 33 independent measurements are available (corresponding to data shown in Table XIII in [LeBlond et al. (2011)](http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf)).
+
+``` {r example_1, message = FALSE}
+library(expirest)
+
+# Data frame
+str(exp3)
+
+# Perform what-if shelf life estimation (wisle) and print a summary
+res1 <- expirest_wisle(
+      data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+      batch_vbl = "Batch", rl = 3.00, rl_sf = 3, sl = c(0.5, 4.5),
+      sl_sf = c(1, 2), srch_range = c(0, 500), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")
+
+class(res1)
+summary(res1)
+
+# Prepare graphical representation
+ggres1 <- plot_expirest_wisle(
+      model = res1, rl_index = 1, show_grouping = "no",
+      response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
+      x_range = NULL, scenario = "standard", plot_option = "full",
+      ci_app = "ribbon")
+class(ggres1)
+plot(ggres1)
+```
+
+
+### Example 2
+The model type in *Example 1* was *common intercept / common slope* (cics). The model type in this example is *different intercept / different slope* (dids). A data set containing the potency stability data (in \% of label claim (LC)) of five batches of a drug product obtained over a 24 months period is used. A total of *n* = 53 independent measurements are available (corresponding to data shown in Tables IV, VI and VIII in [LeBlond et al. (2011)](http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf)).
+
+``` {r example_2, message = FALSE}
+library(expirest)
+
+# Data frame
+str(exp1)
+
+# Perform what-if shelf life estimation (wisle) and print a summary
+res1 <- expirest_wisle(
+      data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
+      response_vbl = "Potency", time_vbl = "Month", batch_vbl = "Batch",
+      rl = c(98.0, 98.5, 99.), rl_sf = rep(2, 3), sl = 95, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
+
+summary(res1)
+
+# Prepare graphical representation
+ggres1 <- plot_expirest_wisle(
+      model = res1, rl_index = 2, show_grouping = "yes",
+      response_vbl_unit = "%", y_range = c(93, 107),
+      x_range = NULL, scenario = "standard", plot_option = "full",
+      ci_app = "ribbon")
+class(ggres1)
+plot(ggres1)
+```
+
+
+## Contact
+[Pius Dahinden](https://github.com/piusdahinden), Tillotts Pharma AG
+
+
+---
