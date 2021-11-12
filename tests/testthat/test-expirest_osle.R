@@ -235,7 +235,8 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
 # on p. 174-176 of the manual, i.e. in SAS Institute Inc. 2015. JMP(R) 12
 # Reliability and Survival Methods. Cary, NC: SAS Institute Inc.
 
-test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_manual", {
+test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
+          manual", {
   re <-
     expirest_osle(data = exp4, response_vbl = "Conc", time_vbl = "Month",
                   batch_vbl = "Batch", sl = 95, sl_sf = 2,
@@ -490,7 +491,7 @@ test_that("expirest_osle_succeeds_with_transformations", {
 
 test_that("expirest_osle_succeeds_for_model_type", {
   t_dat1 <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
-  t_dat2 <- exp1[exp1$Batch %in% c("b3", "b5", "b5"), ]
+  t_dat2 <- exp1[exp1$Batch %in% c("b3", "b4", "b5"), ]
   t_dat3 <- exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]
 
   usl <- 105

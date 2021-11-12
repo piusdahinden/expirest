@@ -6,7 +6,7 @@ test_that("check_ancova_succeeds", {
   tmp[1:2] <- check_ancova(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                            response_vbl = "Potency", time_vbl = "Month",
                            batch_vbl = "Batch", alpha = 0.25)
-  tmp[3:4] <- check_ancova(data = exp1[exp1$Batch %in% c("b3", "b5", "b5"), ],
+  tmp[3:4] <- check_ancova(data = exp1[exp1$Batch %in% c("b3", "b4", "b5"), ],
                            response_vbl = "Potency", time_vbl = "Month",
                            batch_vbl = "Batch", alpha = 0.25)
   tmp[5:6] <- check_ancova(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],

@@ -155,7 +155,7 @@ test_that("expirest_wisle_estimation_succeeds_with_transformations", {
 
 test_that("expirest_wisle_estimation_succeeds_for_model_type", {
   t_dat1 <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
-  t_dat2 <- exp1[exp1$Batch %in% c("b3", "b5", "b5"), ]
+  t_dat2 <- exp1[exp1$Batch %in% c("b3", "b4", "b5"), ]
   t_dat3 <- exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]
 
   usl <- 105

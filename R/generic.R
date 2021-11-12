@@ -33,6 +33,8 @@
 #' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
 #' \code{\link[base]{formatC}}, \code{\link[utils]{methods}}.
 #'
+#' @example man/examples/examples_summary.expirest_osle.R
+#'
 #' @export
 
 summary.expirest_osle <- function(object, ...) {
@@ -96,6 +98,8 @@ summary.expirest_osle <- function(object, ...) {
 #'
 #' @inherit summary.expirest_osle details seealso
 #'
+#' @example man/examples/examples_print.expirest_osle.R
+#'
 #' @export
 
 print.expirest_osle <- function(x, ...) {
@@ -130,6 +134,8 @@ print.expirest_osle <- function(x, ...) {
 #' @seealso \code{\link{expirest_osle}}, \code{\link{plot_expirest_osle}},
 #' \code{\link[ggplot2]{ggplot}()}, \code{\link[utils]{methods}}.
 #'
+#' @example man/examples/examples_plot.plot_expirest_osle.R
+#'
 #' @export
 
 plot.plot_expirest_osle <- function(x, ...) {
@@ -151,6 +157,8 @@ plot.plot_expirest_osle <- function(x, ...) {
 #' @inheritParams plot.plot_expirest_osle
 #'
 #' @inherit plot.plot_expirest_osle details return seealso
+#'
+#' @example man/examples/examples_print.plot_expirest_osle.R
 #'
 #' @export
 
@@ -200,6 +208,8 @@ print.plot_expirest_osle <- function(x, ...) {
 #'
 #' @seealso \code{\link{expirest_wisle}}, \code{\link{expirest_osle}},
 #' \code{\link[base]{formatC}}, \code{\link[utils]{methods}}.
+#'
+#' @example man/examples/examples_summary.expirest_wisle.R
 #'
 #' @export
 
@@ -279,6 +289,8 @@ summary.expirest_wisle <- function(object, ...) {
 #'
 #' @inherit summary.expirest_wisle details seealso
 #'
+#' @example man/examples/examples_print.expirest_wisle.R
+#'
 #' @export
 
 print.expirest_wisle <- function(x, ...) {
@@ -312,6 +324,8 @@ print.expirest_wisle <- function(x, ...) {
 #' @seealso \code{\link{expirest_wisle}}, \code{\link{plot_expirest_wisle}},
 #' \code{\link[ggplot2]{ggplot}()}, \code{\link[utils]{methods}}.
 #'
+#' @example man/examples/examples_plot.plot_expirest_wisle.R
+#'
 #' @export
 
 plot.plot_expirest_wisle <- function(x, ...) {
@@ -333,6 +347,8 @@ plot.plot_expirest_wisle <- function(x, ...) {
 #' @inheritParams plot.plot_expirest_wisle
 #'
 #' @inherit plot.plot_expirest_wisle details return seealso
+#'
+#' @example man/examples/examples_print.plot_expirest_wisle.R
 #'
 #' @export
 

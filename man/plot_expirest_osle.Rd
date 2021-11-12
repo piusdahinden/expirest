@@ -80,27 +80,58 @@ the list that is returned by \code{\link{plot_expirest_osle}()} and can be
 used to modify the appearance of the graph.
 }
 \examples{
-# Successful estimation
-r.exp <-
+# Potency stability data (in \% of label claim (LC)) of five batches of a drug
+# product obtained over a 24 months period:
+str(exp1)
+
+# 'data.frame':	53 obs. of  3 variables:
+# $ Batch  : Factor w/ 6 levels "b2","b3","b4",..: 1 1 1 1 1 1 1 1 1 1 ...
+# $ Month  : num  0 1 3 3 6 6 12 12 24 24 ...
+# $ Potency: num  101 101.3 99.8 99.2 99.5 ...
+
+# Start by making an "ordinary shelf life estimation" (osle).
+res1 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                 response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3,
-                srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
-                xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
-                ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
+                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
 
-# Graphical display
-tmp <- plot_expirest_osle(
-  model = r.exp, show_grouping = "no", response_vbl_unit = "\%",
+# Pass the 'expirest_osle' object on to the plot_expirest_osle() function.
+# This function does not produce any output. It returns a 'plot_expirest_osle'
+# object that is essentially an 'expirest_osle' object augmented by a 'ggplot'
+# object.
+gg1 <- plot_expirest_osle(
+  model = res1, show_grouping = "no", response_vbl_unit = "\%",
   y_range = c(93, 107), x_range = NULL, plot_option = "full",
+  ci_app = "line")
+gg1
+
+# Since the element gg1$Graph is a 'ggplot' object it can be used for further
+# manipulation by aid of 'ggplot2' functions.
+\dontrun{
+  library(ggplot2)
+
+  gg1$Graph + labs(title = "Ordinary Shelf Life Estimation (OSLE)",
+                   x = "Time [months]", y = "Potency [\% LC]")
+}
+
+# Illustration of the grouping
+gg2 <- plot_expirest_osle(
+  model = res1, show_grouping = "yes", response_vbl_unit = "\%",
+  y_range = c(93, 107), x_range = c(0, 35), plot_option = "full",
+  ci_app = "line")
+gg2
+
+# Repeat this for a different intercept / different slope (dids) model.
+res2 <-
+  expirest_osle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
+                response_vbl = "Potency", time_vbl = "Month",
+                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
+
+gg3 <- plot_expirest_osle(
+  model = res2, show_grouping = "yes", response_vbl_unit = "\%",
+  y_range = c(83, 107), x_range = c(0, 43), plot_option = "full",
   ci_app = "ribbon")
-
-# Results in tmp[["Expiry"]]
-# cics     dics     dids
-# 25.99576 24.56688 23.14804
-
-# Plotting the graph
-# tmp[["Graph"]]
+gg3
 }
 \seealso{
 \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
