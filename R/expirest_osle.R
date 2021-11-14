@@ -835,14 +835,11 @@ plot_expirest_osle <- function(
     }
   }
 
-  # Setting the plotting area's x range and setting the ticks where the number
-  # of ticks should be approximately 10 and they should be divisible by 3.
-  x_tick_distance <- round(((t_max - t_min) / 10) / 3, 0) * 3
-  if (x_tick_distance < 1) x_tick_distance <- 1
+  # Setting x_range and the x_breaks where the number of ticks should be 5
   x_range <- c(t_min, t_max)
-  x_breaks <- seq(t_min, t_max, x_tick_distance)
+  x_breaks <- pretty(x_range, 5)
 
-  # Setting the y_breaks where the number of ticks should be 5.
+  # Setting the y_breaks where the number of ticks should be 5
   y_breaks <- pretty(y_range, 5)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -127,7 +127,8 @@ gg1
   library(ggplot2)
 
   gg1$Graph + labs(title = "What-if Shelf Life Estimation (WISLE)",
-                   x = "Time [months]", y = "Potency [\% LC]")
+                   x = "Time [months]", y = "Potency [\% LC]") +
+    scale_x_continuous(limits = c(-5, 31), breaks = seq(0, 30, 6))
 }
 
 # Illustration of the grouping

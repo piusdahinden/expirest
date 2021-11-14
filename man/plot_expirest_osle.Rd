@@ -111,7 +111,8 @@ gg1
   library(ggplot2)
 
   gg1$Graph + labs(title = "Ordinary Shelf Life Estimation (OSLE)",
-                   x = "Time [months]", y = "Potency [\% LC]")
+                   x = "Time [months]", y = "Potency [\% LC]") +
+    scale_x_continuous(limits = c(-1, 31), breaks = seq(0, 30, 6))
 }
 
 # Illustration of the grouping
