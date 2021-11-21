@@ -1,9 +1,9 @@
 context("Getting intercepts")
 
 test_that("get_icpt_succeeds", {
-  response_vbl = "Potency"
-  time_vbl = "Month"
-  batch_vbl = "Batch"
+  response_vbl <- "Potency"
+  time_vbl <- "Month"
+  batch_vbl <- "Batch"
 
   l_models <- list()
 

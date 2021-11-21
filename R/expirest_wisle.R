@@ -432,13 +432,13 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 
     a_prl <- array(NA, dim = c(length(rl), length(l_icpt[[variety]][["icpt"]]),
                                length(l_icpt[[variety]][["icpt"]])),
-                   dimnames = list(as.character(1:length(rl)),
+                   dimnames = list(as.character(seq_along(rl)),
                                    names(l_icpt[[variety]][["icpt"]]),
                                    names(l_icpt[[variety]][["icpt"]])))
 
     # Fill arrays
     for(j in seq_along(rl)) {
-      for(k in 1:ncol(l_wcsl[[variety]])) {
+      for(k in seq_len(ncol(l_wcsl[[variety]]))) {
         if (variety != "dids") {
           tmp_poi <- try_get_model(
             find_poi(srch_range = srch_range,
@@ -470,7 +470,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
           } else {
             t_prl <- rep(NA, ncol(l_wcsl[[variety]]))
 
-            for(kk in 1:ncol(l_wcsl[["dids"]])) {
+            for(kk in seq_len(ncol(l_wcsl[["dids"]]))) {
               tmp_prl <- try_get_model(
                 get_intvl_limit(
                   x_new = tmp_poi[["Model"]],
