@@ -21,19 +21,19 @@
 #' @keywords internal
 
 try_get_model <- function(expr) {
-  warning.msg <- error.msg <- NULL
+  warning_msg <- error_msg <- NULL
 
   result <- withCallingHandlers(
     tryCatch(expr,
              error = function(err) {
-               error.msg <<- err
+               error_msg <<- err
                NULL
              }),
     warning = function(warn) {
-      warning.msg <<- warn
+      warning_msg <<- warn
     })
 
-  list(Model = result, Warning = warning.msg, Error = error.msg)
+  list(Model = result, Warning = warning_msg, Error = error_msg)
 }
 
 ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><>

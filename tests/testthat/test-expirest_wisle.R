@@ -211,7 +211,7 @@ test_that("expirest_wisle_warns", {
   expect_warning(
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = lrl, rl_sf = 2, sl = lsl, sl_sf= 2,
+      batch_vbl = "Batch", rl = lrl, rl_sf = 2, sl = lsl, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "prediction", ivl_type = "one.sided", ivl_side = "lower"),
@@ -219,7 +219,7 @@ test_that("expirest_wisle_warns", {
   expect_warning(
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = lrl, rl_sf = 2, sl = lsl, sl_sf= 2,
+      batch_vbl = "Batch", rl = lrl, rl_sf = 2, sl = lsl, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "prediction", ivl_type = "one.sided", ivl_side = "lower"),
@@ -240,7 +240,7 @@ test_that("expirest_wisle_fails_with_warning_tight_spec_limits", {
     suppressWarnings(
       expirest_wisle(
         data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-        batch_vbl = "Batch", rl = lrl, rl_sf = 2, sl = lsl, sl_sf= 2,
+        batch_vbl = "Batch", rl = lrl, rl_sf = 2, sl = lsl, sl_sf = 2,
         srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
         xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
         ivl = "prediction", ivl_type = "two.sided", ivl_side = "lower"
@@ -249,7 +249,7 @@ test_that("expirest_wisle_fails_with_warning_tight_spec_limits", {
     suppressWarnings(
       expirest_wisle(
         data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-        batch_vbl = "Batch",rl = lrl, rl_sf = 2, sl = lsl, sl_sf= 2,
+        batch_vbl = "Batch", rl = lrl, rl_sf = 2, sl = lsl, sl_sf = 2,
         srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
         xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
         ivl = "prediction", ivl_type = "two.sided", ivl_side = "lower"

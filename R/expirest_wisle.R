@@ -296,11 +296,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # Note: The log and sqrt transformations include adding the value defined by
   #       the shift parameter before performing the transformation.
 
-  d_dat <- r_ret[["Data"]]
-
   if (sum(xform %in% "no") == 0) {
-    old_time_vbl <- r_ret[["Variables"]][["time.orig"]]
-    old_response_vbl <- r_ret[["Variables"]][["response.orig"]]
     time_vbl <- r_ret[["Variables"]][["time"]]
     response_vbl <- r_ret[["Variables"]][["response"]]
   }
@@ -424,7 +420,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   l_prl <- vector(mode = "list", length = length(l_icpt))
   names(l_prl) <- c("cics", "dics", "dids")
 
-  for(variety in names(l_icpt)) {
+  for (variety in names(l_icpt)) {
     # Initialise empty arrays
     m_poi <-
       matrix(NA, nrow = length(rl), ncol = length(l_icpt[[variety]][["icpt"]]))
@@ -437,8 +433,8 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
                                    names(l_icpt[[variety]][["icpt"]])))
 
     # Fill arrays
-    for(j in seq_along(rl)) {
-      for(k in seq_len(ncol(l_wcsl[[variety]]))) {
+    for (j in seq_along(rl)) {
+      for (k in seq_len(ncol(l_wcsl[[variety]]))) {
         if (variety != "dids") {
           tmp_poi <- try_get_model(
             find_poi(srch_range = srch_range,
@@ -470,7 +466,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
           } else {
             t_prl <- rep(NA, ncol(l_wcsl[[variety]]))
 
-            for(kk in seq_len(ncol(l_wcsl[["dids"]]))) {
+            for (kk in seq_len(ncol(l_wcsl[["dids"]]))) {
               tmp_prl <- try_get_model(
                 get_intvl_limit(
                   x_new = tmp_poi[["Model"]],
@@ -548,7 +544,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   l_wc_batch <- vector(mode = "list", length = length(l_min_poi))
   names(l_wc_batch) <- names(l_min_poi)
 
-  for(i in seq_along(l_min_dist)) {
+  for (i in seq_along(l_min_dist)) {
     if (names(l_min_dist)[i] == "cics") {
       l_wc_batch[[i]] <- rep(NA, length(rl))
     } else {
@@ -845,7 +841,6 @@ plot_expirest_wisle <- function(
   d_dat <- expob[["Data"]]
 
   alpha <- expob[["Parameters"]][["alpha"]]
-  alpha_pool <- expob[["Parameters"]][["alpha.pool"]]
   ivl <- expob[["Parameters"]][["ivl"]]
   ivl_type <- expob[["Parameters"]][["ivl.type"]]
   ivl_side <- expob[["Parameters"]][["ivl.side"]]
@@ -900,9 +895,6 @@ plot_expirest_wisle <- function(
   # Extraction of limits and the intercept
 
   l_lim <- expob[["Limits"]]
-
-  sl_orig <- l_lim[["sl.orig"]]
-  rl_orig <- l_lim[["rl.orig"]]
 
   sl <- l_lim[["sl"]]
   rl <- l_lim[["rl"]]
@@ -963,7 +955,8 @@ plot_expirest_wisle <- function(
 
   # Transformation of new x values, if necessary
   switch(xform[1],
-         "no" = {},
+         "no" = {
+         },
          "log" = {
            x_new_trfmd <- log(x_new + shift[1])
          },
@@ -993,7 +986,8 @@ plot_expirest_wisle <- function(
 
   # Back-transformation of predicted (response) values, if necessary
   switch(xform[2],
-         "no" = {},
+         "no" = {
+         },
          "log" = {
            m_pred <- exp(m_pred) - shift[2]
          },
@@ -1614,4 +1608,3 @@ plot_expirest_wisle <- function(
 }
 
 # <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-

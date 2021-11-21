@@ -629,7 +629,7 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
   # If necessary, determine the adjusted (based on rl_sf and sl_sf) values of
   # rl and sl.
 
-  if (sf_option == "loose"){
+  if (sf_option == "loose") {
     # Specification limit(s)
     sl_factor <- 10^(get_n_whole_part(sl) - 1)
     sl_std <- signif(sl / sl_factor, sl_sf)
@@ -962,8 +962,8 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
   # common_icpt: yes or no (common intercept model)
   # common_slp:  yes or no (common slope model)
 
-  ifelse (p_batch > alpha, common_icpt <- 1L, common_icpt <- 0L)
-  ifelse (p_interaction > alpha, common_slp <- 1L, common_slp <- 0L)
+  ifelse(p_batch > alpha, common_icpt <- 1L, common_icpt <- 0L)
+  ifelse(p_interaction > alpha, common_slp <- 1L, common_slp <- 0L)
 
   t_res <- c(common_icpt, common_slp)
   names(t_res) <- c("common.icpt", "common.slp")
@@ -1236,7 +1236,7 @@ extract_wc_x <- function(l1, l2) {
   m_res <- matrix(NA, nrow = length(l2[[1]]), ncol = length(l1))
   colnames(m_res) <- names(l1)
 
-  for(i in seq_along(l1)) {
+  for (i in seq_along(l1)) {
     if (names(l1)[i] == "cics") {
       if (is.matrix(l1[["cics"]])) {
         m_res[, "cics"] <- l1[["cics"]]

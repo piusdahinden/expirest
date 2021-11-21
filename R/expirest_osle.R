@@ -750,7 +750,6 @@ plot_expirest_osle <- function(
   d_dat <- expob[["Data"]]
 
   alpha <- expob[["Parameters"]][["alpha"]]
-  alpha_pool <- expob[["Parameters"]][["alpha.pool"]]
   ivl <- expob[["Parameters"]][["ivl"]]
   ivl_type <- expob[["Parameters"]][["ivl.type"]]
   ivl_side <- expob[["Parameters"]][["ivl.side"]]
@@ -806,7 +805,6 @@ plot_expirest_osle <- function(
 
   l_lim <- expob[["Limits"]]
 
-  sl_orig <- l_lim[["sl.orig"]]
   sl <- l_lim[["sl"]]
 
   # POI with the upper or lower confidence or prediction interval of the
@@ -850,7 +848,8 @@ plot_expirest_osle <- function(
 
   # Transformation of new x values, if necessary
   switch(xform[1],
-         "no" = {},
+         "no" = {
+         },
          "log" = {
            x_new_trfmd <- log(x_new + shift[1])
          },
@@ -880,7 +879,8 @@ plot_expirest_osle <- function(
 
   # Back-transformation of predicted (response) values, if necessary
   switch(xform[2],
-         "no" = {},
+         "no" = {
+         },
          "log" = {
            m_pred <- exp(m_pred) - shift[2]
          },

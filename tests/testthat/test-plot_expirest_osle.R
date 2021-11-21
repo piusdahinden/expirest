@@ -4,7 +4,7 @@ test_that("plot_expirest_osle_succeeds", {
   re1 <-
     expirest_osle(
       data = exp2, response_vbl = "Related", time_vbl = "Month",
-      batch_vbl = "Batch", sl = 0.3, sl_sf = 2,srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 0.3, sl_sf = 2, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "loose", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "upper")

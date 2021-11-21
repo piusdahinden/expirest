@@ -2,9 +2,9 @@ context("Ordinary shelf life estimation")
 
 # The tests use the values published by LeBlond et al. (LeBlond 2011),
 # i.e. in the various tables and figures that are presented in
-# LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
-# Shelf Life Estimation Using Analysis of Covariance. J Valid Technol (2011)
-# 17(3): 47-68.
+# LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102:
+# Stability Shelf Life Estimation Using Analysis of Covariance.
+# J Valid Technol (2011) 17(3): 47-68.
 
 test_that("expirest_osle_results_match_LeBlond_2011", {
   re <-
@@ -279,7 +279,7 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
   expect_equivalent(signif(re[["Models"]][["dics"]]$coefficients[5], 12),
                     -0.202213553211)
   expect_equivalent(signif(re[["Intercepts"]][["dids"]]$icpt, 12),
-                    c(101.817460317 , 100.249139280 , 102.384126984,
+                    c(101.817460317, 100.249139280, 102.384126984,
                       104.070645793))
   expect_equivalent(signif(c(re[["Models"]][["dids"]]$coefficients[5],
                              re[["Models"]][["dids"]]$coefficients[5] +
