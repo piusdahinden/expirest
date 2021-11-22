@@ -130,8 +130,6 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
   return(res)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Determine distance of lines
 #'
 #' The function \code{get_distance()} calculates the distance between two
@@ -230,8 +228,6 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
   return(res)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Point of intersection
 #'
 #' The function \code{find_poi()} determines the point where the distance
@@ -319,8 +315,6 @@ find_poi <- function(srch_range, model, sl, alpha = 0.05, ivl = "confidence",
 
   return(res)
 }
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' Transformation of variables
 #'
@@ -419,8 +413,6 @@ get_xformed_variables <- function(data, response_vbl, time_vbl,
   return(d_dat)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Listing of variable names
 #'
 #' The function \code{get_variable_list()} makes a list of the (original) and,
@@ -514,8 +506,6 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 
   return(l_variables)
 }
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' Adjustment of limits
 #'
@@ -732,8 +722,6 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
   return(l_res)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Determination of the \dQuote{worst case scenario} (wcs) limit
 #'
 #' The function \code{get_wcs_limit()} calculates \dQuote{worst case scenario}
@@ -884,8 +872,6 @@ get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
   return(l_res)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Result of ANCOVA model check
 #'
 #' The function \code{check_ancova()} fits an ANalysis of COVAriance (ANCOVA)
@@ -970,8 +956,6 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 
   return(t_res)
 }
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' Getting intercept(s) of a linear model
 #'
@@ -1096,8 +1080,6 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
   return(l_res)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Extract information from \dQuote{worst case scenario} (wcs) limit lists list
 #'
 #' The function \code{extract_from_ll_wcsl()} extracts specific elements from
@@ -1168,8 +1150,6 @@ extract_from_ll_wcsl <- function(ll, element) {
 
   return(l_res)
 }
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' Extract worst case x value
 #'
@@ -1267,8 +1247,6 @@ extract_wc_x <- function(l1, l2) {
   return(m_res)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Print value(s)
 #'
 #' The function \code{print_val()} generates a character string for the purpose
@@ -1341,8 +1319,6 @@ print_val <- function(val_name, val_value, val_unit, val_sf,
         val_unit, suffix, sep = "")
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Get number of digits of whole part (of a decimal number)
 #'
 #' The function \code{get_n_whole_part()} counts the number of digits of the
@@ -1381,5 +1357,3 @@ get_n_whole_part <- function(x) {
 
   vapply(x, function(xx) check(xx), numeric(1))
 }
-
-# <><><><><><><><><><><><><><><><><><><><><><><><><><><><>

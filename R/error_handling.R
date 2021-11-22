@@ -35,5 +35,3 @@ try_get_model <- function(expr) {
 
   list(Model = result, Warning = warning_msg, Error = error_msg)
 }
-
-## <><><><><><><><><><><><><><><><><><><><><><><><><><><><>

@@ -586,8 +586,6 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
             class = "expirest_osle")
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Illustrating the ordinary shelf life estimate (osle)
 #'
 #' The function \code{plot_expirest_osle()} makes a graphical display of the
@@ -1143,5 +1141,3 @@ plot_expirest_osle <- function(
                            vlines = d_vlines),
                       class = "plot_expirest_osle"))
 }
-
-# <><><><><><><><><><><><><><><><><><><><><><><><><><><><>

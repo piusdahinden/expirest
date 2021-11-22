@@ -82,8 +82,6 @@ summary.expirest_osle <- function(object, ...) {
   invisible(object)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Print a summary of the shelf life estimation (osle)
 #'
 #' This is a method for the function \code{print()} for objects of class
@@ -108,8 +106,6 @@ print.expirest_osle <- function(x, ...) {
 
   invisible(x)
 }
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' Plot illustrating the shelf life estimation (osle)
 #'
@@ -145,8 +141,6 @@ plot.plot_expirest_osle <- function(x, ...) {
   invisible(x)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Print a plot illustrating the shelf life estimation (osle)
 #'
 #' This is a method for the function \code{print()} for objects of class
@@ -168,8 +162,6 @@ print.plot_expirest_osle <- function(x, ...) {
 
   invisible(x)
 }
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' Summary of the what-if shelf life estimation (wisle)
 #'
@@ -273,8 +265,6 @@ summary.expirest_wisle <- function(object, ...) {
   invisible(object)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Print a summary of the what-if shelf life estimation (wisle)
 #'
 #' This is a method for the function \code{print()} for objects of class
@@ -299,7 +289,6 @@ print.expirest_wisle <- function(x, ...) {
 
   invisible(x)
 }
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' Plot illustrating the what-if shelf life estimation (wisle)
 #'
@@ -335,8 +324,6 @@ plot.plot_expirest_wisle <- function(x, ...) {
   invisible(x)
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Print a plot illustrating the what-if shelf life estimation (wisle)
 #'
 #' This is a method for the function \code{print()} for objects of class
@@ -358,5 +345,3 @@ print.plot_expirest_wisle <- function(x, ...) {
 
   invisible(x)
 }
-
-## <><><><><><><><><><><><><><><><><><><><><><><><><><><><>

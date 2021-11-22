@@ -660,8 +660,6 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
             class = "expirest_wisle")
 }
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #' Illustrating the what-if (approach for) shelf life estimate (wisle)
 #'
 #' The function \code{plot_expirest_wisle()} makes a graphical display of the
@@ -1606,5 +1604,3 @@ plot_expirest_wisle <- function(
                            arrow = d_arr),
                       class = "plot_expirest_wisle"))
 }
-
-# <><><><><><><><><><><><><><><><><><><><><><><><><><><><>
