@@ -160,7 +160,7 @@ test_that("get_intvl_limit_fails", {
   usl <- 105
   lsl <- 95
 
-  tmp <- rep(NA, 2)
+  tmp <- rep(NA, 3)
 
   # <-><-><-><->
 
@@ -170,10 +170,13 @@ test_that("get_intvl_limit_fails", {
   tmp[2] <- get_intvl_limit(x_new = 24, model = r_pot, alpha = 1E-32,
                             ivl = "prediction", ivl_type = "one.sided",
                             ivl_side = "upper")
+  tmp[3] <- get_intvl_limit(x_new = NA, model = r_pot, alpha = 0.05,
+                            ivl = "prediction", ivl_type = "two.sided",
+                            ivl_side = "lower")
 
   # <-><-><-><->
 
-  expect_equal(signif(tmp, 12), c(Inf, Inf))
+  expect_equal(signif(tmp, 12), c(Inf, Inf, NA))
 
   # <-><-><-><->
 

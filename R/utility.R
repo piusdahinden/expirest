@@ -22,7 +22,7 @@
 
 get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
                          ivl_type = "one.sided", ivl_side = "lower") {
-  if (!is.numeric(x_new)) {
+  if (!is.numeric(x_new) & !is.na(x_new)) {
     stop("x_new must be a numeric value.")
   }
   if (class(model) != "lm") {
@@ -1059,10 +1059,12 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
              icpt_orig <- intercept^2 - shift[2]
            },
            "sq" = {
-             if (sum(intercept < 0) > 0) {
-               icpt_orig <- NA
-             } else {
-               icpt_orig <- sqrt(intercept) - shift[2]
+             icpt_orig <- rep(NA, length(intercept))
+             names(icpt_orig) <- names(intercept)
+
+             ok <- unname(which(intercept >= 0))
+             if (length(ok) > 0) {
+               icpt_orig[ok] <- sqrt(intercept[ok]) - shift[2]
              }
            })
   }
@@ -1112,13 +1114,20 @@ extract_from_ll_wcsl <- function(ll, element) {
     stop("The list ll must have three elements named \"cics\", \"dics\" ",
          "and \"dids\".")
   }
-  if (sum(vapply(ll, function(x) !is.list(x), logical(1))) > 0) {
-    stop("The elements of ll must be matrices or list of one vector.")
-  }
   if (!(element %in%
         c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig"))) {
     stop("Please specify element either as \"delta.lim\", \"delta.lim.orig\", ",
          "\"wcs.lim\" or \"wcs.lim.orig\".")
+  }
+  if (get_n_list_levels(ll) != 4) {
+    stop("The parameter ll must be a list of lists returned by ",
+         "get_wcs_limit() at level three.")
+  }
+  if (sum(vapply(ll, function(x)
+    sum(c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig") %in%
+                                     names(x[[1]][[1]])) != 4, logical(1)))) {
+    stop("The element was not found in the element names of the list ",
+         "at level three that must be a list returned by get_wcs_limit().")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1192,12 +1201,15 @@ extract_wc_x <- function(l1, l2) {
     stop("The list l2 must have three elements named \"cics\", \"dics\" ",
          "and \"dids\".")
   }
-  if (length(l1) != length(l2)) {
-    stop("The two lists l1 and l2 must have the same length.")
-  }
-  if (sum(vapply(l1, function(x) !is.matrix(x) &
-                 !is.vector(x[[1]]), logical(1))) > 0) {
-    stop("The elements of l1 must be matrices or list of one vector.")
+  if (get_n_list_levels(l1) == 1) {
+    if (sum(vapply(l1, function(x) !is.matrix(x), logical(1))) > 0) {
+      stop("The elements of l1 must be matrices or lists of vectors.")
+    }
+  } else {
+    if (sum(vapply(l1, function(x)
+      !is.numeric(x[[1]]) & !is.logical(x[[1]]), logical(1))) > 0) {
+      stop("The elements of l1 must be matrices or lists of vectors.")
+    }
   }
   if (sum(vapply(l2, function(x)
     !is.numeric(x) & !is.logical(x), logical(1))) > 0) {
@@ -1356,4 +1368,27 @@ get_n_whole_part <- function(x) {
   }
 
   vapply(x, function(xx) check(xx), numeric(1))
+}
+
+#' Determine the level of nesting of a list
+#'
+#' The function \code{get_n_list_levels()} determines the number of levels of
+#' a nested list.
+#'
+#' @param x A list.
+#'
+#' @details The function \code{get_n_list_levels()} determines the number of
+#' levels of a (nested) list.
+#'
+#' @return An integer representing the number of levels of the list. If an
+#' object is passed on to \code{x} that is not a list \code{0} is returned.
+#'
+#' @keywords internal
+
+get_n_list_levels <- function(x) {
+  if (is.list(x)) {
+    1L + max(vapply(x, get_n_list_levels, numeric(1)))
+  } else {
+   0L
+  }
 }

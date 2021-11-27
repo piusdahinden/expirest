@@ -1,6 +1,6 @@
 Package: expirest
 Type: Package
-Version: 0.0.0.9008
+Version: 0.0.0.9009
 Title: Expiry Estimation Procedures
 Description: The Australian Regulatory Guidelines for Prescription Medicines
     (ARGPM), guidance on \"Stability testing for prescription medicines\"
@@ -27,5 +27,5 @@ License: GPL (>= 2)
 URL: https://github.com/piusdahinden/expirest
 BugReports: https://github.com/piusdahinden/expirest/issues
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Encoding: UTF-8
