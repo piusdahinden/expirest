@@ -38,6 +38,6 @@ common intercept / common slope (cics) model, data in Table VI (batches
 LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
 (2011) \strong{17}(3): 47-68.\cr
-\url{http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
+\url{https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
 }
 \keyword{datasets}

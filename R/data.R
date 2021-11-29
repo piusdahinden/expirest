@@ -26,7 +26,7 @@
 #' LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 #' Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
 #' (2011) \strong{17}(3): 47-68.\cr
-#' \url{http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
+#' \url{https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
 #'
 #' @source
 #' See reference: Example data sets shown in Tables IV, VI and VIII.
@@ -58,7 +58,7 @@
 #' LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 #' Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
 #' (2011) \strong{17}(3): 47-68.\cr
-#' \url{http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
+#' \url{https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
 #'
 #' @source
 #' See reference: Example data sets shown in Table XI.
@@ -90,7 +90,7 @@
 #' LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 #' Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
 #' (2011) \strong{17}(3): 47-68.\cr
-#' \url{http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
+#' \url{https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
 #'
 #' @source
 #' See reference: Example data sets shown in Table XIII.
@@ -125,10 +125,7 @@
 #'
 #' @references
 #' SAS Institute Inc. 2015. \emph{JMP(R) 12 Reliability and Survival Methods}.
-#' Cary, NC: SAS Institute Inc.\cr
-#' \cr
-#' \url{https://support.sas.com/documentation/onlinedoc/jmp/12.0/
-#' ReliabilitySurvivalMethods.pdf}
+#' Cary, NC: SAS Institute Inc.
 #'
 #' @source
 #' See reference: Example data set (Stability.jmp) used in chapter

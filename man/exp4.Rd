@@ -33,9 +33,6 @@ Methods} manual).
 }
 \references{
 SAS Institute Inc. 2015. \emph{JMP(R) 12 Reliability and Survival Methods}.
-Cary, NC: SAS Institute Inc.\cr
-\cr
-\url{https://support.sas.com/documentation/onlinedoc/jmp/12.0/
-ReliabilitySurvivalMethods.pdf}
+Cary, NC: SAS Institute Inc.
 }
 \keyword{datasets}
