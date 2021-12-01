@@ -16,7 +16,7 @@ Description: The Australian Regulatory Guidelines for Prescription
     a release limit needs to be specified. Finding a release limit and the
     associated shelf life is supported, as well as the standard approach
     that is recommended by guidance Q1E \"Evaluation of stability data\"
-    from the Internation Council for Harmonisation (ICH)
+    from the International Council for Harmonisation (ICH)
     <https://database.ich.org/sites/default/files/Q1E%20Guideline.pdf>.
 License: GPL (>= 2)
 URL: https://github.com/piusdahinden/expirest
