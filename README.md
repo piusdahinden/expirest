@@ -18,10 +18,10 @@ medicines](https://www.tga.gov.au/stability-testing-prescription-medicines)).
 ## Installation
 
 **So far, the package has not yet been submitted to CRAN.** The
-development version of is available from
+development version is available from
 [GitHub](https://github.com/piusdahinden/expirest). Installation from
-this source is easily done by using ‘install\_github()’ function from
-the ‘devtools’ package:
+this source is easily done by using `install_github()` function from the
+`devtools` package:
 
 ``` r
 # install.packages("devtools")
@@ -37,7 +37,7 @@ using a data set containing the moisture stability data (% (w/w)) of
 three batches obtained over a 24 months period of a drug product. A
 total of *n* = 33 independent measurements are available (corresponding
 to data shown in Table XIII in [LeBlond et
-al. (2011)](http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf)).
+al. (2011)](https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf)).
 
 ``` r
 library(expirest)
@@ -100,7 +100,7 @@ data (in % of label claim (LC)) of five batches of a drug product
 obtained over a 24 months period is used. A total of *n* = 53
 independent measurements are available (corresponding to data shown in
 Tables IV, VI and VIII in [LeBlond et
-al. (2011)](http://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf)).
+al. (2011)](https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf)).
 
 ``` r
 library(expirest)
