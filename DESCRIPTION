@@ -1,7 +1,7 @@
 Type: Package
 Package: expirest
 Title: Expiry Estimation Procedures
-Version: 0.1.0.9001
+Version: 0.1.1
 Authors@R: c(
     person("Pius", "Dahinden", , "pius.dahinden@tillotts.com", role = c("aut", "cre")),
     person("Tillotts Pharma AG", , , "tillotts@tillotts.com", role = c("cph", "fnd"))
