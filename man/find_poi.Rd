@@ -67,9 +67,28 @@ package. The distance between the two lines of interest is calculated using
 the function \code{\link{get_distance}()}, and it is this distance which
 \code{uniroot()} tries to minimise. Recommendations on how to estimate shelf
 life or expiry can be found in the corresponding section below.
-
-#@inheritSection get_distance How to estimate shelf life or expiry
 }
+\section{How to estimate shelf life or expiry}{
+
+ICH Q1E recommends that \dQuote{\emph{For an attribute known to decrease with
+time, the lower one-sided 95 percent confidence limit should be compared
+to the acceptance criterion. For an attribute known to increase with time,
+the upper one-sided 95 percent confidence limit should be compared to the
+acceptance criterion. For an attribute that can either increase or decrease,
+or whose direction of change is not known, two-sided 95 percent confidence
+limits should be calculated and compared to the upper and lower acceptance
+criteria.}} Since attributes often either decrease or increase, the default
+for \code{ivl_type} is \code{one.sided}.
+
+According to the ARGPM guidance \dQuote{Stability testing for prescription
+medicines}, the shelf life or expiry limit is estimated as the point where
+the upper or lower limit of the 95\% confidence interval of the linear model
+fitted to the data intersects the worst case scenario limit. The worst case
+scenario limit is obtained by adding/subtracting the absolute difference of
+specification limit and release limit to/from the common intercept of the
+test batches or the intercept of the worst performing batch.
+}
+
 \references{
 Therapeutic Goods Administration (TGA) of the Department of Health of the
 Australian Government, Australian Regulatory Guidelines for Prescription

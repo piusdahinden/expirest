@@ -260,7 +260,7 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
 #' \code{uniroot()} tries to minimise. Recommendations on how to estimate shelf
 #' life or expiry can be found in the corresponding section below.
 #'
-#' #@inheritSection get_distance How to estimate shelf life or expiry
+#' @inheritSection get_distance How to estimate shelf life or expiry
 #'
 #' @return A numeric value representing the value of \eqn{x} where the distance
 #' between the two lines of interest is minimal is returned.
