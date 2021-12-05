@@ -338,14 +338,12 @@ res2$POI
 #        28.12518       22.47939       15.96453
 
 # Unsuccessful estimation
-\dontrun{
-  res3 <-
-    expirest_wisle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
-                   response_vbl = "Potency", time_vbl = "Month",
-                   batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                   sl_sf = 3, srch_range = c(0, 500), alpha = 1E-16)
-  res3$POI
-}
+res3 <-
+  expirest_wisle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
+                 response_vbl = "Potency", time_vbl = "Month",
+                 batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
+                 sl_sf = 3, srch_range = c(0, 500), alpha = 1E-16)
+res3$POI
 
 # (Expected) results in res3$POI
 #  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
@@ -358,14 +356,12 @@ res2$POI
 #        14.42089       2.480635             NA
 
 # Estimation may also fail because of an inappropriate 'srch-range' setting.
-\dontrun{
-  res4 <-
-    expirest_wisle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
-                   response_vbl = "Potency", time_vbl = "Month",
-                   batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                   sl_sf = 3, srch_range = c(0, 5))
-  res4$POI
-}
+res4 <-
+  expirest_wisle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
+                 response_vbl = "Potency", time_vbl = "Month",
+                 batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
+                 sl_sf = 3, srch_range = c(0, 5))
+res4$POI
 
 # (Expected) results in res4$POI
 #  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics

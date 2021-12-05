@@ -26,7 +26,7 @@ gg1
 
 # Since the element gg1$Graph is a 'ggplot' object it can be used for further
 # manipulation by aid of 'ggplot2' functions.
-\dontrun{
+if (requireNamespace("ggplot2")) {
   library(ggplot2)
 
   gg1$Graph + labs(title = "What-if Shelf Life Estimation (WISLE)",

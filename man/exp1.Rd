@@ -32,7 +32,7 @@ common intercept / common slope (cics) model, data in Table VI (batches
 \code{b8}) with a different intercept / different slope (dids) model.
 }
 \examples{
-\dontrun{exp1}
+str(exp1)
 }
 \references{
 LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability

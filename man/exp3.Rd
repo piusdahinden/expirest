@@ -26,7 +26,7 @@ batches of a drug product obtained over a 24 months period. A total of
 shown in Table XIII in LeBlond et al. (2011)).
 }
 \examples{
-\dontrun{exp3}
+str(exp3)
 }
 \references{
 LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability

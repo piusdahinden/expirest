@@ -5,7 +5,13 @@ cran-comments
 
 ## First submission
 
-This is the first submission.
+This is the second iteration of the first submission. In this version I
+have:
+
+-   Unwrapped examples that were wrapped by \\dontrun{} that are
+    executable in \< 5 sec.
+-   Replaced \\dontrun{} by tryCatch() in order to catch errors from
+    examples that deliberately produce errors.
 
 ## Test environments
 

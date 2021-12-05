@@ -448,7 +448,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   t_poi <- rep(NA, 3)
   names(t_poi) <- names(l_icpt)
 
-  for(variety in names(t_poi)) {
+  for (variety in names(t_poi)) {
     if (variety != "dids") {
       tmp <- try_get_model(
         find_poi(srch_range = srch_range, model = l_models[[variety]], sl = sl,

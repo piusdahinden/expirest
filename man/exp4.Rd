@@ -29,7 +29,7 @@ independent measurements are available (corresponding to the data set
 Methods} manual).
 }
 \examples{
-\dontrun{exp4}
+str(exp4)
 }
 \references{
 SAS Institute Inc. 2015. \emph{JMP(R) 12 Reliability and Survival Methods}.

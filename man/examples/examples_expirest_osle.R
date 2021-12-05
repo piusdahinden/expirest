@@ -57,28 +57,24 @@ str(exp3)
 
 # Unsuccessful estimations
 # Intervals are wider than the specification limits (no intersection)
-\dontrun{
-  res3 <-
-    expirest_osle(
-      data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", sl = 1.5, sl_sf = 2, srch_range = c(0, 500),
-      sf_option = "tight", ivl = "prediction", ivl_type = "two.sided",
-      ivl_side = "lower")
-  res3$POI
-}
+res3 <-
+  expirest_osle(
+    data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+    batch_vbl = "Batch", sl = 1.5, sl_sf = 2, srch_range = c(0, 500),
+    sf_option = "tight", ivl = "prediction", ivl_type = "two.sided",
+    ivl_side = "lower")
+res3$POI
 
 # (Expected) results in res3$POI
 # cics dics dids
 #   NA   NA   NA
 
 # Estimation may also fail because of an inappropriate 'srch-range' setting.
-\dontrun{
-  res4 <-
-    expirest_osle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
-                  response_vbl = "Potency", time_vbl = "Month",
-                  batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 5))
-  res4$POI
-}
+res4 <-
+  expirest_osle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
+                response_vbl = "Potency", time_vbl = "Month",
+                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 5))
+res4$POI
 
 # (Expected) results in res4$POI
 # cics dics dids

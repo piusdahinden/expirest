@@ -32,7 +32,7 @@
 #' See reference: Example data sets shown in Tables IV, VI and VIII.
 #'
 #' @examples
-#' \dontrun{exp1}
+#' str(exp1)
 "exp1"
 
 
@@ -64,7 +64,7 @@
 #' See reference: Example data sets shown in Table XI.
 #'
 #' @examples
-#' \dontrun{exp2}
+#' str(exp2)
 "exp2"
 
 
@@ -96,7 +96,7 @@
 #' See reference: Example data sets shown in Table XIII.
 #'
 #' @examples
-#' \dontrun{exp3}
+#' str(exp3)
 "exp3"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,7 +132,7 @@
 #' \emph{Stability Analysis}, p. 174-176.
 #'
 #' @examples
-#' \dontrun{exp4}
+#' str(exp4)
 "exp4"
 
 ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><>

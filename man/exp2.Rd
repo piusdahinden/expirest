@@ -26,7 +26,7 @@ period. A total of \eqn{n = 24} independent measurements are available
 (corresponding to data shown in Table XI in LeBlond et al. (2011)).
 }
 \examples{
-\dontrun{exp2}
+str(exp2)
 }
 \references{
 LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability

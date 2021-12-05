@@ -1,5 +1,14 @@
 ---
 
+# expirest 0.1.2
+
+- Examples that were wrapped by \\dontrun{} although they are executable in
+  < 5 sec are now unwrapped.
+- Errors from examples that deliberately produce errors are caught by tryCatch()
+  and are no longer wrapped by \\dontrun{}.
+
+---
+
 # expirest 0.1.1
 
 - CRAN submission
