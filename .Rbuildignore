@@ -5,3 +5,4 @@
 ^cran-comments\.Rmd$
 ^README\.Rmd$
 ^CRAN-RELEASE$
+^revdep$

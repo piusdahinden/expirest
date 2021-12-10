@@ -23,7 +23,13 @@ The package supports shelf life estimation for chemically derived medicines, eit
 
 ## Installation
 
-**So far, the package has not yet been submitted to CRAN.** The development version is available from [GitHub](https://github.com/piusdahinden/expirest). Installation from this source is easily done by using `install_github()` function from the `devtools` package:
+A stable version of `expirest` can be installed from CRAN:
+
+``` r
+# install.packages("expirest")
+```
+
+The development version is available from [GitHub](https://github.com/piusdahinden/expirest) by:
 
 ``` r
 # install.packages("devtools")
