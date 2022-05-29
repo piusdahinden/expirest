@@ -979,8 +979,16 @@ plot_expirest_wisle <- function(
   colnames(d_new) <- c(batch_vbl, time_vbl)
 
   # Prediction
-  m_pred <- predict(model, newdata = d_new, interval = ivl,
-                    level = 1 - alpha)
+  if (model_name != "dids") {
+    m_pred <- predict(model, newdata = d_new, interval = ivl,
+                      level = 1 - alpha)
+  } else {
+    l_pred <- lapply(t_batches, function(x)
+      predict(l_models$individual[[x]],
+              newdata = d_new[d_new[, batch_vbl] == x, ],
+              interval = ivl, level = 1 - alpha))
+    m_pred <- do.call(rbind, l_pred)
+  }
 
   # Back-transformation of predicted (response) values, if necessary
   switch(xform[2],
