@@ -25,7 +25,7 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
   if (!is.numeric(x_new) & !is.na(x_new)) {
     stop("x_new must be a numeric value.")
   }
-  if (class(model) != "lm") {
+  if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
   if (alpha <= 0 | alpha > 1) {
@@ -191,7 +191,7 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
   if (!is.numeric(x_new)) {
     stop("x_new must be a numeric value.")
   }
-  if (class(model) != "lm") {
+  if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
   if (!is.numeric(sl) | length(sl) > 1) {
@@ -279,7 +279,7 @@ find_poi <- function(srch_range, model, sl, alpha = 0.05, ivl = "confidence",
   if (!is.numeric(srch_range) | length(srch_range) != 2) {
     stop("The parameter srch_range must be a vector of length 2.")
   }
-  if (class(model) != "lm") {
+  if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
   if (!is.numeric(sl) | length(sl) > 1) {
@@ -988,7 +988,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 
 get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
                      xform = c("no", "no"), shift = c(0, 0)) {
-  if (class(model) != "lm") {
+  if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
   if (!is.character(response_vbl)) {

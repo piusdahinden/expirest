@@ -746,7 +746,7 @@ plot_expirest_wisle <- function(
   model, rl_index = 1, show_grouping = "yes", response_vbl_unit = NULL,
   y_range, x_range = NULL, scenario = "standard", plot_option = "full",
   ci_app = "line") {
-  if (class(model) != "expirest_wisle") {
+  if (!inherits(model, "expirest_wisle")) {
     stop("The model must be an object of class expirest_wisle.")
   }
   if (!is.numeric(rl_index) | length(rl_index) > 1) {
