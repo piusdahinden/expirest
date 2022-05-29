@@ -1325,10 +1325,23 @@ print_val <- function(val_name, val_value, val_unit, val_sf,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Formatting of information
 
-  paste(prefix, val_name,
-        formatC(signif(val_value, val_sf), digits = val_sf, format = "fg",
-                flag = "#"),
-        val_unit, suffix, sep = "")
+  if (is.na(val_value)) {
+    paste(prefix, val_name,
+          formatC(signif(val_value, val_sf), digits = val_sf, format = "fg",
+                  flag = "#"),
+          val_unit, suffix, sep = "")
+  } else {
+    if (val_sf <= get_n_whole_part(val_value)) {
+      paste(prefix, val_name,
+            formatC(signif(val_value, val_sf), digits = val_sf, format = "fg"),
+            val_unit, suffix, sep = "")
+    } else {
+      paste(prefix, val_name,
+            formatC(signif(val_value, val_sf), digits = val_sf, format = "fg",
+                    flag = "#"),
+            val_unit, suffix, sep = "")
+    }
+  }
 }
 
 #' Get number of digits of whole part (of a decimal number)

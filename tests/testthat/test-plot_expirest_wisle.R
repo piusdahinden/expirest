@@ -46,11 +46,17 @@ test_that("plot_expirest_wisle_succeeds", {
       response_vbl_unit = " mg/kg", y_range = c(92, 107),
       x_range = c(-1, 29), scenario = "standard", plot_option = "full",
       ci_app = "line")
-  tmp3 <-
+  tmp3stsc <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(92, 107),
       x_range = c(-1, 29), scenario = "standard", plot_option = "full",
+      ci_app = "ribbon")
+  tmp3wcsc <-
+    plot_expirest_wisle(
+      model = re2, rl_index = 1, show_grouping = "yes",
+      response_vbl_unit = NULL, y_range = c(92, 107),
+      x_range = NULL, scenario = "worst", plot_option = "full",
       ci_app = "ribbon")
   tmp4 <-
     plot_expirest_wisle(
@@ -77,10 +83,11 @@ test_that("plot_expirest_wisle_succeeds", {
       x_range = c(-1, 29), scenario = "standard",
       plot_option = "basic1", ci_app = "ribbon")
   tmp4b2 <-
-    plot_expirest_wisle(model = re2, rl_index = 1, show_grouping = "no",
-                        response_vbl_unit = NULL, y_range = c(92, 107),
-                        x_range = c(-1, 29), scenario = "standard",
-                        plot_option = "basic2", ci_app = "ribbon")
+    plot_expirest_wisle(
+      model = re2, rl_index = 1, show_grouping = "no",
+      response_vbl_unit = NULL, y_range = c(92, 107),
+      x_range = c(-1, 29), scenario = "standard",
+      plot_option = "basic2", ci_app = "ribbon")
   tmp5 <-
     plot_expirest_wisle(
       model = re3, rl_index = 1, show_grouping = "no",
@@ -204,11 +211,21 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(tmp2[["arrow"]][1, "Angle"], 90)
   expect_equal(tmp2[["arrow"]][1, "Length"], 5)
 
-  expect_length(tmp3[["Graph"]]$labels, 11)
-  expect_equal(tmp3[["text"]][, "Label"],
+  expect_length(tmp3stsc[["Graph"]]$labels, 11)
+  expect_equal(tmp3stsc[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "98.405 ", "100.45",
                  "7.5\n(worst case scenario)", "23.7\n(standard scenario)",
                  "LRL: 96.995"))
+  expect_equal(signif(tmp3stsc[["text"]][, "Month"], 5),
+               c(29.000, 29.0000, 0.00000, 0.00000, 7.5187, 23.698, 29.000))
+
+  expect_length(tmp3wcsc[["Graph"]]$labels, 11)
+  expect_equal(tmp3wcsc[["text"]][, "Label"],
+               c("LSL: 94.95", "USL: 105.04", "98.405 ", "100.45",
+                 "7.5\n(worst case scenario)", "23.7\n(standard scenario)",
+                 "LRL: 96.995"))
+  expect_equal(signif(tmp3wcsc[["text"]][, "Month"], 5),
+               c(10.000, 10.0000, 0.00000, 0.00000, 7.5187, 23.698, 10.000))
 
   expect_length(tmp4[["Graph"]]$labels, 8)
   expect_equal(tmp4[["text"]][, "Label"],
