@@ -1,5 +1,17 @@
 ---
 
+# expirest 0.1.3
+
+- The graphical output of the dids model was not appropriate because the 
+  prediction was based on the whole model with interaction term (group x time,
+  where group is a categorical variable and time is a continuous variable).
+  Now, the prediction is based on individual models fitted to the different
+  levels of group.
+- Before, a decimal point was shown in case of numbers without decimal digits.
+- Comparisons of type class() == "string" were replaced by inherits() calls.
+
+---
+
 # expirest 0.1.2
 
 - Examples that were wrapped by \\dontrun{} although they are executable in
