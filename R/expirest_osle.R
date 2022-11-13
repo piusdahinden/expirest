@@ -494,11 +494,12 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # In case of dids model: wc_batch_ich needs to be determined using the
   #   models fitted to the data of each batch individually.
 
+  wc_batch_ich <- NA
+  wc_icpt_ich <- NA
+
   if (!is.na(t_poi[l_model_type[[2]]])) {
     switch(l_model_type[[2]],
            "cics" = {
-             wc_batch_ich <- NA
-
              if (xform[2] != "no") {
                wc_icpt_ich <- l_icpt[["cics"]][["icpt.orig"]]
              } else {
@@ -519,9 +520,6 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
                } else {
                  wc_icpt_ich <- l_icpt[["dics"]][["icpt"]][wc_batch_ich]
                }
-             } else {
-               wc_batch_ich <- NA
-               wc_icpt_ich <- NA
              }
            },
            "dids" = {
@@ -533,14 +531,8 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
                } else {
                  wc_icpt_ich <- l_icpt[["dids"]][["icpt"]][wc_batch_ich]
                }
-             } else {
-               wc_batch_ich <- NA
-               wc_icpt_ich <- NA
              }
            })
-  } else {
-    wc_batch_ich <- NA
-    wc_icpt_ich <- NA
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

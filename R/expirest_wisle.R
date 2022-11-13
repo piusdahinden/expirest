@@ -402,9 +402,9 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # Example: the response is the assay, and the lower specification limit is
   # the relevant limit. A batch may have a shorter POI than the other batches,
   # but because it has a higher intercept or/and smaller variability than one
-  # or more of the other batches, it may be that the lower confidence or
-  # prediction interval limit of one of the other batches is closer to the
-  # lower specification limit so that their POI values are the POI values of
+  # or more of the other batches, the lower confidence or prediction interval
+  # limit of one of the other batches still may be closer to the lower
+  # specification limit so that their POI values are the POI values of
   # relevance.
 
   # Note: in case of the "dids" model the POI is not determined using the model
@@ -490,14 +490,6 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
     l_prl[[variety]] <- a_prl
   }
 
-  if (sum(vapply(l_poi, is.null, logical(1))) > 0) {
-    stop("Not all POI values for all wcs limits calculated.")
-  }
-
-  if (sum(vapply(l_prl, is.null, logical(1))) > 0) {
-    stop("Not all prediction limits for all POI values calculated.")
-  }
-
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of the batches with the confidence or prediction interval
   # limits that are closest to the respective specification limit for each
@@ -519,20 +511,12 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
            })
          })
 
-  if (sum(!(names(l_prl) %in% names(l_min_dist))) > 0) {
-    stop("Not all minimal distances (interval - specification) determined.")
-  }
-
   # Determination of the smallest POI value for each model and each rl value
   l_min_poi <- lapply(l_poi, FUN = function(x) {
     apply(x, 1, function(y) {
       ifelse(length(which.min(y)) != 0, which.min(y), NA)
     })
   })
-
-  if (sum(!(names(l_poi) %in% names(l_min_poi))) > 0) {
-    stop("Not all minimal POI values determined.")
-  }
 
   # Determination of the worst case batches for each model and each rl value:
   #   The worst case batches are the ones with the confidence or prediction
@@ -556,10 +540,6 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
         },
         numeric(1))
     }
-  }
-
-  if (sum(vapply(l_wc_batch, is.null, logical(1))) > 0) {
-    stop("Not all worst case batches for all minimal POI values determined.")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
