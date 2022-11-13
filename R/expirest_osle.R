@@ -643,8 +643,9 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #' @importFrom stats as.formula
 #' @importFrom stats coef
 #' @importFrom stats predict
+#' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
+#' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_hline
@@ -1040,52 +1041,59 @@ plot_expirest_osle <- function(
   }
 
   if (show_grouping == "no") {
-    ggraph <- ggplot(d_dat, aes_string(x = time_vbl, y = response_vbl)) +
+    ggraph <-
+      ggplot(d_dat,
+             aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
       geom_point(size = 2, shape = 1) +
       geom_line(data = d_pred,
-                aes_string(x = time_vbl, y = response_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]]),
                 colour = "royalblue", linetype = "solid")
 
     switch(ci_app,
            "line" = {
              ggraph <- ggraph +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "LL"),
+               geom_line(data = d_pred, aes(x = .data[[time_vbl]], y = LL),
                          colour = "royalblue", linetype = "solid",
-                         size = 0.5) +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "UL"),
+                         linewidth = 0.5) +
+               geom_line(data = d_pred, aes(x = .data[[time_vbl]], y = UL),
                          colour = "royalblue", linetype = "solid",
-                         size = 0.5)
+                         linewidth = 0.5)
            },
            "ribbon" = {
              ggraph <- ggraph +
-               geom_ribbon(data = d_pred,
-                           aes_string(ymin = "LL", ymax = "UL"),
+               geom_ribbon(data = d_pred, aes(ymin = LL, ymax = UL),
                            fill = "royalblue", alpha = 0.25)
            })
 
     ggraph <- ggraph + theme(legend.position = "none")
   } else {
-    ggraph <- ggplot(d_dat, aes_string(x = time_vbl, y = response_vbl)) +
-      geom_point(size = 2, aes_string(colour = batch_vbl, shape = batch_vbl)) +
+    ggraph <-
+      ggplot(d_dat,
+             aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
+      geom_point(aes(colour = .data[[batch_vbl]],
+                     shape = .data[[batch_vbl]]), size = 2) +
       geom_line(data = d_pred,
-                aes_string(x = time_vbl, y = response_vbl, colour = batch_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]],
+                    colour = .data[[batch_vbl]]),
                 linetype = "solid")
 
     switch(ci_app,
            "line" = {
              ggraph <- ggraph +
                geom_line(data = d_pred,
-                         aes_string(x = time_vbl, y = "LL", colour = batch_vbl),
-                         linetype = "solid", size = 0.5) +
+                         aes(x = .data[[time_vbl]], y = LL,
+                             colour = .data[[batch_vbl]]),
+                         linetype = "solid", linewidth = 0.5) +
                geom_line(data = d_pred,
-                         aes_string(x = time_vbl, y = "UL", colour = batch_vbl),
-                         linetype = "solid", size = 0.5)
+                         aes(x = .data[[time_vbl]], y = UL,
+                             colour = .data[[batch_vbl]]),
+                         linetype = "solid", linewidth = 0.5)
            },
            "ribbon" = {
              ggraph <- ggraph +
                geom_ribbon(data = d_pred,
-                           aes_string(ymin = "LL", ymax = "UL",
-                                      fill = batch_vbl), alpha = 0.25)
+                           aes(ymin = LL, ymax = UL,
+                               fill = .data[[batch_vbl]]), alpha = 0.25)
            })
 
     ggraph <- ggraph + theme(legend.position = c(0.04, 0.96),
@@ -1116,7 +1124,7 @@ plot_expirest_osle <- function(
   if (plot_option == "full") {
     ggraph <- ggraph +
       geom_text(data = d_text,
-                aes_string(x = time_vbl, y = response_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]]),
                 label = d_text$Label, hjust = "right", size = 4,
                 lineheight = 0.8, colour = d_text$Colour)
   }

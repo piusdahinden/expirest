@@ -699,8 +699,9 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' @importFrom stats as.formula
 #' @importFrom stats coef
 #' @importFrom stats predict
+#' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
+#' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_hline
@@ -1471,51 +1472,56 @@ plot_expirest_wisle <- function(
   }
 
   if (show_grouping == "no") {
-    ggraph <- ggplot(d_dat, aes_string(x = time_vbl, y = response_vbl)) +
+    ggraph <- ggplot(d_dat,
+                     aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
       geom_point(size = 2, shape = 1) +
       geom_line(data = d_pred,
-                aes_string(x = time_vbl, y = response_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]]),
                 colour = "royalblue", linetype = "solid")
 
     switch(ci_app,
            "line" = {
              ggraph <- ggraph +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "LL"),
+               geom_line(data = d_pred, aes(x = .data[[time_vbl]], y = LL),
                          colour = "royalblue", linetype = "solid",
-                         size = 0.5) +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "UL"),
+                         linewidth = 0.5) +
+               geom_line(data = d_pred, aes(x = .data[[time_vbl]], y = UL),
                          colour = "royalblue", linetype = "solid",
-                         size = 0.5)
+                         linewidth = 0.5)
            },
            "ribbon" = {
              ggraph <- ggraph +
-               geom_ribbon(data = d_pred, aes_string(ymin = "LL", ymax = "UL"),
+               geom_ribbon(data = d_pred, aes(ymin = LL, ymax = UL),
                            fill = "royalblue", alpha = 0.25)
            })
 
     ggraph <- ggraph + theme(legend.position = "none")
   } else {
-    ggraph <- ggplot(d_dat, aes_string(x = time_vbl, y = response_vbl)) +
-      geom_point(size = 2, aes_string(colour = batch_vbl, shape = batch_vbl)) +
+    ggraph <- ggplot(d_dat, aes(x = .data[[time_vbl]],
+                                y = .data[[response_vbl]])) +
+      geom_point(size = 2, aes(colour = .data[[batch_vbl]],
+                               shape = .data[[batch_vbl]])) +
       geom_line(data = d_pred,
-                aes_string(x = time_vbl, y = response_vbl, colour = batch_vbl),
-                linetype = "solid")
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]],
+                    colour = .data[[batch_vbl]]), linetype = "solid")
 
     switch(ci_app,
            "line" = {
              ggraph <- ggraph +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "LL",
-                                                   colour = batch_vbl),
-                         linetype = "solid", size = 0.5) +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "UL",
-                                                   colour = batch_vbl),
-                         linetype = "solid", size = 0.5)
+               geom_line(data = d_pred,
+                         aes(x = .data[[time_vbl]], y = LL,
+                             colour = .data[[batch_vbl]]),
+                         linetype = "solid", linewidth = 0.5) +
+               geom_line(data = d_pred,
+                         aes(x = .data[[time_vbl]], y = UL,
+                             colour = .data[[batch_vbl]]),
+                         linetype = "solid", linewidth = 0.5)
            },
            "ribbon" = {
              ggraph <- ggraph +
-               geom_ribbon(data = d_pred, aes_string(ymin = "LL", ymax = "UL",
-                                                     fill = batch_vbl),
-                           alpha = 0.25)
+               geom_ribbon(data = d_pred,
+                           aes(ymin = LL, ymax = UL,
+                               fill = .data[[batch_vbl]]), alpha = 0.25)
            })
 
     ggraph <- ggraph + theme(legend.position = c(0.04, 0.96),
@@ -1544,7 +1550,7 @@ plot_expirest_wisle <- function(
   if (plot_option %in% c("basic1", "lean1", "lean2", "full")) {
     ggraph <- ggraph +
       geom_text(data = d_text[show_text, ],
-                aes_string(x = time_vbl, y = response_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]]),
                 label = d_text[show_text, "Label"], hjust = "right",
                 size = 4, lineheight = 0.8,
                 colour = d_text[show_text, "Colour"])
@@ -1555,24 +1561,24 @@ plot_expirest_wisle <- function(
       geom_vline(xintercept = d_vlines[, time_vbl],
                  colour = d_vlines$Colour, linetype = d_vlines$Type) +
       geom_segment(data = d_seg[show_seg, ],
-                   aes_string(x = paste(time_vbl, 1, sep = "."),
-                              y = paste(response_vbl, 1, sep = "."),
-                              xend = paste(time_vbl, 2, sep = "."),
-                              yend = paste(response_vbl, 2, sep = ".")),
+                   aes(x = .data[[paste(time_vbl, 1, sep = ".")]],
+                       y = .data[[paste(response_vbl, 1, sep = ".")]],
+                       xend = .data[[paste(time_vbl, 2, sep = ".")]],
+                       yend = .data[[paste(response_vbl, 2, sep = ".")]]),
                    colour = d_seg$Colour[show_seg],
                    linetype = d_seg$Type[show_seg],
-                   size = d_seg$Size[show_seg])
+                   linewidth = d_seg$Size[show_seg])
   }
 
   if (plot_option == "full") {
     ggraph <- ggraph +
       geom_curve(data = d_arr,
-                 aes_string(x = paste(time_vbl, 1, sep = "."),
-                            y = paste(response_vbl, 1, sep = "."),
-                            xend = paste(time_vbl, 2, sep = "."),
-                            yend = paste(response_vbl, 2, sep = ".")),
+                 aes(x = .data[[paste(time_vbl, 1, sep = ".")]],
+                     y = .data[[paste(response_vbl, 1, sep = ".")]],
+                     xend = .data[[paste(time_vbl, 2, sep = ".")]],
+                     yend = .data[[paste(response_vbl, 2, sep = ".")]]),
                  colour = d_arr$Colour, linetype = d_arr$Line.Type,
-                 size = d_arr$Size, curvature = d_arr$Curvature,
+                 linewidth = d_arr$Size, curvature = d_arr$Curvature,
                  angle = d_arr$Angle, ncp = 20, lineend = "round",
                  arrow = arrow(length = unit(d_arr$Length, "points"),
                                type = d_arr$Arrow.Type))
