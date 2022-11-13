@@ -39,6 +39,7 @@
 
 summary.expirest_osle <- function(object, ...) {
   mt <- object[["Model.Type"]]$type.spec
+  mtac <- object[["Model.Type"]]$type.acronym
 
   mf <- match.call(expand.dots = TRUE)
   m <- match("digits", names(mf), 0L)
@@ -56,7 +57,7 @@ summary.expirest_osle <- function(object, ...) {
       c("Different intercepts and", "Common intercepts and")[mt[1] + 1],
       c("Different slopes", "Common slopes")[mt[2] + 1],
       paste0("(acronym: ",
-             object[["Model.Type"]]$type.acronym,
+             mtac,
              ")."))
 
   cat("\n\nWorst case intercept:",
@@ -71,11 +72,11 @@ summary.expirest_osle <- function(object, ...) {
                     [, object[["Variables"]]$batch])[object$wc.batch]))
 
   cat("\n\nEstimated shelf life for",
-      object[["Model.Type"]]$type.acronym,
+      mtac,
       "model:",
-      ifelse(is.na(object[["POI"]][object[["Model.Type"]]$type.acronym]),
+      ifelse(is.na(object[["POI"]][mtac]),
              NA,
-             formatC(object[["POI"]][object[["Model.Type"]]$type.acronym],
+             formatC(object[["POI"]][mtac],
                      digits)),
       "\n")
 
@@ -207,6 +208,7 @@ print.plot_expirest_osle <- function(x, ...) {
 
 summary.expirest_wisle <- function(object, ...) {
   mt <- object[["Model.Type"]]$type.spec
+  mtac <- object[["Model.Type"]]$type.acronym
 
   mf <- match.call(expand.dots = TRUE)
   m <- match("digits", names(mf), 0L)
@@ -217,14 +219,27 @@ summary.expirest_wisle <- function(object, ...) {
     digits <- mf[[m]]
   }
 
-  tmp <- object[["POI"]][, -c(grep("Intercept", colnames(object[["POI"]])),
-                             grep("Delta", colnames(object[["POI"]])),
-                             grep("WCSL", colnames(object[["POI"]])))]
+  tmp_1 <- object[["POI"]][, -c(grep("Intercept", colnames(object[["POI"]])),
+                                grep("Delta", colnames(object[["POI"]])),
+                                grep("WCSL", colnames(object[["POI"]])))]
 
-  tmp <- tmp[, c("Exp.Spec.Report", "Rel.Spec.Report",
-                 colnames(tmp)[grep(object[["Model.Type"]]$type.acronym,
-                                    colnames(tmp))])]
-  colnames(tmp) <- c("SL", "RL", "wisle", "osle")
+  tmp_1 <- tmp_1[, c("Exp.Spec.Report", "Rel.Spec.Report",
+                     colnames(tmp_1)[grep(mtac,
+                                          colnames(tmp_1))])]
+  colnames(tmp_1) <- c("SL", "RL", "wisle", "osle")
+  rownames(tmp_1) <- NULL
+
+  wc_batch <- rep(NA, length(object$wc.batch[[mtac]]))
+  for (i in seq_along(object$wc.batch[[mtac]])) {
+    if (!is.na(object$wc.batch[[mtac]][i]))
+      wc_batch[i] <- levels(object[["Data"]][[object[["Variables"]]$batch]])[
+        object$wc.batch[[mtac]][i]]
+  }
+
+  tmp_2 <- data.frame(RL = object[["POI"]][, "Rel.Spec.Report"],
+                      Batch = wc_batch,
+                      Intercept = object$wc.icpt[, mtac])
+  rownames(tmp_2) <- NULL
 
   cat("\nSummary of shelf life estimation following the ARGPM
   guidance \"Stability testing for prescription medicines\"")
@@ -234,25 +249,21 @@ summary.expirest_wisle <- function(object, ...) {
       c("Different intercepts and", "Common intercepts and")[mt[1] + 1],
       c("Different slopes", "Common slopes")[mt[2] + 1],
       paste0("(acronym: ",
-             object[["Model.Type"]]$type.acronym,
+             mtac,
              ")."))
 
-  cat("\n\nWorst case intercept(s):",
-      ifelse(is.na(object$wc.icpt[, object[["Model.Type"]]$type.acronym]),
-             NA,
-             formatC(object$wc.icpt[, object[["Model.Type"]]$type.acronym],
-                     digits = digits)))
+  if (nrow(tmp_2) == 1) {
+    cat("\n\nWorst case intercept and batch:\n")
+    print(tmp_2, digits = digits)
+  } else {
+    cat("\n\nWorst case intercepts and batches:\n")
+    print(tmp_2, digits = digits)
+  }
 
-  cat("\nWorst case batch(es):",
-      ifelse(is.na(object$wc.batch[[object[["Model.Type"]]$type.acronym]]),
-             NA,
-             levels(object[["Data"]][[object[["Variables"]]$batch]])
-             [object$wc.batch[[object[["Model.Type"]]$type.acronym]]]))
-
-  cat("\n\nEstimated shelf life (lives) for",
-      object[["Model.Type"]]$type.acronym,
+  cat("\nEstimated shelf lives for",
+      mtac,
       "model:\n")
-  print(tmp, digits = digits)
+  print(tmp_1, digits = digits)
   cat("\nAbbreviations:\n")
   cat("ARGPM: Australian Regulatory Guidelines for Prescription Medicines;",
       "ICH: International Council for Harmonisation;",

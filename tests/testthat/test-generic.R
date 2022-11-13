@@ -143,18 +143,29 @@ test_that("summary.expirest_wisle_succeeds", {
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
+  re3 <-
+    expirest_wisle(
+      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
+      batch_vbl = "Batch", rl = seq(98, 99, 0.5), rl_sf = rep(3, 3), sl = 95,
+      sl_sf = 2, srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
+      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
 
   # <-><-><-><->
 
   expect_s3_class(expect_output(summary(re1)), "expirest_wisle")
   expect_output(summary(re1), "cics")
-  expect_output(summary(re1), "NA")
-
-  expect_output(summary(re1, digits = 5), "cics 0.5  2 92.999 118.19")
+  expect_output(summary(re1, digits = 5), "2    NA    2.4568")
+  expect_output(summary(re1, digits = 5), "0.5  2 92.999 118.19")
 
   expect_s3_class(expect_output(summary(re2)), "expirest_wisle")
-  expect_output(summary(re2), "cics")
-  expect_output(summary(re2), "b8")
+  expect_output(summary(re2), "dids")
+  expect_output(summary(re2, digits = 5), "98    b8    101.26")
+  expect_output(summary(re2, digits = 5), "95 98 7.6197 17.039")
+
+  expect_output(summary(re3, digits = 5), "95 98.0  8.8631 17.039")
+  expect_output(summary(re3, digits = 5), "95 98.5 10.1748 17.039")
+  expect_output(summary(re3, digits = 5), "95 99.0 11.4405 17.039")
 })
 
 test_that("print.expirest_wisle_succeeds", {
@@ -183,10 +194,10 @@ test_that("print.expirest_wisle_succeeds", {
   expect_output(print(re1), "cics")
   expect_output(print(re1), "NA")
 
-  expect_output(print(re1, digits = 5), "cics 0.5  2 92.999 118.19")
+  expect_output(print(re1, digits = 5), "0.5  2 92.999 118.19")
 
   expect_s3_class(expect_output(print(re2)), "expirest_wisle")
-  expect_output(print(re2), "cics")
+  expect_output(print(re2), "dids")
   expect_output(print(re2), "b8")
 })
 
