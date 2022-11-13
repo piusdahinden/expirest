@@ -1233,8 +1233,11 @@ extract_wc_x <- function(l1, l2) {
       if (is.matrix(l1[["cics"]])) {
         m_res[, "cics"] <- l1[["cics"]]
       }
-      if (is.vector(l1[["cics"]][[1]]) & length(l1[["cics"]][[1]]) == 1) {
-        m_res[, "cics"] <- rep(unname(l1[[i]][[1]]), length(l2[[1]]))
+      if (is.list(l1[["cics"]])) {
+        if (is.vector(l1[["cics"]][[length(l1[["cics"]])]]) &
+            length(l1[["cics"]][[length(l1[["cics"]])]]) == 1) {
+          m_res[, "cics"] <- rep(unname(l1[[i]][[1]]), length(l2[[1]]))
+        }
       }
     } else {
       if (is.matrix(l1[[i]])) {
@@ -1243,15 +1246,14 @@ extract_wc_x <- function(l1, l2) {
                  l1[[i]][j, l2[[i]][j]],
                  NA)
         }, numeric(1))
-      } else {
-        if (is.list(l1[[i]])) {
-          m_res[, i] <- vapply(seq_along(l2[[1]]), function(j) {
-            ifelse(!is.na(l2[[i]][j]),
-                   l1[[i]][[1]][l2[[i]][j]],
-                   NA)
-          },
-          numeric(1))
-        }
+      }
+      if (is.list(l1[[i]])) {
+        m_res[, i] <- vapply(seq_along(l2[[1]]), function(j) {
+          ifelse(!is.na(l2[[i]][j]),
+                 l1[[i]][[1]][l2[[i]][j]],
+                 NA)
+        },
+        numeric(1))
       }
     }
   }

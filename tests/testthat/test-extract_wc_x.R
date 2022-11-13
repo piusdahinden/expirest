@@ -13,8 +13,8 @@ test_that("extract_wc_x_succeeds", {
 
   sl <- 95
   sl_sf <- 2
-  rl <- 100
-  rl_sf <- 3
+  rl <- c(100, 99, 98)
+  rl_sf <- rep(3, 3)
 
   re <-
     expirest_osle(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
@@ -120,15 +120,15 @@ test_that("extract_wc_x_succeeds", {
   }
 
   # Worst case batches
-  l_wcb1 <- list(cics = NA,
-                 dics = 1,
-                 dids = 1)
-  l_wcb2 <- list(cics = NA,
-                 dics = 2,
-                 dids = 2)
-  l_wcb3 <- list(cics = NA,
-                 dics = 3,
-                 dids = 3)
+  l_wcb1 <- list(cics = rep(NA, 3),
+                 dics = rep(1, 3),
+                 dids = rep(1, 3))
+  l_wcb2 <- list(cics = rep(NA, 3),
+                 dics = rep(2, 3),
+                 dids = rep(2, 3))
+  l_wcb3 <- list(cics = rep(NA, 3),
+                 dics = rep(3, 3),
+                 dids = rep(3, 3))
 
   # <-><-><-><->
 
@@ -138,12 +138,26 @@ test_that("extract_wc_x_succeeds", {
 
   # <-><-><-><->
 
-  expect_equivalent(signif(m_poi1, 12),
+  expect_equivalent(signif(m_poi1[1, ], 12),
                     c(21.6549171662, 3.17687698779, 22.9097844894))
-  expect_equivalent(signif(m_poi2, 12),
+  expect_equivalent(signif(m_poi1[2, ], 12),
+                    c(17.4818579854, NA, 18.4046501763))
+  expect_equivalent(signif(m_poi1[3, ], 12),
+                    c(13.0333154143, NA, 13.7263312141))
+
+  expect_equivalent(signif(m_poi2[1, ], 12),
                     c(21.6549171662, 18.7469763190, 20.0994160261))
-  expect_equivalent(signif(m_poi3, 12),
+  expect_equivalent(signif(m_poi2[2, ], 12),
+                    c(17.4818579854, 14.3890859543, 16.1214018480))
+  expect_equivalent(signif(m_poi2[3, ], 12),
+                    c(13.0333154143, 9.9092777658, 11.9517450346))
+
+  expect_equivalent(signif(m_poi3[1, ], 12),
                     c(21.6549171662, 20.1820835353, 12.8002095693))
+  expect_equivalent(signif(m_poi3[2, ], 12),
+                    c(17.4818579854, 15.8554616662, 10.3030302984))
+  expect_equivalent(signif(m_poi3[3, ], 12),
+                    c(13.0333154143, 11.4214113200, 7.61966072158))
 })
 
 test_that("extract_wc_x_fails", {
