@@ -208,7 +208,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   if (!is.factor(data[, batch_vbl])) {
     stop("The column in data specified by batch_vbl must be a factor.")
   }
-  if (!is.numeric(sl) | length(sl) > 2) {
+  if (!is.numeric(sl) || length(sl) > 2) {
     stop("The parameter sl must be a numeric or vector of length 1 or 2.")
   }
   if (length(sl) == 2) {
@@ -216,7 +216,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
       stop("The parameter sl must be of the form c(lower, upper).")
     }
   }
-  if (!is.numeric(sl_sf) & all(!is.na(sl_sf))) {
+  if (!is.numeric(sl_sf) && all(!is.na(sl_sf))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
   if (sum(sl_sf < 0) > 0) {
@@ -228,19 +228,19 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   if (!isTRUE(all.equal(sl_sf, as.integer(sl_sf)))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
-  if (!is.numeric(srch_range) | length(srch_range) != 2) {
+  if (!is.numeric(srch_range) || length(srch_range) != 2) {
     stop("The parameter srch_range must be a vector of length 2.")
   }
-  if (alpha <= 0 | alpha > 1) {
+  if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
   }
-  if (alpha_pool <= 0 | alpha_pool > 1) {
+  if (alpha_pool <= 0 || alpha_pool > 1) {
     stop("Please specify alpha_pool as (0, 1].")
   }
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
@@ -264,26 +264,26 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   }
 
   if (length(sl) == 2) {
-    if (ivl_side == "lower" & sum(data[, response_vbl] < sl[1]) > 0) {
+    if (ivl_side == "lower" && sum(data[, response_vbl] < sl[1]) > 0) {
       warning("You specified ivl_side = \"lower\". But ",
               round(100 / nrow(data) * sum(data[, response_vbl] < sl[1]), 1),
               "% of the response values are < sl[1]. ",
               "Are you sure that you did not want to set ivl_side = \"upper\"?")
     }
-    if (ivl_side == "upper" & sum(data[, response_vbl] > sl[2]) > 0) {
+    if (ivl_side == "upper" && sum(data[, response_vbl] > sl[2]) > 0) {
       warning("You specified ivl_side = \"upper\". But ",
               round(100 / nrow(data) * sum(data[, response_vbl] > sl[2]), 1),
               "% of the response values are > sl[2]. ",
               "Are you sure that you did not want to set ivl_side = \"lower\"?")
     }
   } else {
-    if (ivl_side == "lower" & sum(data[, response_vbl] < sl) > 0) {
+    if (ivl_side == "lower" && sum(data[, response_vbl] < sl) > 0) {
       warning("You specified ivl_side = \"lower\". But ",
               round(100 / nrow(data) * sum(data[, response_vbl] < sl), 1),
               "% of the response values are < sl. ",
               "Are you sure that you did not want to set ivl_side = \"upper\"?")
     }
-    if (ivl_side == "upper" & sum(data[, response_vbl] > sl) > 0) {
+    if (ivl_side == "upper" && sum(data[, response_vbl] > sl) > 0) {
       warning("You specified ivl_side = \"upper\". But ",
               round(100 / nrow(data) * sum(data[, response_vbl] > sl), 1),
               "% of the response values are > sl. ",
@@ -384,7 +384,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
 
-  if (mrl > 0 & mrlsf > 0) {
+  if (mrl > 0 && mrlsf > 0) {
     l_lim <-
       set_limits(rl = mf[[mrl]], rl_sf = mf[[mrlsf]], sl = sl, sl_sf = sl_sf,
                  sf_option = sf_option, xform = xform, shift = shift,
@@ -677,14 +677,14 @@ plot_expirest_osle <- function(
   if (!(show_grouping %in% c("yes", "no"))) {
     stop("Please specify show_grouping either as \"yes\" or \"no\".")
   }
-  if (!is.numeric(y_range) | length(y_range) != 2) {
+  if (!is.numeric(y_range) || length(y_range) != 2) {
     stop("The parameter y_range must be a vector of length 2.")
   }
   if (y_range[1] > y_range[2]) {
     stop("The parameter y_range must be of the form c(min, max).")
   }
   if (!is.null(x_range)) {
-    if (!is.numeric(x_range) | length(x_range) != 2) {
+    if (!is.numeric(x_range) || length(x_range) != 2) {
       stop("The parameter x_range must be a vector of length 2.")
     }
     if (x_range[1] > x_range[2]) {

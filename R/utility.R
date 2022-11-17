@@ -22,13 +22,13 @@
 
 get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
                          ivl_type = "one.sided", ivl_side = "lower") {
-  if (!is.numeric(x_new) & !is.na(x_new)) {
+  if (!is.numeric(x_new) && !is.na(x_new)) {
     stop("x_new must be a numeric value.")
   }
   if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
-  if (alpha <= 0 | alpha > 1) {
+  if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
   }
   if (!(ivl %in% c("confidence", "prediction", "fitted.line"))) {
@@ -60,7 +60,7 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
   variable_names <- names(attr(model$terms, which = "dataClasses"))
   is_factor <- sum(attr(model$terms, which = "dataClasses") %in% "factor")
 
-  if (is_factor == 0 & length(variable_names) == 2) {
+  if (is_factor == 0 && length(variable_names) == 2) {
     l_newdata <- list(x_new)
     names(l_newdata) <- variable_names[2]
 
@@ -194,10 +194,10 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
   if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
-  if (!is.numeric(sl) | length(sl) > 1) {
+  if (!is.numeric(sl) || length(sl) > 1) {
     stop("sl must be a numeric value of length 1.")
   }
-  if (alpha <= 0 | alpha > 1) {
+  if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
   }
   if (!(ivl %in% c("confidence", "prediction", "fitted.line"))) {
@@ -276,16 +276,16 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
 
 find_poi <- function(srch_range, model, sl, alpha = 0.05, ivl = "confidence",
                      ivl_type = "one.sided", ivl_side = "lower", ...) {
-  if (!is.numeric(srch_range) | length(srch_range) != 2) {
+  if (!is.numeric(srch_range) || length(srch_range) != 2) {
     stop("The parameter srch_range must be a vector of length 2.")
   }
   if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
-  if (!is.numeric(sl) | length(sl) > 1) {
+  if (!is.numeric(sl) || length(sl) > 1) {
     stop("sl must be a numeric value of length 1.")
   }
-  if (alpha <= 0 | alpha > 1) {
+  if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
   }
   if (!(ivl %in% c("confidence", "prediction", "fitted.line"))) {
@@ -352,11 +352,11 @@ get_xformed_variables <- function(data, response_vbl, time_vbl,
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (!is.numeric(shift) | length(shift) != 2) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
 
@@ -445,7 +445,7 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
@@ -477,13 +477,13 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
            })
   }
 
-  if (xform[1] == "no" & xform[2] == "no") {
+  if (xform[1] == "no" && xform[2] == "no") {
     l_variables <- list(batch = batch_vbl,
                         response = response_vbl,
                         time = time_vbl)
   }
 
-  if (xform[1] != "no" & xform[2] != "no") {
+  if (xform[1] != "no" && xform[2] != "no") {
     l_variables <- list(batch = batch_vbl,
                         response.orig = response_vbl,
                         response = new_response_vbl,
@@ -557,22 +557,22 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
                        xform = c("no", "no"), shift = c(0, 0),
                        ivl_side = "lower") {
-  if (!is.numeric(rl) & all(!is.na(rl))) {
+  if (!is.numeric(rl) && all(!is.na(rl))) {
     stop("The parameter rl must be a numeric value or NA.")
   }
-  if (!is.numeric(rl_sf) & all(!is.na(rl_sf))) {
+  if (!is.numeric(rl_sf) && all(!is.na(rl_sf))) {
     stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
   }
-  if (sum(rl_sf < 0) > 0 & all(!is.na(rl_sf))) {
+  if (sum(rl_sf < 0) > 0 && all(!is.na(rl_sf))) {
     stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
   }
   if (length(rl_sf) != length(rl)) {
     stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
   }
-  if (!isTRUE(all.equal(rl_sf, as.integer(rl_sf))) & all(!is.na(rl_sf))) {
+  if (!isTRUE(all.equal(rl_sf, as.integer(rl_sf))) && all(!is.na(rl_sf))) {
     stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
   }
-  if (!is.numeric(sl) | length(sl) > 2) {
+  if (!is.numeric(sl) || length(sl) > 2) {
     stop("The parameter sl must be a numeric value or vector of length 1 or 2.")
   }
   if (length(sl) == 2) {
@@ -580,7 +580,7 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
       stop("The parameter sl must be of the form c(lower, upper).")
     }
   }
-  if (!is.numeric(sl_sf) & all(!is.na(sl_sf))) {
+  if (!is.numeric(sl_sf) && all(!is.na(sl_sf))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
   if (sum(sl_sf < 0) > 0) {
@@ -598,11 +598,11 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (!is.numeric(shift) | length(shift) != 2) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
   if (!(ivl_side %in% c("lower", "upper"))) {
@@ -782,10 +782,10 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
 
 get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
                           shift = c(0, 0), ivl_side = "lower") {
-  if (!is.numeric(rl) | length(rl) > 1) {
+  if (!is.numeric(rl) || length(rl) > 1) {
     stop("The parameter rl must be a numeric value of length 1.")
   }
-  if (!is.numeric(sl) | length(sl) > 1) {
+  if (!is.numeric(sl) || length(sl) > 1) {
     stop("The parameter sl must be a numeric value of length 1.")
   }
   if (!is.numeric(intercept)) {
@@ -794,21 +794,21 @@ get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (!is.numeric(shift) | length(shift) != 2) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
   if (!(ivl_side %in% c("lower", "upper"))) {
     stop("Please specify ivl_side either as \"lower\" or \"upper\".")
   }
 
-  if (ivl_side == "lower" & rl < sl) {
+  if (ivl_side == "lower" && any(rl < sl)) {
     stop("If ivl_side is \"lower\" rl must be > sl.")
   }
-  if (ivl_side == "upper" & rl > sl) {
+  if (ivl_side == "upper" && any(rl > sl)) {
     stop("If ivl_side is \"upper\" rl must be < sl.")
   }
 
@@ -925,7 +925,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
   if (!is.factor(data[, batch_vbl])) {
     stop("The column in data specified by batch_vbl must be a factor.")
   }
-  if (alpha <= 0 | alpha > 1) {
+  if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
   }
 
@@ -1014,11 +1014,11 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (!is.numeric(shift) | length(shift) != 2) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
 
@@ -1234,7 +1234,7 @@ extract_wc_x <- function(l1, l2) {
         m_res[, "cics"] <- l1[["cics"]]
       }
       if (is.list(l1[["cics"]])) {
-        if (is.vector(l1[["cics"]][[length(l1[["cics"]])]]) &
+        if (is.vector(l1[["cics"]][[length(l1[["cics"]])]]) &&
             length(l1[["cics"]][[length(l1[["cics"]])]]) == 1) {
           m_res[, "cics"] <- rep(unname(l1[[i]][[1]]), length(l2[[1]]))
         }
@@ -1302,13 +1302,13 @@ print_val <- function(val_name, val_value, val_unit, val_sf,
   if (length(val_value) > 1) {
     stop("The parameter val_value must be a numeric value of length 1.")
   }
-  if (!is.numeric(val_value) & !is.na(val_value)) {
+  if (!is.numeric(val_value) && !is.na(val_value)) {
     stop("The parameter val_value must be a numeric value of length 1.")
   }
   if (!is.character(val_unit)) {
     stop("The parameter val_unit must be a string.")
   }
-  if (!is.numeric(val_sf) | length(val_sf) > 1) {
+  if (!is.numeric(val_sf) || length(val_sf) > 1) {
     stop("The parameter val_sf must be a positive integer of length 1.")
   }
   if (val_sf != as.integer(val_sf)) {
@@ -1363,7 +1363,7 @@ print_val <- function(val_name, val_value, val_unit, val_sf,
 #' @keywords internal
 
 get_n_whole_part <- function(x) {
-  if (!is.numeric(x) & all(!is.na(x))) {
+  if (!is.numeric(x) && all(!is.na(x))) {
     stop("The parameter x must be a numeric value or NA.")
   }
 
@@ -1374,7 +1374,7 @@ get_n_whole_part <- function(x) {
     if (is.na(xx)) {
       NA
     } else {
-      if (xx <= 1 & xx >= -1) {
+      if (xx <= 1 && xx >= -1) {
         1
       } else {
         floor(log10(abs(xx))) + 1

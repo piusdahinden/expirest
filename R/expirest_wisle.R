@@ -192,7 +192,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   if (!is.numeric(rl)) {
     stop("The parameter rl must be a numeric.")
   }
-  if (!is.numeric(rl_sf) & all(!is.na(rl_sf))) {
+  if (!is.numeric(rl_sf) && all(!is.na(rl_sf))) {
     stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
   }
   if (sum(rl_sf < 0) > 0) {
@@ -204,7 +204,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   if (!isTRUE(all.equal(rl_sf, as.integer(rl_sf)))) {
     stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
   }
-  if (!is.numeric(sl) | length(sl) > 2) {
+  if (!is.numeric(sl) || length(sl) > 2) {
     stop("The parameter sl must be a numeric or vector of length 1 or 2.")
   }
   if (length(sl) == 2) {
@@ -212,7 +212,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
       stop("The parameter sl must be of the form c(lower, upper).")
     }
   }
-  if (!is.numeric(sl_sf) & all(!is.na(sl_sf))) {
+  if (!is.numeric(sl_sf) && all(!is.na(sl_sf))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
   if (sum(sl_sf < 0) > 0) {
@@ -224,19 +224,19 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   if (!isTRUE(all.equal(sl_sf, as.integer(sl_sf)))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
-  if (!is.numeric(srch_range) | length(srch_range) != 2) {
+  if (!is.numeric(srch_range) || length(srch_range) != 2) {
     stop("The parameter srch_range must be a vector of length 2.")
   }
-  if (alpha <= 0 | alpha > 1) {
+  if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
   }
-  if (alpha_pool <= 0 | alpha_pool > 1) {
+  if (alpha_pool <= 0 || alpha_pool > 1) {
     stop("Please specify alpha_pool as (0, 1].")
   }
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
@@ -260,17 +260,17 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   }
 
   if (length(sl) == 1) {
-    if (ivl_side == "lower" & !all(rl > sl)) {
+    if (ivl_side == "lower" && !all(rl > sl)) {
       stop("If ivl_side is \"lower\" rl must be > sl.")
     }
-    if (ivl_side == "upper" & !all(rl < sl)) {
+    if (ivl_side == "upper" && !all(rl < sl)) {
       stop("If ivl_side is \"upper\" rl must be < sl.")
     }
   } else {
-    if (ivl_side == "lower" & !all(rl > sl[1])) {
+    if (ivl_side == "lower" && !all(rl > sl[1])) {
       stop("If ivl_side is \"lower\" rl must be > sl.")
     }
-    if (ivl_side == "upper" & !all(rl < sl[2])) {
+    if (ivl_side == "upper" && !all(rl < sl[2])) {
       stop("If ivl_side is \"upper\" rl must be < sl.")
     }
   }
@@ -730,27 +730,27 @@ plot_expirest_wisle <- function(
   if (!inherits(model, "expirest_wisle")) {
     stop("The model must be an object of class expirest_wisle.")
   }
-  if (!is.numeric(rl_index) | length(rl_index) > 1) {
+  if (!is.numeric(rl_index) || length(rl_index) > 1) {
     stop("The parameter rl_index must be a positive integer of length 1.")
   }
   if (rl_index != as.integer(rl_index)) {
     stop("The parameter rl_index must be a positive integer of length 1.")
   }
-  if (rl_index < 1 | rl_index > nrow(model[["POI"]])) {
+  if (rl_index < 1 || rl_index > nrow(model[["POI"]])) {
     stop("The parameter rl_index must be between 1 and the number of rl ",
          "values.")
   }
   if (!(show_grouping %in% c("yes", "no"))) {
     stop("Please specify show_grouping either as \"yes\" or \"no\".")
   }
-  if (!is.numeric(y_range) | length(y_range) != 2) {
+  if (!is.numeric(y_range) || length(y_range) != 2) {
     stop("The parameter y_range must be a vector of length 2.")
   }
   if (y_range[1] > y_range[2]) {
     stop("The parameter y_range must be of the form c(min, max).")
   }
   if (!is.null(x_range)) {
-    if (!is.numeric(x_range) | length(x_range) != 2) {
+    if (!is.numeric(x_range) || length(x_range) != 2) {
       stop("The parameter x_range must be a vector of length 2.")
     }
     if (x_range[1] > x_range[2]) {
