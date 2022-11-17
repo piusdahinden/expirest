@@ -780,6 +780,9 @@ plot_expirest_wisle <- function(
 
   expob <- model
 
+  # Make visible binding for global variable
+  LL <- UL <- NULL
+
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Extraction of models and of the model type
   # If show_grouping = "no" the model_type is "cics"
