@@ -88,18 +88,20 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
       variable_names[attr(model$terms, which = "dataClasses") %in% "factor"]
 
     x_length <- vapply(grouping_variables,
-                       function(x)
-                         nlevels(model$model[, grouping_variables]),
+                       function(x) {
+                         nlevels(model$model[, grouping_variables])
+                       },
                        numeric(1))
     x_length <- prod(x_length)
 
     l_newdata <-
       vapply(grouping_variables,
-             function(x)
+             function(x) {
                list(rep(levels(model$model[, grouping_variables]),
                         each = x_length /
                           nlevels(model$model[, grouping_variables]) *
-                          length(x_new))),
+                          length(x_new)))
+             },
              list(1))
     l_newdata[[length(l_newdata) + 1]] <- rep(x_new, x_length)
     names(l_newdata) <- c(grouping_variables,
@@ -1123,9 +1125,11 @@ extract_from_ll_wcsl <- function(ll, element) {
     stop("The parameter ll must be a list of lists returned by ",
          "get_wcs_limit() at level three.")
   }
-  if (sum(vapply(ll, function(x)
+  if (sum(vapply(ll, function(x) {
     sum(c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig") %in%
-                                     names(x[[1]][[1]])) != 4, logical(1)))) {
+        names(x[[1]][[1]])) != 4
+  },
+  logical(1)))) {
     stop("The element was not found in the element names of the list ",
          "at level three that must be a list returned by get_wcs_limit().")
   }
@@ -1202,17 +1206,24 @@ extract_wc_x <- function(l1, l2) {
          "and \"dids\".")
   }
   if (get_n_list_levels(l1) == 1) {
-    if (sum(vapply(l1, function(x) !is.matrix(x), logical(1))) > 0) {
+    if (sum(vapply(l1, function(x) {
+      !is.matrix(x)
+    },
+    logical(1))) > 0) {
       stop("The elements of l1 must be matrices or lists of vectors.")
     }
   } else {
-    if (sum(vapply(l1, function(x)
-      !is.numeric(x[[1]]) & !is.logical(x[[1]]), logical(1))) > 0) {
+    if (sum(vapply(l1, function(x) {
+      !is.numeric(x[[1]]) & !is.logical(x[[1]])
+    },
+    logical(1))) > 0) {
       stop("The elements of l1 must be matrices or lists of vectors.")
     }
   }
-  if (sum(vapply(l2, function(x)
-    !is.numeric(x) & !is.logical(x), logical(1))) > 0) {
+  if (sum(vapply(l2, function(x) {
+    !is.numeric(x) & !is.logical(x)
+  },
+  logical(1))) > 0) {
     stop("The elements of l2 must be numeric vectors or vectors of NA.")
   }
   if (sum(vapply(l1, function(x) is.matrix(x), logical(1))) == 3) {

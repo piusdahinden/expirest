@@ -371,8 +371,9 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # Individual
   t_formula <- paste(response_vbl, "~", time_vbl)
   l_models[["individual"]] <-
-    by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat)
-    do.call("lm", list(as.formula(t_formula), data = as.name("dat"))))
+    by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat) {
+      do.call("lm", list(as.formula(t_formula), data = as.name("dat")))
+    })
 
   # ---------
   # Determination of the Akaike Information Criterion (AIC) and Bayesian
@@ -430,10 +431,11 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of intercepts of all models
 
-  l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x)
+  l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x) {
     list(get_icpt(model = x, response_vbl = response_vbl,
                   time_vbl = time_vbl, batch_vbl = batch_vbl,
-                  xform = xform, shift = shift)),
+                  xform = xform, shift = shift))
+    },
     list(1))
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
