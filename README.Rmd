@@ -104,5 +104,4 @@ plot(ggres1)
 ## Contact
 [Pius Dahinden](https://github.com/piusdahinden), Tillotts Pharma AG
 
-
 ---

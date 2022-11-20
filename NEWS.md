@@ -1,5 +1,21 @@
 ---
 
+# expirest 0.1.4
+
+- Due to a misconception of object type tests the same value was reported for
+  each rl value if the cics model was the appropriate model although the
+  correct values were calculated. Now, the correct values (i.e. Delta, WCSL
+  and Shelf.Life) are reported.
+- The output of the summary() function has been harmonised between cics models
+  on the one hand and dics / dids models on the other.
+- The deprecated ggplot2 function aes_string() has been replaced by aes().
+  Variables containing column names as a character vector (var_name) are
+  now called via .data[[var_name]]. In addition, size has been replaced by
+  linewidth when used in the geom_line() function. In addition, visible binding
+  for global variavles was added.
+  
+---
+
 # expirest 0.1.3
 
 - The graphical output of the dids model was not appropriate because the 

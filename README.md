@@ -153,7 +153,7 @@ ggres1 <- plot_expirest_wisle(
 class(ggres1)
 #> [1] "plot_expirest_wisle"
 plot(ggres1)
-#> Warning: Removed 4 rows containing missing values (geom_point).
+#> Warning: Removed 4 rows containing missing values (`geom_point()`).
 ```
 
 <img src="man/figures/README-example_2-1.png" width="100%" />
