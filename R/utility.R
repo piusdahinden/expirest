@@ -776,7 +776,8 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
 #' Australian Government, Australian Regulatory Guidelines for Prescription
 #' Medicines (ARGPM), Stability testing for prescription medicines,
 #' Version 1.1, March 2017 \cr
-#' \url{https://www.tga.gov.au/stability-testing-prescription-medicines}
+#' \url{https://www.tga.gov.au/resources/resource/guidance/
+#'      stability-testing-prescription-medicines}
 #'
 #' @seealso \code{\link{expirest_wisle}}, \code{\link[stats]{lm}}.
 #'

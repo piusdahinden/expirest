@@ -25,8 +25,7 @@
 #' @references
 #' LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 #' Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
-#' (2011) \strong{17}(3): 47-68.\cr
-#' \url{https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
+#' (2011) \strong{17}(3): 47-68.
 #'
 #' @source
 #' See reference: Example data sets shown in Tables IV, VI and VIII.
@@ -57,8 +56,7 @@
 #' @references
 #' LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 #' Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
-#' (2011) \strong{17}(3): 47-68.\cr
-#' \url{https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
+#' (2011) \strong{17}(3): 47-68.
 #'
 #' @source
 #' See reference: Example data sets shown in Table XI.
@@ -89,8 +87,7 @@
 #' @references
 #' LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102: Stability
 #' Shelf Life Estimation Using Analysis of Covariance. \emph{J Valid Technol}
-#' (2011) \strong{17}(3): 47-68.\cr
-#' \url{https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf}
+#' (2011) \strong{17}(3): 47-68.
 #'
 #' @source
 #' See reference: Example data sets shown in Table XIII.
@@ -99,7 +96,6 @@
 #' str(exp3)
 "exp3"
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #' Stability data of 4 batches
 #'
@@ -118,7 +114,7 @@
 #'     \code{4_14}.}
 #'   \item{Month}{Numeric representing the time points of testing from the
 #'                start (0 months) to the end (24 months) of the study.}
-#'   \item{Conc}{Numeric of the meausred concentrations in \eqn{mg / kg}.}
+#'   \item{Conc}{Numeric of the measured concentrations in \eqn{mg / kg}.}
 #' }
 #'
 #' @keywords datasets
@@ -134,5 +130,3 @@
 #' @examples
 #' str(exp4)
 "exp4"
-
-## <><><><><><><><><><><><><><><><><><><><><><><><><><><><>

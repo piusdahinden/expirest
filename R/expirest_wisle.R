@@ -140,7 +140,8 @@
 #' Australian Government, Australian Regulatory Guidelines for Prescription
 #' Medicines (ARGPM), Stability testing for prescription medicines,
 #' Version 1.1, March 2017\cr
-#' \url{https://www.tga.gov.au/stability-testing-prescription-medicines}
+#' \url{https://www.tga.gov.au/resources/resource/guidance/
+#'      stability-testing-prescription-medicines}
 #'
 #' International Council for Harmonisation of Technical Requirements for
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
