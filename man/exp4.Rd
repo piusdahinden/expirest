@@ -11,7 +11,7 @@ A data frame with 36 observations and 3 variables:
     \code{4_14}.}
   \item{Month}{Numeric representing the time points of testing from the
                start (0 months) to the end (24 months) of the study.}
-  \item{Conc}{Numeric of the meausred concentrations in \eqn{mg / kg}.}
+  \item{Conc}{Numeric of the measured concentrations in \eqn{mg / kg}.}
 }
 }
 \source{
