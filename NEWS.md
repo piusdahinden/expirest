@@ -1,5 +1,11 @@
 ---
 
+# expirest 0.1.5
+
+- URLs were either updated or, in case of expired ones, deleted.
+
+---
+
 # expirest 0.1.4
 
 - Due to a misconception of object type tests the same value was reported for
@@ -12,7 +18,7 @@
   Variables containing column names as a character vector (var_name) are
   now called via .data[[var_name]]. In addition, size has been replaced by
   linewidth when used in the geom_line() function. In addition, visible binding
-  for global variavles was added.
+  for global variables was added.
   
 ---
 

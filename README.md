@@ -13,7 +13,7 @@ Evaluation of Stability Data](https://www.ich.org/)) or following the
 worst-case scenario consideration (what-if analysis) described in the
 Australian Regulatory Guidelines for Prescription Medicines (ARGPM),
 guidance on ([Stability testing for prescription
-medicines](https://www.tga.gov.au/stability-testing-prescription-medicines)).
+medicines](https://www.tga.gov.au/resources/resource/guidance/stability-testing-prescription-medicines)).
 
 ## Installation
 
@@ -39,8 +39,7 @@ This is a basic example which shows you how to solve a common problem
 using a data set containing the moisture stability data (% (w/w)) of
 three batches obtained over a 24 months period of a drug product. A
 total of *n* = 33 independent measurements are available (corresponding
-to data shown in Table XIII in [LeBlond et
-al. (2011)](https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf)).
+to data shown in Table XIII in LeBlond et al. (2011).
 
 ``` r
 library(expirest)
@@ -102,8 +101,7 @@ different slope* (dids). A data set containing the potency stability
 data (in % of label claim (LC)) of five batches of a drug product
 obtained over a 24 months period is used. A total of *n* = 53
 independent measurements are available (corresponding to data shown in
-Tables IV, VI and VIII in [LeBlond et
-al. (2011)](https://www.ivtnetwork.com/sites/default/files/LinearRegression.pdf)).
+Tables IV, VI and VIII in LeBlond et al. (2011).
 
 ``` r
 library(expirest)
@@ -157,6 +155,12 @@ plot(ggres1)
 ```
 
 <img src="man/figures/README-example_2-1.png" width="100%" />
+
+## Literature
+
+LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102:
+Stability Shelf Life Estimation Using Analysis of Covariance. *J Valid
+Technol* (2011) **17**(3): 47-68.
 
 ## Contact
 
