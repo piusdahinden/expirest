@@ -14,12 +14,13 @@ This patch comes with the following changes:
 ## Test environments
 
 - Local windows-x86_64-w64-mingw32/x64 (R 4.2.2)
-- Win-builder windows-x86_64-w64-mingw32/x64 (R 4.1.3)
 - Win-builder windows-x86_64-w64-mingw32/x64 (R 4.2.2)
+- Win-builder windows-x86_64-w64-mingw32/x64 (R 4.1.3)
 - Win-builder windows-x86_64-w64-mingw32/x64 (R-devel)
 - R-hub Ubuntu Linux 20.04.1 LTS, GCC (R-release)
 - R-hub Fedora Linux, clang, gfortran (R-devel)
 - R-hub macOS 10.13.6 High Sierra (R-release)
+- R-hub Windows Server 2022 32/64 bit (R-release)
 
 ## R CMD check results
 
