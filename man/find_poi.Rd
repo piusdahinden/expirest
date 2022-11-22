@@ -93,15 +93,12 @@ test batches or the intercept of the worst performing batch.
 Therapeutic Goods Administration (TGA) of the Department of Health of the
 Australian Government, Australian Regulatory Guidelines for Prescription
 Medicines (ARGPM), Stability testing for prescription medicines,
-Version 1.1, March 2017\cr
-\url{https://www.tga.gov.au/resources/resource/guidance/
-stability-testing-prescription-medicines}
+Version 1.1, March 2017
 
 International Council for Harmonisation of Technical Requirements for
 Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
-(CPMP/ICH/420/02).\cr
-\url{https://www.ich.org/page/quality-guidelines}
+(CPMP/ICH/420/02).
 }
 \seealso{
 \code{\link{get_distance}}, \code{\link[stats]{uniroot}},

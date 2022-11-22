@@ -87,9 +87,7 @@ The results are returned on the transformed scale and on the original scale.
 Therapeutic Goods Administration (TGA) of the Department of Health of the
 Australian Government, Australian Regulatory Guidelines for Prescription
 Medicines (ARGPM), Stability testing for prescription medicines,
-Version 1.1, March 2017 \cr
-\url{https://www.tga.gov.au/resources/resource/guidance/
-stability-testing-prescription-medicines}
+Version 1.1, March 2017
 }
 \seealso{
 \code{\link{expirest_wisle}}, \code{\link[stats]{lm}}.

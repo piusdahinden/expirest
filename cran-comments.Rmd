@@ -9,7 +9,7 @@ output: github_document
 
 This patch comes with the following changes:
 
-- URLs were either updated or, in case of expired ones, deleted.
+- Expired and (possibly) invalid URLs were removed.
 
 ## Test environments
 

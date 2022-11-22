@@ -2,7 +2,7 @@
 
 # expirest 0.1.5
 
-- URLs were either updated or, in case of expired ones, deleted.
+- Expired and (possibly) invalid URLs were removed.
 
 ---
 

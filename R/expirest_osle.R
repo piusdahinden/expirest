@@ -162,8 +162,7 @@
 #' International Council for Harmonisation of Technical Requirements for
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
-#' (CPMP/ICH/420/02).\cr
-#' \url{https://www.ich.org/page/quality-guidelines}
+#' (CPMP/ICH/420/02).
 #'
 #' @seealso \code{\link{expirest_wisle}}, \code{\link{find_poi}},
 #' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
