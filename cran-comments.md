@@ -7,28 +7,18 @@ cran-comments
 
 This patch comes with the following changes:
 
-- Due to a misconception of object type tests the same value was
-  reported for each rl value if the cics model was the appropriate model
-  although the correct values were calculated. Now, the correct values
-  (i.e. Delta, WCSL and Shelf.Life) are reported.
-- The output of the summary() function was harmonised for cics models on
-  the one hand and dics / dids models on the other.
-- The deprecated ggplot2 function aes_string() has been replaced by
-  aes(). Variables containing column names as a character vector
-  (var_name) are now called via .data\[\[var_name\]\]. In addition, size
-  has been replaced by linewidth when used in the geom_line() function.
-  In addition, visible binding for global variavles was added.
+- Expired and (possibly) invalid URLs were removed.
 
 ## Test environments
 
 - Local windows-x86_64-w64-mingw32/x64 (R 4.2.2)
-- Win-builder windows-x86_64-w64-mingw32/x64 (R 4.1.3)
 - Win-builder windows-x86_64-w64-mingw32/x64 (R 4.2.2)
+- Win-builder windows-x86_64-w64-mingw32/x64 (R 4.1.3)
 - Win-builder windows-x86_64-w64-mingw32/x64 (R-devel)
-- R-hub Windows Server 2022, 64-bit (R-devel)
 - R-hub Ubuntu Linux 20.04.1 LTS, GCC (R-release)
 - R-hub Fedora Linux, clang, gfortran (R-devel)
 - R-hub macOS 10.13.6 High Sierra (R-release)
+- R-hub Windows Server 2022 32/64 bit (R-release)
 
 ## R CMD check results
 
