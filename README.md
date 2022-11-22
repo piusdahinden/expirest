@@ -8,12 +8,11 @@
 
 The package supports shelf life estimation for chemically derived
 medicines, either following the standard method proposed by the
-International Council for Harmonisation (ICH), in quality guideline [Q1E
-Evaluation of Stability Data](https://www.ich.org/)) or following the
-worst-case scenario consideration (what-if analysis) described in the
-Australian Regulatory Guidelines for Prescription Medicines (ARGPM),
-guidance on ([Stability testing for prescription
-medicines](https://www.tga.gov.au/resources/resource/guidance/stability-testing-prescription-medicines)).
+International Council for Harmonisation (ICH), in quality guideline Q1E
+Evaluation of Stability Data or following the worst-case scenario
+consideration (what-if analysis) described in the Australian Regulatory
+Guidelines for Prescription Medicines (ARGPM), guidance on Stability
+testing for prescription medicines.
 
 ## Installation
 
