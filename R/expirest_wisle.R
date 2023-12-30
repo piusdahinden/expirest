@@ -152,17 +152,13 @@
 #'
 #' @example man/examples/examples_expirest_wisle.R
 #'
-#' @importFrom stats lm
-#' @importFrom stats as.formula
-#' @importFrom stats coef
-#'
 #' @export
 
-expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
-                       sl, sl_sf, srch_range, alpha = 0.05, alpha_pool = 0.25,
-                       xform = c("no", "no"), shift = c(0, 0),
-                       sf_option = "loose", ivl = "confidence",
-                       ivl_type = "one.sided", ivl_side = "lower", ...) {
+expirest_wisle <-
+  function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf, sl, sl_sf,
+           srch_range, alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
+           shift = c(0, 0), sf_option = "loose", ivl = "confidence",
+           ivl_type = "one.sided", ivl_side = "lower", ...) {
   if (!is.data.frame(data)) {
     stop("The data must be provided as data frame.")
   }

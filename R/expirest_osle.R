@@ -184,19 +184,13 @@
 #'
 #' @example man/examples/examples_expirest_osle.R
 #'
-#' @importFrom stats lm
-#' @importFrom stats as.formula
-#' @importFrom stats coef
-#' @importFrom stats AIC
-#' @importFrom stats BIC
-#'
 #' @export
 
-expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
-                       sl, sl_sf, srch_range, alpha = 0.05, alpha_pool = 0.25,
-                       xform = c("no", "no"), shift = c(0, 0),
-                       sf_option = "loose", ivl = "confidence",
-                       ivl_type = "one.sided", ivl_side = "lower", ...) {
+expirest_osle <-
+  function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf, srch_range,
+           alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
+           shift = c(0, 0), sf_option = "loose", ivl = "confidence",
+           ivl_type = "one.sided", ivl_side = "lower", ...) {
   if (!is.data.frame(data)) {
     stop("The data must be provided as data frame.")
   }
@@ -344,65 +338,20 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # ANCOVA to figure out which kind of model suits the data best
 
-  l_model_type <-
-    check_ancova(data = d_dat, response_vbl = response_vbl,
-                 time_vbl = time_vbl, batch_vbl = batch_vbl,
-                 alpha = alpha_pool)
+  l_model_type <- check_ancova(data = d_dat, response_vbl = response_vbl,
+                               time_vbl = time_vbl, batch_vbl = batch_vbl,
+                               alpha = alpha_pool)
+
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Fitting of all possible models that are relevant
 
-  l_models <- vector(mode = "list", length = 4)
-  names(l_models) <- c("cics", "dics", "dids", "individual")
+  tmp <- get_linear_models(data = d_dat, response_vbl = response_vbl,
+                           time_vbl = time_vbl, batch_vbl = batch_vbl)
 
-  if (nlevels(d_dat[, batch_vbl]) > 1) {
-    # ---------
-    # Common Intercept / Common Slope
-    t_formula <- paste(response_vbl, "~", time_vbl)
-    l_models[["cics"]] <-
-      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-    # ---------
-    # Different Intercept / Common Slope
-    t_formula <-
-      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " + "))
-    l_models[["dics"]] <-
-      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-    # ---------
-    # Different Intercept / Different Slope
-    t_formula <-
-      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " * "))
-    l_models[["dids"]] <-
-      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-    # ---------
-    # Individual
-    t_formula <- paste(response_vbl, "~", time_vbl)
-    l_models[["individual"]] <-
-      by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat) {
-        do.call("lm", list(as.formula(t_formula), data = as.name("dat")))
-      })
-
-    # ---------
-    # Determination of the Akaike Information Criterion (AIC) and Bayesian
-    # Information Criterion (BIC) of each of the relevant models
-
-    t_AIC <- vapply(l_models[1:(length(l_models) - 1)], AIC, numeric(1))
-    t_BIC <- vapply(l_models[1:(length(l_models) - 1)], BIC, numeric(1))
-  } else {
-    t_formula <- paste(response_vbl, "~", time_vbl)
-
-    l_models[names(l_models) != "individual"] <- NA
-    l_models[["individual"]] <-
-      by(data = d_dat, INDICES = d_dat[, batch_vbl],
-         FUN = function(dat) {
-           do.call("lm",
-                   list(as.formula(t_formula), data = as.name("dat")))
-         })
-
-    t_AIC <- t_BIC <- setNames(rep(NA, 3), c("cics", "dics", "dids"))
-  }
+  l_models <- tmp$Models
+  t_AIC <- tmp$AIC
+  t_BIC <- tmp$BIC
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits

@@ -1020,6 +1020,144 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
   return(l_model_type)
 }
 
+#' Linear model fitting
+#'
+#' The function \code{get_linear_models()} fits four types of linear regression
+#' models that are often used for the assessment of stability data, e.g. for
+#' the estimation of the shelf life or retest period.
+#'
+#' @inheritParams expirest_osle
+#'
+#' @details The function \code{get_linear_models()} expects a data frame with
+#' a response variable, a time variable and a categorical variable which
+#' usually has factor levels of multiple batches of a drug product that was
+#' assessed over a certain period of time with respect to the time-dependen
+#' behavior of characteristic parameters. Using these results, the function
+#' fits
+#' \itemize{
+#'  \item a \emph{common intercept / common slope} model (cics),
+#'  \item a \emph{different intercept / common slope} model (dics) or
+#'  \item a \emph{different intercept / different slope} model (dids) and
+#'  \item individual regression models
+#' }
+#'
+#' If the categorical variable has only a single factor level, then the first
+#' three models are \code{NA} and only an individual regression model is fitted.
+#'
+#' @return A list of three elements is returned,
+#' containing the following elements:
+#' \item{Models}{A list of four elements named \code{cics}, \code{dics},
+#'   \code{dids} and \code{individual}. The first three elements contain the
+#'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
+#'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
+#'   and \dQuote{different intercept / different slope} (\code{dids}) models.
+#'   The fourth element is a list of the \sQuote{\code{lm}} objects of the
+#'   models obtained from fitting the data of each batch individually. The
+#'   \code{cics}, \code{dics} and \code{dids} elements are \code{NA} if data
+#'   of only a single batch were provided.}
+#' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
+#'   values of the \code{cics}, \code{dics} and \code{dids} models.}
+#' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
+#'   values of each of the \code{cics}, \code{dics} and \code{dids} models.}
+#'
+#' @seealso \code{\link{expirest_osle}}.
+#'
+#' @importFrom stats lm
+#' @importFrom stats as.formula
+#' @importFrom stats coef
+#' @importFrom stats AIC
+#' @importFrom stats BIC
+#'
+#' @keywords internal
+
+get_linear_models <- function(data, response_vbl, time_vbl, batch_vbl) {
+  if (!is.data.frame(data)) {
+    stop("The data must be provided as data frame.")
+  }
+  if (!is.character(response_vbl)) {
+    stop("The parameter response_vbl must be a string.")
+  }
+  if (!(response_vbl %in% colnames(data))) {
+    stop("The response_vbl was not found in the provided data frame.")
+  }
+  if (!is.character(time_vbl)) {
+    stop("The parameter time_vbl must be a string.")
+  }
+  if (!(time_vbl %in% colnames(data))) {
+    stop("The time_vbl was not found in the provided data frame.")
+  }
+  if (!is.character(batch_vbl)) {
+    stop("The parameter batch_vbl must be a string.")
+  }
+  if (!(batch_vbl %in% colnames(data))) {
+    stop("The batch_vbl was not found in the provided data frame.")
+  }
+  if (!is.factor(data[, batch_vbl])) {
+    stop("The column in data specified by batch_vbl must be a factor.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  # Remove unused factor levels
+  d_dat <- droplevels(data)
+
+  l_models <- vector(mode = "list", length = 4)
+  names(l_models) <- c("cics", "dics", "dids", "individual")
+
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    # ---------
+    # Common Intercept / Common Slope
+    t_formula <- paste(response_vbl, "~", time_vbl)
+    l_models[["cics"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+
+    # ---------
+    # Different Intercept / Common Slope
+    t_formula <-
+      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " + "))
+    l_models[["dics"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+
+    # ---------
+    # Different Intercept / Different Slope
+    t_formula <-
+      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " * "))
+    l_models[["dids"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+
+    # ---------
+    # Individual
+    t_formula <- paste(response_vbl, "~", time_vbl)
+    l_models[["individual"]] <-
+      by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat) {
+        do.call("lm", list(as.formula(t_formula), data = as.name("dat")))
+      })
+
+    # ---------
+    # Determination of the Akaike Information Criterion (AIC) and Bayesian
+    # Information Criterion (BIC) of each of the relevant models
+
+    t_AIC <- vapply(l_models[1:(length(l_models) - 1)], AIC, numeric(1))
+    t_BIC <- vapply(l_models[1:(length(l_models) - 1)], BIC, numeric(1))
+  } else {
+    t_formula <- paste(response_vbl, "~", time_vbl)
+
+    l_models[names(l_models) != "individual"] <- NA
+    l_models[["individual"]] <-
+      by(data = d_dat, INDICES = d_dat[, batch_vbl],
+         FUN = function(dat) {
+           do.call("lm",
+                   list(as.formula(t_formula), data = as.name("dat")))
+         })
+
+    t_AIC <- t_BIC <- setNames(rep(NA, 3), c("cics", "dics", "dids"))
+  }
+
+  return(list(Models = l_models,
+              AIC = t_AIC,
+              BIC = t_BIC))
+}
+
 #' Getting the intercept(s) of a linear model
 #'
 #' The function \code{get_icpt()} determines the intercept(s) of the provided
