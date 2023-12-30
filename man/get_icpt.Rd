@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility.R
 \name{get_icpt}
 \alias{get_icpt}
-\title{Getting intercept(s) of a linear model}
+\title{Getting the intercept(s) of a linear model}
 \usage{
 get_icpt(
   model,

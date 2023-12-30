@@ -26,9 +26,16 @@ decision which model is appropriate, i.e. if the assumption of
 The default is \code{0.05}.}
 }
 \value{
-A numeric vector of the form \code{c(ci, cs)} is returned, specifying
-if a common intercept is appropriate (\code{ci = 1}) or not (\code{ci = 0})
-and if a common slope is appropriate (\code{cs = 1}) or not (\code{cs = 0}).
+A list of two elements is returned specifying which model, based on
+  the ANCOVA analysis, suits best. The first element (\code{type.spec})
+  is a numeric vector of length 2 specifying the best model accepted at the
+  significance level specified by \code{alpha}. It has the form
+  \code{c(ci, cs)}, where \code{ci} specifies if a common intercept is
+  appropriate (\code{ci = 1}) or not (\code{ci = 0}) and \code{cs} specifies
+  if a common slope is appropriate (\code{cs = 1}) or not (\code{cs = 0}).
+  The second element (\code{type.acronym}) is an acronym representing the
+  first item. In case of a linear model including only a single batch,
+  all elements are \code{NA}.
 }
 \description{
 The function \code{check_ancova()} fits an ANalysis of COVAriance (ANCOVA)

@@ -29,27 +29,29 @@ test_that("extract_wc_x_succeeds", {
   l_icpt <- re[["Intercepts"]]
 
   # Determination of worst case scenario (wcs) limits
-  ll_wcsl <- lapply(seq_along(l_icpt), function(i) {
-    lapply(l_icpt[[i]]$icpt, function(xx) {
-      lapply(rl, function(j) {
-        get_wcs_limit(rl = j, sl = 95, intercept = xx,  xform = xform,
-                      shift = shift, ivl_side = ivl_side)
-      })
-    })
-  })
+  ll_wcsl <-
+    lapply(seq_along(l_icpt[-grep("individual", names(l_icpt))]),
+           function(i) {
+             lapply(l_icpt[[i]]$icpt, function(xx) {
+               lapply(rl, function(j) {
+                 get_wcs_limit(rl = j, sl = 95, intercept = xx,  xform = xform,
+                               shift = shift, ivl_side = ivl_side)
+               })
+             })
+           })
 
-  names(ll_wcsl) <- names(l_icpt)
+  names(ll_wcsl) <- names(l_icpt[-grep("individual", names(l_icpt))])
   l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
 
   # Calculation of POI values for all wcs limits
   # Determination of worst case POI values
-  l_poi <- vector(mode = "list", length = length(l_icpt))
+  l_poi <- vector(mode = "list", length = length(l_wcsl))
   names(l_poi) <- c("cics", "dics", "dids")
 
-  l_prl <- vector(mode = "list", length = length(l_icpt))
+  l_prl <- vector(mode = "list", length = length(l_wcsl))
   names(l_prl) <- c("cics", "dics", "dids")
 
-  for (variety in names(l_icpt)) {
+  for (variety in names(l_wcsl)) {
     # Initialise empty arrays
     m_poi <-
       matrix(NA, nrow = length(rl), ncol = length(l_icpt[[variety]][["icpt"]]))

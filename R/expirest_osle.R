@@ -70,7 +70,7 @@
 #'
 #' @details According to ICH Q1E guideline, \dQuote{\emph{an appropriate
 #' approach to retest period or shelf life estimation is to analyse a
-#' quantitative  attribute by determining the earliest time at which the 95
+#' quantitative attribute by determining the earliest time at which the 95
 #' percent confidence limit for the mean intersects the proposed acceptance
 #' criterion}} (in this package, this point is called the \dQuote{point of
 #' intersection} (POI)). Furthermore, it says that \dQuote{\emph{for an
@@ -78,22 +78,26 @@
 #' confidence limit should be compared to the acceptance criterion. For an
 #' attribute that can either increase or decrease, or whose direction of change
 #' is not known, two-sided 95 percent confidence limits should be calculated
-#' and compared to the upper and lower acceptance criteria.}} With respect to
-#' the number of batches to be included in the analysis it says that
-#' \dQuote{\emph{the retest period or shelf life is generally estimated based
-#' on the stability data from a minimum of three batches.}}
+#' and compared to the upper and lower acceptance criteria.}} The approach
+#' can be used to estimate the retest period or shelf life for a single batch
+#' or for multiple batches. According to the guideline, \dQuote{\emph{for a
+#' drug substance or for a drug product available in a single strength and a
+#' single container size and/or fill, the retest period or shelf life is
+#' generally estimated based on the stability data from a minimum of three
+#' batches.}}
 #'
-#' Before performing the retest period or shelf life estimation the most
-#' suitable model should be determined. It should particularly be verified
-#' if data of all test batches are poolable or not. Details on this are
-#' described in section \dQuote{Checking batch poolability} below.
+#' Before performing the retest period or shelf life estimation with results
+#' from multiple batches, the most suitable model should be determined. It
+#' should particularly be verified if data of all test batches are poolable or
+#' not. Details on this are described in section \dQuote{Checking batch
+#' poolability} below.
 #'
 #' @section Checking batch poolability:
 #' According to ICH Q1E guideline, construction of the 95\% confidence interval
 #' on the basis of the combined data of all test batches is allowed only if it
 #' has been confirmed by aid of a statistical test whether the regression lines
 #' from the different batches have a common slope and a common intercept. A
-#' significance level of \code{alpha_pool = 0.25} has to be used for both
+#' significance level of \code{alpha_pool = 0.25} should to be used for both
 #' batch-related terms, and the test of the slopes has to precede the test of
 #' the intercepts. From these tests, three possible models may be appropriate,
 #' i.e.
@@ -103,8 +107,13 @@
 #'  \item a \emph{different intercept / different slope} model (dids).
 #' }
 #' The \emph{common intercept / different slope} model is not of practical
-#' relevance because the corresponding model is missing an effect. If the slopes
-#' are significantly different, there is no point comparing intercepts.
+#' relevance because the corresponding model is missing an effect. If the
+#' slopes are significantly different, there is no point comparing intercepts.
+#' The dids model has individual intercepts and individual slopes, and the
+#' calculation of confidence intervals is based on the corresponding individual
+#' mean squared errors. The \emph{different intercept / different slope} model
+#' where the mean squared error is pooled across batches is reported as
+#' dids.pmse.
 #'
 #' These requirements can be checked by aid of an \dQuote{ANalysis of
 #' COVAriance} (ANCOVA) including the batch variable as interaction term. The
@@ -129,34 +138,39 @@
 #' \item{Variables}{A list of the variable names, i.e. the original names of
 #'   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
 #'   applicable, of the transformed variables.}
-#' \item{Model.Type}{A list of five elements specifying which model, based on
+#' \item{Model.Type}{A list of two elements specifying which model, based on
 #'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
 #'   is a numeric vector of length 2 specifying the best model accepted at the
-#'   significance level of 0.25. The first number represents the decision on
-#'   the intercept and the second on the slope, where \code{1} stands for
-#'   \dQuote{common} and \code{2} stands for \dQuote{different}. The second
-#'   element (\code{type.acronym}) is an acronym representing the first item.}
+#'   significance level specified by \code{alpha.pool}. The first number
+#'   represents the decision on the intercept and the second on the slope,
+#'   where \code{1} stands for \dQuote{common} and \code{2} stands for
+#'   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
+#'   representing the first item.}
 #' \item{Models}{A list of four elements named \code{cics}, \code{dics},
 #'   \code{dids} and \code{individual}. The first three elements contain the
 #'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
 #'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
 #'   and \dQuote{different intercept / different slope} (\code{dids}) models.
 #'   The fourth element is a list of the \sQuote{\code{lm}} objects of the
-#'   models obtained from fitting the data of each batch individually.}
+#'   models obtained from fitting the data of each batch individually. The
+#'   \code{cics}, \code{dics} and \code{dids} elements are \code{NA} if data
+#'   of only a single batch were provided.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-#'   values of each of the three fitted models.}
+#'   values of the \code{cics}, \code{dics} and \code{dids} models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-#'   values of each of the three fitted models.}
-#' \item{wc.icpt}{A numeric value of the worst case intercept.}
+#'   values of each of the \code{cics}, \code{dics} and \code{dids} models.}
+#' \item{wc.icpt}{A numeric value of the intercept of the worst case batch. In
+#'   case of the \code{dids} model, the worst case batch is determined on the
+#'   basis of the models fitted to each batch individually.}
 #' \item{wc.batch}{A numeric value of the worst case batch. In case of the
-#'  \code{dids} model type, the estimation is done using the models obtained
-#'  from fitting the data of each batch individually.}
+#'  \code{dids} model, the worst case batch is determined on the basis of the
+#'   models fitted to each batch individually.}
 #' \item{Limits}{A list of all limits.}
-#' \item{Intercepts}{A list of the intercepts of the three fitted models.}
-#' \item{POI}{A numeric named vector of the POI values of each of the three
-#'   fitted models. In case of the \code{dids} model type, the estimation is
-#'   done using the models obtained from fitting the data of each
-#'   batch individually.}
+#' \item{Intercepts}{A list of the intercepts of all models.}
+#' \item{All.POI}{A list of the POI values of all models.}
+#' \item{POI}{A numeric named vector of the (worst case) POI values of all
+#'   models. In case of the \code{dids} model, the worst case batch is
+#'   determined on the basis of the models fitted to each batch individually.}
 #'
 #' @references
 #' International Council for Harmonisation of Technical Requirements for
@@ -307,7 +321,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   #       the shift parameter before performing the transformation.
 
   d_dat <-
-    get_xformed_variables(data = droplevels(data), response_vbl = response_vbl,
+    get_xformed_variables(data = data, response_vbl = response_vbl,
                           time_vbl = time_vbl, xform = xform, shift = shift)
 
   l_variables <-
@@ -330,17 +344,10 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # ANCOVA to figure out which kind of model suits the data best
 
-  tmp <- check_ancova(data = d_dat, response_vbl = response_vbl,
-                      time_vbl = time_vbl, batch_vbl = batch_vbl,
-                      alpha = alpha_pool)
-
-  common_icpt <- tmp[1]
-  common_slp <- tmp[2]
-
-  l_model_type <- list(type.spec = c(common_icpt, common_slp),
-                       type.acronym =
-                         paste0(c("di", "ci")[common_icpt + 1],
-                                c("ds", "cs")[common_slp + 1]))
+  l_model_type <-
+    check_ancova(data = d_dat, response_vbl = response_vbl,
+                 time_vbl = time_vbl, batch_vbl = batch_vbl,
+                 alpha = alpha_pool)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Fitting of all possible models that are relevant
@@ -348,38 +355,54 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   l_models <- vector(mode = "list", length = 4)
   names(l_models) <- c("cics", "dics", "dids", "individual")
 
-  # ---------
-  # Common Intercept / Common Slope
-  t_formula <- paste(response_vbl, "~", time_vbl)
-  l_models[["cics"]] <-
-    do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    # ---------
+    # Common Intercept / Common Slope
+    t_formula <- paste(response_vbl, "~", time_vbl)
+    l_models[["cics"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
 
-  # ---------
-  # Different Intercept / Common Slope
-  t_formula <- paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " + "))
-  l_models[["dics"]] <-
-    do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+    # ---------
+    # Different Intercept / Common Slope
+    t_formula <-
+      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " + "))
+    l_models[["dics"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
 
-  # ---------
-  # Different Intercept / Different Slope
-  t_formula <- paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " * "))
-  l_models[["dids"]] <-
-    do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+    # ---------
+    # Different Intercept / Different Slope
+    t_formula <-
+      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " * "))
+    l_models[["dids"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
 
-  # ---------
-  # Individual
-  t_formula <- paste(response_vbl, "~", time_vbl)
-  l_models[["individual"]] <-
-    by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat) {
-      do.call("lm", list(as.formula(t_formula), data = as.name("dat")))
-    })
+    # ---------
+    # Individual
+    t_formula <- paste(response_vbl, "~", time_vbl)
+    l_models[["individual"]] <-
+      by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat) {
+        do.call("lm", list(as.formula(t_formula), data = as.name("dat")))
+      })
 
-  # ---------
-  # Determination of the Akaike Information Criterion (AIC) and Bayesian
-  # Information Criterion (BIC) of each of the relevant models
+    # ---------
+    # Determination of the Akaike Information Criterion (AIC) and Bayesian
+    # Information Criterion (BIC) of each of the relevant models
 
-  t_AIC <- vapply(l_models[1:(length(l_models) - 1)], AIC, numeric(1))
-  t_BIC <- vapply(l_models[1:(length(l_models) - 1)], BIC, numeric(1))
+    t_AIC <- vapply(l_models[1:(length(l_models) - 1)], AIC, numeric(1))
+    t_BIC <- vapply(l_models[1:(length(l_models) - 1)], BIC, numeric(1))
+  } else {
+    t_formula <- paste(response_vbl, "~", time_vbl)
+
+    l_models[names(l_models) != "individual"] <- NA
+    l_models[["individual"]] <-
+      by(data = d_dat, INDICES = d_dat[, batch_vbl],
+         FUN = function(dat) {
+           do.call("lm",
+                   list(as.formula(t_formula), data = as.name("dat")))
+         })
+
+    t_AIC <- t_BIC <- setNames(rep(NA, 3), c("cics", "dics", "dids"))
+  }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
@@ -430,58 +453,87 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of intercepts of all models
 
-  l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x) {
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x) {
+      list(get_icpt(model = x, response_vbl = response_vbl,
+                    time_vbl = time_vbl, batch_vbl = batch_vbl,
+                    xform = xform, shift = shift))
+    },
+    list(1))
+  } else {
+    l_icpt <- list(cics = NA, dics = NA, dids = NA)
+  }
+
+  tmp <- vapply(l_models[["individual"]], function(x) {
     list(get_icpt(model = x, response_vbl = response_vbl,
                   time_vbl = time_vbl, batch_vbl = batch_vbl,
                   xform = xform, shift = shift))
-    },
-    list(1))
+  },
+  list(1))
+  tmp <- unlist(tmp)
+  names(tmp) <- sub("\\.\\(Intercept\\)", "", names(tmp))
+
+  if (xform[2] == "no") {
+    names(tmp) <- sub("\\.icpt", "", names(tmp))
+    l_icpt$individual$icpt <- tmp
+  } else {
+    t_i_orig <- grep("orig", names(tmp))
+    names(tmp) <- sub("\\.icpt", "", names(tmp))
+    names(tmp) <- sub("\\.orig", "", names(tmp))
+
+    l_icpt$individual$icpt <- tmp[-t_i_orig]
+    l_icpt$individual$icpt.orig <- tmp[t_i_orig]
+  }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Calculation of POI values for all three model types
+  # Determination of POI values of all models
 
-  # Note: in case of the dids model type, the POI is not determined using the
-  # model that was determined using the data from all batches (i.e. the full
-  # model with the batch_vbl * time_vbl interaction term). Instead, separate
-  # models are fitted to the data of each individual batch and the POI values
-  # are determined for each of these models.
+  l_poi <- list(cics = NA, dics = NA, dids = NA, individual = NA)
+  names(l_poi) <- names(l_models)
 
-  t_poi <- rep(NA, 3)
-  names(t_poi) <- names(l_icpt)
+  l_poi[["individual"]] <-
+    vapply(l_models[["individual"]],
+           function(x) {
+             tmp <- try_get_model(
+               find_poi(srch_range = srch_range, model = x, sl = sl,
+                        mode = "minimal", alpha = alpha, ivl_type = ivl_type,
+                        ivl_side = ivl_side, ivl = ivl)
+             )
 
-  for (variety in names(t_poi)) {
-    if (variety != "dids") {
-      tmp <- try_get_model(
-        find_poi(srch_range = srch_range, model = l_models[[variety]], sl = sl,
-                 alpha = alpha, ivl_type = ivl_type, ivl_side = ivl_side,
-                 ivl = ivl)
-      )
+             ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
+           },
+           numeric(1))
 
-      if (is.null(tmp[["Error"]])) {
-        t_poi[variety] <- tmp[["Model"]]
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    for (variety in names(l_poi)[-length(l_poi)]) {
+      if (variety == "cics") {
+        tmp <- try_get_model(
+          find_poi(srch_range = srch_range, model = l_models[[variety]],
+                   sl = sl, mode = "minimal", alpha = alpha,
+                   ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
       }
-    } else {
-      t_poi_dids <-
-        vapply(l_models[["individual"]],
-               function(x) {
-                 tmp <- try_get_model(
-                   find_poi(srch_range = srch_range,
-                            model = x,
-                            sl = sl, alpha = alpha, ivl_type = ivl_type,
-                            ivl_side = ivl_side, ivl = ivl)
-                 )
-
-                 ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
-               },
-               numeric(1))
-
-      if (sum(is.na(t_poi_dids)) == 0) {
-        t_poi[variety] <- as.numeric((t_poi_dids[which.min(t_poi_dids)]))
+      if (variety %in% c("dics", "dids")) {
+        tmp <- try_get_model(
+          find_poi(srch_range = srch_range, model = l_models[[variety]],
+                   sl = sl, mode = "all", alpha = alpha,
+                   ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
+      }
+      if (is.null(tmp[["Error"]])) {
+        l_poi[[variety]] <- tmp[["Model"]]
       }
     }
   }
 
-  if (sum(is.na(t_poi)) != 0) {
+  # Extraction of the worst case POI values
+  t_poi <- vapply(l_poi, function(x) min(x, na.rm = TRUE), numeric(1))
+  t_poi[is.infinite(t_poi)] <- NA
+
+  # Swapping the dids and the individual model and renaming the vector
+  t_poi <- t_poi[c(1:2, 4, 3)]
+  names(t_poi) <- sub("dids", "dids.pmse", names(t_poi))
+  names(t_poi) <- sub("individual", "dids", names(t_poi))
+
+  if (sum(is.na(t_poi)) != 0 && nlevels(d_dat[, batch_vbl]) > 1) {
     warning("Not for all model types POI values obtained. ",
             "Possibly, changing srch_range could solve the issue.")
   }
@@ -491,49 +543,64 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   #   and its intercept (wc_icpt_ich)
 
   # In case of cics model: wc_icpt_ich is the common intercept of all batches
-  #   and none of the batches is the worst case batch.
+  #   and none of the batches is the worst case batch and thus NA.
   # In case of dids model: wc_batch_ich needs to be determined using the
-  #   models fitted to the data of each batch individually.
+  #   models fitted to the data of each individual batch.
 
-  wc_batch_ich <- NA
+  # Worst case batch (of the most appropriate model)
+  # Note that the dids and the individual model are renamed
+  wc_batch_ich <- lapply(l_poi, function(x) {
+    ifelse(!length(which.min(x)), NA, which.min(x))
+  })
+  wc_batch_ich[[1]] <- NA
+  names(wc_batch_ich) <- sub("dids", "dids.pmse", names(wc_batch_ich))
+  names(wc_batch_ich) <- sub("individual", "dids", names(wc_batch_ich))
+  wc_batch_ich <- wc_batch_ich[[l_model_type[[2]]]]
+
+  # Intercept of the worst case batch (of the most appropriate model)
   wc_icpt_ich <- NA
 
-  if (!is.na(t_poi[l_model_type[[2]]])) {
-    switch(l_model_type[[2]],
-           "cics" = {
-             if (xform[2] != "no") {
-               wc_icpt_ich <- l_icpt[["cics"]][["icpt.orig"]]
-             } else {
-               wc_icpt_ich <- l_icpt[["cics"]][["icpt"]]
-             }
-           },
-           "dics" = {
-             pred_lim <- get_intvl_limit(x_new = t_poi["dics"],
-                                         model = l_models[["dics"]],
-                                         alpha = alpha, ivl_type = ivl_type,
-                                         ivl_side = ivl_side, ivl = ivl)
-
-             if (sum(is.na(pred_lim)) == 0) {
-               wc_batch_ich <- which.min(abs(sl - pred_lim))
-
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    if (!is.na(t_poi[l_model_type[[2]]])) {
+      switch(l_model_type[[2]],
+             "cics" = {
                if (xform[2] != "no") {
-                 wc_icpt_ich <- l_icpt[["dics"]][["icpt.orig"]][wc_batch_ich]
+                 wc_icpt_ich <- l_icpt[["cics"]][["icpt.orig"]]
                } else {
-                 wc_icpt_ich <- l_icpt[["dics"]][["icpt"]][wc_batch_ich]
+                 wc_icpt_ich <- l_icpt[["cics"]][["icpt"]]
                }
-             }
-           },
-           "dids" = {
-             if (sum(is.na(t_poi_dids)) == 0) {
-               wc_batch_ich <- which.min(t_poi_dids)
+             },
+             "dics" = {
+               if (!is.na(wc_batch_ich)) {
+                 if (xform[2] != "no") {
+                   wc_icpt_ich <- l_icpt[["dics"]][["icpt.orig"]][wc_batch_ich]
+                 } else {
+                   wc_icpt_ich <-  l_icpt[["dics"]][["icpt"]][wc_batch_ich]
+                 }
+               }
+             },
+             "dids" = {
+               if (!is.na(wc_batch_ich)) {
+                 if (xform[2] != "no") {
+                   wc_icpt_ich <-
+                     l_icpt[["individual"]][["icpt.orig"]][wc_batch_ich]
+                 } else {
+                   wc_icpt_ich <-
+                     l_icpt[["individual"]][["icpt"]][wc_batch_ich]
+                 }
+               }
+             })
+    }
+  } else {
+    if (sum(is.na(l_poi[["individual"]])) == 0) {
+      wc_batch_ich <- which.min(l_poi[["individual"]])
 
-               if (xform[2] != "no") {
-                 wc_icpt_ich <- l_icpt[["dids"]][["icpt.orig"]][wc_batch_ich]
-               } else {
-                 wc_icpt_ich <- l_icpt[["dids"]][["icpt"]][wc_batch_ich]
-               }
-             }
-           })
+      if (xform[2] != "no") {
+        wc_icpt_ich <- l_icpt[["individual"]][[wc_batch_ich]][["icpt.orig"]]
+      } else {
+        wc_icpt_ich <- l_icpt[["individual"]][[wc_batch_ich]][["icpt"]]
+      }
+    }
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -575,6 +642,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
                  wc.batch = wc_batch_ich,
                  Limits = l_lim,
                  Intercepts = l_icpt,
+                 All.POI = l_poi,
                  POI = t_poi),
             class = "expirest_osle")
 }

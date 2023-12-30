@@ -127,6 +127,7 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
                                    interval = ivl))[, "upr"]
              })
     }
+    names(res) <- l_newdata[[grouping_variables]]
   }
 
   return(res)
@@ -142,13 +143,17 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
 #'   interval limits from the upper or lower specification or expiry limits,
 #'   respectively.
 #' @param model A linear model object of type \sQuote{\code{lm}}.
-#' @param sl A numeric variable specifying the \dQuote{specification limit} (SL)
-#'   or, for determinations according to ARGPM guidance \dQuote{Stability
+#' @param sl A numeric variable specifying the \dQuote{specification limit}
+#'   (SL) or, for determinations according to ARGPM guidance \dQuote{Stability
 #'   testing for prescription medicines}, the \dQuote{expiry limit} (EL). The
 #'   EL is defined as the intercept \eqn{\pm} the difference between the
 #'   specification limit and the release limit (RL). If it is the upper limit
 #'   which is the relevant limit, it is added (\code{+}) to the intercept,
 #'   otherwise it is subtracted (\code{-}) from the intercept.
+#' @param mode A character string of either \code{"minimal"} or \code{"all"},
+#'   specifying if only the minimal distance of a factorial regression model
+#'   is returned or if the distances of all lines belonging to the different
+#'   factor levels is returned. The default is \code{"minimal"}.
 #' @inheritParams expirest_osle
 #'
 #' @details The function \code{find_get_distance()} estimates the distance
@@ -188,8 +193,9 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
 #'
 #' @keywords internal
 
-get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
-                          ivl_type = "one.sided", ivl_side = "lower") {
+get_distance <- function(x_new, model, sl, mode = "minimal", alpha = 0.05,
+                         ivl = "confidence", ivl_type = "one.sided",
+                         ivl_side = "lower") {
   if (!is.numeric(x_new)) {
     stop("x_new must be a numeric value.")
   }
@@ -198,6 +204,9 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
   }
   if (!is.numeric(sl) || length(sl) > 1) {
     stop("sl must be a numeric value of length 1.")
+  }
+  if (!(mode %in% c("minimal", "all"))) {
+    stop("Please specify mode either as \"minimal\" or \"all\".")
   }
   if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
@@ -219,13 +228,17 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
     get_intvl_limit(x_new = x_new, model = model, alpha = alpha,
                     ivl = ivl, ivl_type = ivl_type, ivl_side = ivl_side)
 
-  switch(ivl_side,
-         "lower" = {
-           res <- sl - min(pred_lim, na.rm = TRUE)
-         },
-         "upper" = {
-           res <- sl - max(pred_lim, na.rm = TRUE)
-         })
+  if (mode == "minimal") {
+    switch(ivl_side,
+           "lower" = {
+             res <- sl - min(pred_lim, na.rm = TRUE)
+           },
+           "upper" = {
+             res <- sl - max(pred_lim, na.rm = TRUE)
+           })
+  } else {
+    res <- sl - pred_lim
+  }
 
   return(res)
 }
@@ -243,9 +256,10 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
 #' @param model A linear model object of type \sQuote{\code{lm}}.
 #' @param sl A numeric variable specifying the \dQuote{specification limit}
 #'   (SL). Another kind of acceptance criterion may be regarded as SL.
-#' @param alpha A numeric value specifying the significance level of the
-#'   confidence or prediction interval that is calculated for the provided
-#'   linear model. The default value is \code{0.05}.
+#' @param mode A character string of either \code{"minimal"} or \code{"all"},
+#'   specifying if only the minimal distance of a factorial regression model
+#'   is returned or if the distances of all lines belonging to the different
+#'   factor levels is returned. The default is \code{"minimal"}.
 #' @param ... Additional named or unnamed arguments passed on to
 #'   \code{\link[stats]{uniroot}()}.
 #' @inheritParams expirest_osle
@@ -276,8 +290,9 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
 #'
 #' @keywords internal
 
-find_poi <- function(srch_range, model, sl, alpha = 0.05, ivl = "confidence",
-                     ivl_type = "one.sided", ivl_side = "lower", ...) {
+find_poi <- function(srch_range, model, sl, mode = "minimal", alpha = 0.05,
+                     ivl = "confidence", ivl_type = "one.sided",
+                     ivl_side = "lower", ...) {
   if (!is.numeric(srch_range) || length(srch_range) != 2) {
     stop("The parameter srch_range must be a vector of length 2.")
   }
@@ -286,6 +301,9 @@ find_poi <- function(srch_range, model, sl, alpha = 0.05, ivl = "confidence",
   }
   if (!is.numeric(sl) || length(sl) > 1) {
     stop("sl must be a numeric value of length 1.")
+  }
+  if (!(mode %in% c("minimal", "all"))) {
+    stop("Please specify mode either as \"minimal\" or \"all\".")
   }
   if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
@@ -303,16 +321,37 @@ find_poi <- function(srch_range, model, sl, alpha = 0.05, ivl = "confidence",
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  tmp <- try_get_model(
-    uniroot(f = get_distance, interval = srch_range, model = model,
-            sl = sl, alpha = alpha, ivl = ivl, ivl_type = ivl_type,
-            ivl_side = ivl_side, ...)[["root"]]
-  )
+  if (mode == "minimal") {
+    tmp <- try_get_model(
+      uniroot(f = get_distance, interval = srch_range, model = model,
+              sl = sl, mode = mode, alpha = alpha, ivl = ivl,
+              ivl_type = ivl_type, ivl_side = ivl_side, ...)[["root"]]
+    )
 
-  if (is.null(tmp[["Error"]])) {
-    res <- tmp[["Model"]]
+    if (is.null(tmp[["Error"]])) {
+      res <- tmp[["Model"]]
+    } else {
+      stop("Error in uniroot (find_poi)!: ", tmp[["Error"]])
+    }
   } else {
-    stop("Error in uniroot! utility.R.488: ", tmp[["Error"]])
+    t_dist <-
+      get_distance(x_new = 0, model = model, sl = sl, mode = mode,
+                   alpha = alpha, ivl = ivl, ivl_type = ivl_type,
+                   ivl_side = ivl_side)
+    res <- setNames(rep(NA, length(t_dist)), names(t_dist))
+
+    for(i in seq_along(t_dist)) {
+      tmp <- try_get_model(
+        uniroot(f = function(x, ii, ...) get_distance(x_new = x, ...)[ii],
+                interval = srch_range, ii = i, model = model, sl = sl,
+                mode = "all", alpha = alpha, ivl = ivl, ivl_type = ivl_type,
+                ivl_side = ivl_side, ...)[["root"]]
+      )
+
+      if (is.null(tmp[["Error"]])) {
+        res[i] <- tmp[["Model"]]
+      }
+    }
   }
 
   return(res)
@@ -372,7 +411,7 @@ get_xformed_variables <- function(data, response_vbl, time_vbl,
   # Note: The log and sqrt transformations include adding the value defined by
   #       the shift parameter before performing the transformation.
 
-  d_dat <- data
+  d_dat <- droplevels(data)
 
   if (xform[1] != "no") {
     switch(xform[1],
@@ -890,9 +929,16 @@ get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
 #' on \code{alpha}, it checks if the intercepts and/or slopes between the
 #' groups differ significantly or not.
 #'
-#' @return A numeric vector of the form \code{c(ci, cs)} is returned, specifying
-#' if a common intercept is appropriate (\code{ci = 1}) or not (\code{ci = 0})
-#' and if a common slope is appropriate (\code{cs = 1}) or not (\code{cs = 0}).
+#' @return A list of two elements is returned specifying which model, based on
+#'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
+#'   is a numeric vector of length 2 specifying the best model accepted at the
+#'   significance level specified by \code{alpha}. It has the form
+#'   \code{c(ci, cs)}, where \code{ci} specifies if a common intercept is
+#'   appropriate (\code{ci = 1}) or not (\code{ci = 0}) and \code{cs} specifies
+#'   if a common slope is appropriate (\code{cs = 1}) or not (\code{cs = 0}).
+#'   The second element (\code{type.acronym}) is an acronym representing the
+#'   first item. In case of a linear model including only a single batch,
+#'   all elements are \code{NA}.
 #'
 #' @seealso \code{\link[stats]{aov}}.
 #'
@@ -932,33 +978,49 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  t_formula <-
-    paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep  = " * "))
-  lm_ancova <-
-    do.call("aov", list(as.formula(t_formula), data = as.name("data")))
-  slm_ancova <- summary(lm_ancova)[[1]]
+  # Remove unused factor levels
+  data <- droplevels(data)
 
-  p_batch <- slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
-                          !grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
-  p_time <- slm_ancova[!grepl(batch_vbl, rownames(slm_ancova)) &
-                         grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
-  p_interaction <- slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
-                                grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
+  if (nlevels(data[, batch_vbl]) > 1) {
+    t_formula <-
+      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep  = " * "))
+    lm_ancova <-
+      do.call("aov", list(as.formula(t_formula), data = as.name("data")))
+    slm_ancova <- summary(lm_ancova)[[1]]
 
-  # Store the outcome of the test in two logical parameters, i.e.
-  # common_icpt: yes or no (common intercept model)
-  # common_slp:  yes or no (common slope model)
+    p_batch <-
+      slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
+                   !grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
+    p_time <-
+      slm_ancova[!grepl(batch_vbl, rownames(slm_ancova)) &
+                   grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
+    p_interaction <-
+      slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
+                   grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
 
-  ifelse(p_batch > alpha, common_icpt <- 1L, common_icpt <- 0L)
-  ifelse(p_interaction > alpha, common_slp <- 1L, common_slp <- 0L)
+    # Store the outcome of the test in two logical parameters, i.e.
+    # common_icpt: yes or no (common intercept model)
+    # common_slp:  yes or no (common slope model)
 
-  t_res <- c(common_icpt, common_slp)
-  names(t_res) <- c("common.icpt", "common.slp")
+    ifelse(p_batch > alpha, common_icpt <- 1L, common_icpt <- 0L)
+    ifelse(p_interaction > alpha, common_slp <- 1L, common_slp <- 0L)
 
-  return(t_res)
+    l_model_type <-
+      list(type.spec = setNames(c(common_icpt, common_slp),
+                                c("common.icpt", "common.slp")),
+           type.acronym =
+             paste0(c("di", "ci")[common_icpt + 1],
+                    c("ds", "cs")[common_slp + 1]))
+  } else {
+    l_model_type <-
+      list(type.spec = setNames(c(NA, NA), c("common.icpt", "common.slp")),
+           type.acronym = "n.a.")
+  }
+
+  return(l_model_type)
 }
 
-#' Getting intercept(s) of a linear model
+#' Getting the intercept(s) of a linear model
 #'
 #' The function \code{get_icpt()} determines the intercept(s) of the provided
 #' model.

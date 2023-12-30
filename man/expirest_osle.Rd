@@ -112,34 +112,39 @@ containing the following elements:
 \item{Variables}{A list of the variable names, i.e. the original names of
   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
   applicable, of the transformed variables.}
-\item{Model.Type}{A list of five elements specifying which model, based on
+\item{Model.Type}{A list of two elements specifying which model, based on
   the ANCOVA analysis, suits best. The first element (\code{type.spec})
   is a numeric vector of length 2 specifying the best model accepted at the
-  significance level of 0.25. The first number represents the decision on
-  the intercept and the second on the slope, where \code{1} stands for
-  \dQuote{common} and \code{2} stands for \dQuote{different}. The second
-  element (\code{type.acronym}) is an acronym representing the first item.}
+  significance level specified by \code{alpha.pool}. The first number
+  represents the decision on the intercept and the second on the slope,
+  where \code{1} stands for \dQuote{common} and \code{2} stands for
+  \dQuote{different}. The second element (\code{type.acronym}) is an acronym
+  representing the first item.}
 \item{Models}{A list of four elements named \code{cics}, \code{dics},
   \code{dids} and \code{individual}. The first three elements contain the
   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
   and \dQuote{different intercept / different slope} (\code{dids}) models.
   The fourth element is a list of the \sQuote{\code{lm}} objects of the
-  models obtained from fitting the data of each batch individually.}
+  models obtained from fitting the data of each batch individually. The
+  \code{cics}, \code{dics} and \code{dids} elements are \code{NA} if data
+  of only a single batch were provided.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-  values of each of the three fitted models.}
+  values of the \code{cics}, \code{dics} and \code{dids} models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-  values of each of the three fitted models.}
-\item{wc.icpt}{A numeric value of the worst case intercept.}
+  values of each of the \code{cics}, \code{dics} and \code{dids} models.}
+\item{wc.icpt}{A numeric value of the intercept of the worst case batch. In
+  case of the \code{dids} model, the worst case batch is determined on the
+  basis of the models fitted to each batch individually.}
 \item{wc.batch}{A numeric value of the worst case batch. In case of the
- \code{dids} model type, the estimation is done using the models obtained
- from fitting the data of each batch individually.}
+ \code{dids} model, the worst case batch is determined on the basis of the
+  models fitted to each batch individually.}
 \item{Limits}{A list of all limits.}
-\item{Intercepts}{A list of the intercepts of the three fitted models.}
-\item{POI}{A numeric named vector of the POI values of each of the three
-  fitted models. In case of the \code{dids} model type, the estimation is
-  done using the models obtained from fitting the data of each
-  batch individually.}
+\item{Intercepts}{A list of the intercepts of all models.}
+\item{All.POI}{A list of the POI values of all models.}
+\item{POI}{A numeric named vector of the (worst case) POI values of all
+  models. In case of the \code{dids} model, the worst case batch is
+  determined on the basis of the models fitted to each batch individually.}
 }
 \description{
 Based on a linear regression model fitted to a stability data set the
@@ -150,7 +155,7 @@ following the ICH Q1E guideline. The abbreviation \dQuote{osle} stands for
 \details{
 According to ICH Q1E guideline, \dQuote{\emph{an appropriate
 approach to retest period or shelf life estimation is to analyse a
-quantitative  attribute by determining the earliest time at which the 95
+quantitative attribute by determining the earliest time at which the 95
 percent confidence limit for the mean intersects the proposed acceptance
 criterion}} (in this package, this point is called the \dQuote{point of
 intersection} (POI)). Furthermore, it says that \dQuote{\emph{for an
@@ -158,15 +163,19 @@ attribute known to increase with time, the upper one-sided 95 percent
 confidence limit should be compared to the acceptance criterion. For an
 attribute that can either increase or decrease, or whose direction of change
 is not known, two-sided 95 percent confidence limits should be calculated
-and compared to the upper and lower acceptance criteria.}} With respect to
-the number of batches to be included in the analysis it says that
-\dQuote{\emph{the retest period or shelf life is generally estimated based
-on the stability data from a minimum of three batches.}}
+and compared to the upper and lower acceptance criteria.}} The approach
+can be used to estimate the retest period or shelf life for a single batch
+or for multiple batches. According to the guideline, \dQuote{\emph{for a
+drug substance or for a drug product available in a single strength and a
+single container size and/or fill, the retest period or shelf life is
+generally estimated based on the stability data from a minimum of three
+batches.}}
 
-Before performing the retest period or shelf life estimation the most
-suitable model should be determined. It should particularly be verified
-if data of all test batches are poolable or not. Details on this are
-described in section \dQuote{Checking batch poolability} below.
+Before performing the retest period or shelf life estimation with results
+from multiple batches, the most suitable model should be determined. It
+should particularly be verified if data of all test batches are poolable or
+not. Details on this are described in section \dQuote{Checking batch
+poolability} below.
 }
 \section{Checking batch poolability}{
 
@@ -174,7 +183,7 @@ According to ICH Q1E guideline, construction of the 95\% confidence interval
 on the basis of the combined data of all test batches is allowed only if it
 has been confirmed by aid of a statistical test whether the regression lines
 from the different batches have a common slope and a common intercept. A
-significance level of \code{alpha_pool = 0.25} has to be used for both
+significance level of \code{alpha_pool = 0.25} should to be used for both
 batch-related terms, and the test of the slopes has to precede the test of
 the intercepts. From these tests, three possible models may be appropriate,
 i.e.
@@ -184,8 +193,13 @@ i.e.
  \item a \emph{different intercept / different slope} model (dids).
 }
 The \emph{common intercept / different slope} model is not of practical
-relevance because the corresponding model is missing an effect. If the slopes
-are significantly different, there is no point comparing intercepts.
+relevance because the corresponding model is missing an effect. If the
+slopes are significantly different, there is no point comparing intercepts.
+The dids model has individual intercepts and individual slopes, and the
+calculation of confidence intervals is based on the corresponding individual
+mean squared errors. The \emph{different intercept / different slope} model
+where the mean squared error is pooled across batches is reported as
+dids.pmse.
 
 These requirements can be checked by aid of an \dQuote{ANalysis of
 COVAriance} (ANCOVA) including the batch variable as interaction term. The

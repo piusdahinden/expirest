@@ -259,7 +259,8 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
   expect_equal(re[["Model.Type"]]$type.acronym, "dics")
   expect_equivalent(re$wc.batch, 2)
   expect_equivalent(signif(re[["POI"]], 12),
-                    c(29.9856687174, 23.4750503440, 23.1159717387))
+                    c(29.9856687174, 23.4750503440, 23.1159717387,
+                      23.2441996167))
   expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
                                      re[["Models"]][["cics"]])[2, "F"],
                         stats::anova(re[["Models"]][["dids"]],

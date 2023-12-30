@@ -8,6 +8,7 @@ find_poi(
   srch_range,
   model,
   sl,
+  mode = "minimal",
   alpha = 0.05,
   ivl = "confidence",
   ivl_type = "one.sided",
@@ -24,9 +25,14 @@ the (time) range within which the minimal distance is expected to be found.}
 \item{sl}{A numeric variable specifying the \dQuote{specification limit}
 (SL). Another kind of acceptance criterion may be regarded as SL.}
 
-\item{alpha}{A numeric value specifying the significance level of the
-confidence or prediction interval that is calculated for the provided
-linear model. The default value is \code{0.05}.}
+\item{mode}{A character string of either \code{"minimal"} or \code{"all"},
+specifying if only the minimal distance of a factorial regression model
+is returned or if the distances of all lines belonging to the different
+factor levels is returned. The default is \code{"minimal"}.}
+
+\item{alpha}{A numeric value between 0 and 1 specifying the significance
+level for the calculation of confidence or prediction intervals. The
+default is \code{0.05}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
 \code{"prediction"}, i.e. specifying the type of interval of interest.

@@ -174,7 +174,7 @@ The \code{POI} data frame has the following columns:
 \item{Shelf.Life.cics}{The estiamted shelf life for the cics model.}
 \item{Shelf.Life.dics}{The estiamted shelf life for the dics model.}
 \item{Shelf.Life.dids}{The estiamted shelf life for the dids model.}
-\item{POI.Model.cics}{The POI  of the cics model.}
+\item{POI.Model.cics}{The POI of the cics model.}
 \item{POI.Model.dics}{The POI of the dics model.}
 \item{POI.Model.dids}{The POI of the dids model.}
 }
@@ -246,7 +246,7 @@ According to ICH Q1E guideline, construction of the 95\% confidence interval
 on the basis of the combined data of all test batches is allowed only if it
 has been confirmed by aid of a statistical test whether the regression lines
 from the different batches have a common slope and a common intercept. A
-significance level of \code{alpha_pool = 0.25} has to be used for both
+significance level of \code{alpha_pool = 0.25} should to be used for both
 batch-related terms, and the test of the slopes has to precede the test of
 the intercepts. From these tests, three possible models may be appropriate,
 i.e.
@@ -256,8 +256,13 @@ i.e.
  \item a \emph{different intercept / different slope} model (dids).
 }
 The \emph{common intercept / different slope} model is not of practical
-relevance because the corresponding model is missing an effect. If the slopes
-are significantly different, there is no point comparing intercepts.
+relevance because the corresponding model is missing an effect. If the
+slopes are significantly different, there is no point comparing intercepts.
+The dids model has individual intercepts and individual slopes, and the
+calculation of confidence intervals is based on the corresponding individual
+mean squared errors. The \emph{different intercept / different slope} model
+where the mean squared error is pooled across batches is reported as
+dids.pmse.
 
 These requirements can be checked by aid of an \dQuote{ANalysis of
 COVAriance} (ANCOVA) including the batch variable as interaction term. The
