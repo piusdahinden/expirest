@@ -715,6 +715,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' @importFrom ggplot2 arrow
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom ggplot2 scale_y_continuous
+#' @importFrom ggplot2 coord_cartesian
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 theme_bw
 #' @importFrom ggplot2 guide_legend
@@ -1543,8 +1544,9 @@ plot_expirest_wisle <- function(
   ggraph <- ggraph +
     geom_hline(yintercept = d_hlines[, response_vbl],
                colour = d_hlines$Colour, linetype = d_hlines$Type) +
-    scale_x_continuous(limits = x_range, breaks = x_breaks) +
-    scale_y_continuous(limits = y_range, breaks = y_breaks) +
+    scale_x_continuous(breaks = x_breaks) +
+    scale_y_continuous(breaks = y_breaks) +
+    coord_cartesian(xlim = x_range, ylim = y_range) +
     theme_bw()  +
     theme(panel.grid.major = element_line(colour = "grey90"),
           panel.grid.minor = element_blank(),

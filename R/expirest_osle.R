@@ -726,6 +726,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #' @importFrom ggplot2 arrow
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom ggplot2 scale_y_continuous
+#' @importFrom ggplot2 coord_cartesian
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 theme_bw
 #' @importFrom ggplot2 guide_legend
@@ -1182,8 +1183,9 @@ plot_expirest_osle <- function(
                colour = d_hlines$Colour, linetype = d_hlines$Type) +
     geom_vline(xintercept = d_vlines[, time_vbl],
                colour = d_vlines$Colour, linetype = d_vlines$Type) +
-    scale_x_continuous(limits = x_range, breaks = x_breaks) +
-    scale_y_continuous(limits = y_range, breaks = y_breaks) +
+    scale_x_continuous(breaks = x_breaks) +
+    scale_y_continuous(breaks = y_breaks) +
+    coord_cartesian(xlim = x_range, ylim = y_range) +
     theme_bw()  +
     theme(panel.grid.major = element_line(colour = "grey90"),
           panel.grid.minor = element_blank(),
