@@ -148,30 +148,28 @@
 #'   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
 #'   representing the first item.}
 #' \item{Models}{A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids} and \code{individual}. The first three elements contain the
+#'   \code{dids.pmse} and \code{dids}. The first three elements contain the
 #'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
 #'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
 #'   and \dQuote{different intercept / different slope} (\code{dids}) models.
-#'   The fourth element is a list of the \sQuote{\code{lm}} objects of the
-#'   models obtained from fitting the data of each batch individually. The
-#'   \code{cics}, \code{dics} and \code{dids} elements are \code{NA} if data
-#'   of only a single batch were provided.}
+#'   The fourth element is a list of the \sQuote{\code{lm}} objects that is
+#'   obtained from fitting a regression model to the data of each level of the
+#'   categorical variable separately. The \code{cics}, \code{dics} and
+#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
+#'   are available.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-#'   values of the \code{cics}, \code{dics} and \code{dids} models.}
+#'   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-#'   values of each of the \code{cics}, \code{dics} and \code{dids} models.}
-#' \item{wc.icpt}{A numeric value of the intercept of the worst case batch. In
-#'   case of the \code{dids} model, the worst case batch is determined on the
-#'   basis of the models fitted to each batch individually.}
-#' \item{wc.batch}{A numeric value of the worst case batch. In case of the
-#'  \code{dids} model, the worst case batch is determined on the basis of the
-#'   models fitted to each batch individually.}
+#'   values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+#'   models.}
+#' \item{wc.icpt}{A numeric named vector of the intercepts of the worst case
+#'   batches.}
+#' \item{wc.batch}{A numeric named vector of the worst case batches.}
 #' \item{Limits}{A list of all limits.}
 #' \item{Intercepts}{A list of the intercepts of all models.}
 #' \item{All.POI}{A list of the POI values of all models.}
 #' \item{POI}{A numeric named vector of the (worst case) POI values of all
-#'   models. In case of the \code{dids} model, the worst case batch is
-#'   determined on the basis of the models fitted to each batch individually.}
+#'   models.}
 #'
 #' @references
 #' International Council for Harmonisation of Technical Requirements for
@@ -403,17 +401,17 @@ expirest_osle <-
   # Determination of intercepts of all models
 
   if (nlevels(d_dat[, batch_vbl]) > 1) {
-    l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x) {
+    l_icpt <- vapply(l_models[c("cics", "dics", "dids.pmse")], function(x) {
       list(get_icpt(model = x, response_vbl = response_vbl,
                     time_vbl = time_vbl, batch_vbl = batch_vbl,
                     xform = xform, shift = shift))
     },
     list(1))
   } else {
-    l_icpt <- list(cics = NA, dics = NA, dids = NA)
+    l_icpt <- list(cics = NA, dics = NA, dids.pmse = NA)
   }
 
-  tmp <- vapply(l_models[["individual"]], function(x) {
+  tmp <- vapply(l_models[["dids"]], function(x) {
     list(get_icpt(model = x, response_vbl = response_vbl,
                   time_vbl = time_vbl, batch_vbl = batch_vbl,
                   xform = xform, shift = shift))
@@ -424,24 +422,25 @@ expirest_osle <-
 
   if (xform[2] == "no") {
     names(tmp) <- sub("\\.icpt", "", names(tmp))
-    l_icpt$individual$icpt <- tmp
+    l_icpt$dids$icpt <- tmp
   } else {
     t_i_orig <- grep("orig", names(tmp))
     names(tmp) <- sub("\\.icpt", "", names(tmp))
     names(tmp) <- sub("\\.orig", "", names(tmp))
 
-    l_icpt$individual$icpt <- tmp[-t_i_orig]
-    l_icpt$individual$icpt.orig <- tmp[t_i_orig]
+    l_icpt$dids$icpt <- tmp[-t_i_orig]
+    l_icpt$dids$icpt.orig <- tmp[t_i_orig]
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of POI values of all models
 
-  l_poi <- list(cics = NA, dics = NA, dids = NA, individual = NA)
-  names(l_poi) <- names(l_models)
+  l_poi <- setNames(vector(mode = "list", length = length(l_models)),
+                    names(l_models))
+  l_poi[1:length(l_poi)] <- NA
 
-  l_poi[["individual"]] <-
-    vapply(l_models[["individual"]],
+  l_poi[["dids"]] <-
+    vapply(l_models[["dids"]],
            function(x) {
              tmp <- try_get_model(
                find_poi(srch_range = srch_range, model = x, sl = sl,
@@ -454,14 +453,14 @@ expirest_osle <-
            numeric(1))
 
   if (nlevels(d_dat[, batch_vbl]) > 1) {
-    for (variety in names(l_poi)[-length(l_poi)]) {
+    for (variety in names(l_poi)[names(l_poi) != "dids"]) {
       if (variety == "cics") {
         tmp <- try_get_model(
           find_poi(srch_range = srch_range, model = l_models[[variety]],
                    sl = sl, mode = "minimal", alpha = alpha,
                    ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
       }
-      if (variety %in% c("dics", "dids")) {
+      if (variety %in% c("dics", "dids.pmse")) {
         tmp <- try_get_model(
           find_poi(srch_range = srch_range, model = l_models[[variety]],
                    sl = sl, mode = "all", alpha = alpha,
@@ -476,11 +475,6 @@ expirest_osle <-
   # Extraction of the worst case POI values
   t_poi <- vapply(l_poi, function(x) min(x, na.rm = TRUE), numeric(1))
   t_poi[is.infinite(t_poi)] <- NA
-
-  # Swapping the dids and the individual model and renaming the vector
-  t_poi <- t_poi[c(1:2, 4, 3)]
-  names(t_poi) <- sub("dids", "dids.pmse", names(t_poi))
-  names(t_poi) <- sub("individual", "dids", names(t_poi))
 
   if (sum(is.na(t_poi)) != 0 && nlevels(d_dat[, batch_vbl]) > 1) {
     warning("Not for all model types POI values obtained. ",
@@ -497,57 +491,42 @@ expirest_osle <-
   #   models fitted to the data of each individual batch.
 
   # Worst case batch (of the most appropriate model)
-  # Note that the dids and the individual model are renamed
-  wc_batch_ich <- lapply(l_poi, function(x) {
+  wc_batch_ich <- vapply(l_poi, function(x) {
     ifelse(!length(which.min(x)), NA, which.min(x))
-  })
-  wc_batch_ich[[1]] <- NA
-  names(wc_batch_ich) <- sub("dids", "dids.pmse", names(wc_batch_ich))
-  names(wc_batch_ich) <- sub("individual", "dids", names(wc_batch_ich))
-  wc_batch_ich <- wc_batch_ich[[l_model_type[[2]]]]
+  },
+  numeric(1))
+  wc_batch_ich["cics"] <- NA
 
   # Intercept of the worst case batch (of the most appropriate model)
-  wc_icpt_ich <- NA
-
   if (nlevels(d_dat[, batch_vbl]) > 1) {
-    if (!is.na(t_poi[l_model_type[[2]]])) {
-      switch(l_model_type[[2]],
-             "cics" = {
-               if (xform[2] != "no") {
-                 wc_icpt_ich <- unname(l_icpt[["cics"]][["icpt.orig"]])
-               } else {
-                 wc_icpt_ich <- unname(l_icpt[["cics"]][["icpt"]])
-               }
-             },
-             "dics" = {
-               if (!is.na(wc_batch_ich)) {
-                 if (xform[2] != "no") {
-                   wc_icpt_ich <- l_icpt[["dics"]][["icpt.orig"]][wc_batch_ich]
-                 } else {
-                   wc_icpt_ich <-  l_icpt[["dics"]][["icpt"]][wc_batch_ich]
-                 }
-               }
-             },
-             "dids" = {
-               if (!is.na(wc_batch_ich)) {
-                 if (xform[2] != "no") {
-                   wc_icpt_ich <-
-                     l_icpt[["individual"]][["icpt.orig"]][wc_batch_ich]
-                 } else {
-                   wc_icpt_ich <-
-                     l_icpt[["individual"]][["icpt"]][wc_batch_ich]
-                 }
-               }
-             })
-    }
+    wc_icpt_ich <-
+      vapply(names(l_icpt), function(nn) {
+        if (nn == "cics") {
+          if (xform[2] != "no") {
+            unname(l_icpt[[nn]][["icpt.orig"]])
+          } else {
+            unname(l_icpt[[nn]][["icpt"]])
+          }
+        } else {
+          if (xform[2] != "no") {
+            l_icpt[[nn]][["icpt.orig"]][wc_batch_ich[nn]]
+          } else {
+            l_icpt[[nn]][["icpt"]][wc_batch_ich[nn]]
+          }
+        }
+      },
+      numeric(1))
   } else {
-    if (sum(is.na(l_poi[["individual"]])) == 0) {
-      wc_batch_ich <- which.min(l_poi[["individual"]])
+    wc_icpt_ich <-
+      setNames(rep(NA, length(wc_batch_ich)), names(wc_batch_ich))
 
+    if (!any(is.na(l_poi[["dids"]]))) {
       if (xform[2] != "no") {
-        wc_icpt_ich <- l_icpt[["individual"]][["icpt.orig"]][wc_batch_ich]
+        wc_icpt_ich["dids"] <-
+          l_icpt[["dids"]][["icpt.orig"]][wc_batch_ich["dids"]]
       } else {
-        wc_icpt_ich <- l_icpt[["individual"]][["icpt"]][wc_batch_ich]
+        wc_icpt_ich["dids"] <-
+          l_icpt[["dids"]][["icpt"]][wc_batch_ich["dids"]]
       }
     }
   }
@@ -764,26 +743,9 @@ plot_expirest_osle <- function(
   l_models <- expob[["Models"]]
 
   if (show_grouping == "yes") {
-    switch(mtbs,
-           "verified" = {
-             model_name <- expob[["Model.Type"]][["type.acronym"]]
-
-             if (model_name == "dids") {
-               model_name = "individual"
-             }
-           },
-           "cics" = {
-             model_name <- "cics"
-           },
-           "dics" = {
-             model_name <- "dics"
-           },
-           "dids" = {
-             model_name <- "individual"
-           },
-           "dids.pmse" = {
-             model_name <- "dids"
-           })
+    model_name <- ifelse(mtbs == "verified",
+                   expob[["Model.Type"]][["type.acronym"]],
+                   mtbs)
   } else {
     model_name <- "cics"
   }
@@ -797,11 +759,7 @@ plot_expirest_osle <- function(
 
   t_exp <- expob[["POI"]]
 
-  # Rename the models
-  names(t_exp) <- sub("dids", "individual", names(t_exp))
-  names(t_exp) <- sub("individual.pmse", "dids", names(t_exp))
-
-  if (sum(is.na(t_exp)) > 0) {
+  if (any(is.na(t_exp))) {
     stop("Expiry determination was not successful.")
   }
 
@@ -935,13 +893,11 @@ plot_expirest_osle <- function(
   colnames(d_new) <- c(batch_vbl, time_vbl)
 
   # Prediction
-  if (model_name != "individual") {
-    m_pred <- predict(model, newdata = d_new, interval = ivl,
-                      level = 1 - alpha)
+  if (model_name != "dids") {
+    m_pred <- predict(model, newdata = d_new, interval = ivl, level = 1 - alpha)
   } else {
     l_pred <- lapply(t_batches, function(x) {
-      predict(l_models$individual[[x]],
-              newdata = d_new[d_new[, batch_vbl] == x, ],
+      predict(l_models$dids[[x]], newdata = d_new[d_new[, batch_vbl] == x, ],
               interval = ivl, level = 1 - alpha)
     })
     m_pred <- do.call(rbind, l_pred)

@@ -122,61 +122,78 @@ containing the following elements:
 \item{Variables}{A list of the variable names, i.e. the original names of
   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
   applicable, of the transformed variables.}
-\item{Model.Type}{A list of five elements specifying which model, based on
+\item{Model.Type}{A list of two elements specifying which model, based on
   the ANCOVA analysis, suits best. The first element (\code{type.spec})
   is a numeric vector of length 2 specifying the best model accepted at the
-  significance level of 0.25. The first number represents the decision on
-  the intercept and the second on the slope, where \code{1} stands for
-  \dQuote{common} and \code{2} stands for \dQuote{different}.}
+  significance level specified by \code{alpha.pool}. The first number
+  represents the decision on the intercept and the second on the slope,
+  where \code{1} stands for \dQuote{common} and \code{2} stands for
+  \dQuote{different}. The second element (\code{type.acronym}) is an acronym
+  representing the first item.}
 \item{Models}{A list of four elements named \code{cics}, \code{dics},
-  \code{dids} and \code{individual}. The first three elements contain the
+  \code{dids.pmse} and \code{dids}. The first three elements contain the
   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
   and \dQuote{different intercept / different slope} (\code{dids}) models.
-  The fourth element is a list of the \sQuote{\code{lm}} objects of the
-  models obtained from fitting the data of each batch individually.}
+  The fourth element is a list of the \sQuote{\code{lm}} objects that is
+  obtained from fitting a regression model to the data of each level of the
+  categorical variable separately. The \code{cics}, \code{dics} and
+  \code{dids.pmse} elements are \code{NA} if data of only a single batch
+  are available.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-  values of each of the three fitted models.}
+  values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-  values of each of the three fitted models.}
+  values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+  models.}
 \item{wc.icpt}{A data frame of the worst case intercepts of each of the
-  three fitted models.}
+  four fitted models.}
 \item{wc.batch}{A list of numeric value(s) of the worst case batch(es) per
-  model type. In case of the \code{dids} model type, the estimation is done
-  using the models obtained from fitting the data of each batch
-  individually.}
+  model type.}
 \item{Limits}{A list of all limits.}
 \item{POI}{A data frame of the intercepts, the differences between release
   and shelf life limits, the WCSLs, the expiry and release specification
-  limits, the shelf lives and POI values. In case of the \code{dids} model
-  type, the estimation of the POI values is done using the models obtained
-  from fitting the data of each batch individually.}
+  limits, the shelf lives and POI values.}
 
 The \code{POI} data frame has the following columns:
-\item{Intercept.cics}{The intercept of the worst case batch for the cics
+\item{Intercept.cics}{The intercept of the worst case batch of the cics
   model.}
-\item{Intercept.dics}{The intercept of the worst case batch for the dics
+\item{Intercept.dics}{The intercept of the worst case batch of the dics
   model.}
-\item{Intercept.dids}{The intercept of the worst case batch for the dids
-  model.}
+\item{Intercept.dids.pmse}{The intercept of the worst case batch of the dids
+  model with pooled mean square error (pmse).}
+\item{Intercept.dids}{The intercept of the worst case batch of the dids
+  model obtained by fitting individual models to the data of each batch.}
 \item{Delta.cics}{Absolute difference between the release and and the shelf
-  life specification for the cics model.}
+  life specification of the cics model.}
 \item{Delta.dics}{Absolute difference between the release and and the shelf
-  life specification for the dics model.}
+  life specification of the dics model.}
+\item{Delta.dids.pmse}{Absolute difference between the release and and the
+  shelf life specification of the dids model with pooled mean square error
+  (pmse).}
 \item{Delta.dids}{Absolute difference between the release and and the shelf
-  life specification for the dids model.}
-\item{WCSL.cics}{WCSL for the cics model.}
-\item{WCSL.dics}{WCSL for the dics model.}
-\item{WCSL.dids}{WCSL for the dids model.}
+  life specification of the dids model obtained by fitting individual
+  models to the data of each batch.}
+\item{WCSL.cics}{WCSL of the cics model.}
+\item{WCSL.dics}{WCSL of the dics model.}
+\item{WCSL.dids.pmse}{WCSL of the dids model with pooled mean square error
+  (pmse).}
+\item{WCSL.dids}{WCSL of the dids model obtained by fitting individual
+  models to the data of each batch.}
 \item{Exp.Spec}{The (expiry) specification, i.e. the specification which is
   relevant for the determination of the expiry.}
 \item{Rel.Spec}{The calculated release specification.}
-\item{Shelf.Life.cics}{The estiamted shelf life for the cics model.}
-\item{Shelf.Life.dics}{The estiamted shelf life for the dics model.}
-\item{Shelf.Life.dids}{The estiamted shelf life for the dids model.}
+\item{Shelf.Life.cics}{The estiamted shelf life of the cics model.}
+\item{Shelf.Life.dics}{The estiamted shelf life of the dics model.}
+\item{Shelf.Life.dids.pmse}{The estimated shelf life of the dids model with
+  pooled mean square error (pmse).}
+\item{Shelf.Life.dids}{The estimated shelf life of the dids model obtained
+  by fitting individual models to the data of each batch.}
 \item{POI.Model.cics}{The POI of the cics model.}
 \item{POI.Model.dics}{The POI of the dics model.}
-\item{POI.Model.dids}{The POI of the dids model.}
+\item{POI.Model.dids.pmse}{The POI of the dids model with pooled mean
+  square error (pmse).}
+\item{POI.Model.dids}{The POI of the dids model obtained by fitting
+  individual models to the data of each batch.}
 }
 \description{
 Based on a linear regression model fitted to a stability data set the

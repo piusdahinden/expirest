@@ -161,11 +161,15 @@ test_that("summary.expirest_wisle_succeeds", {
   expect_s3_class(expect_output(summary(re2)), "expirest_wisle")
   expect_output(summary(re2), "dids")
   expect_output(summary(re2, digits = 5), "98    b8    101.26")
-  expect_output(summary(re2, digits = 5), "95 98 7.6197 17.039")
+  expect_output(summary(re2, digits = 5),
+                "95 98 7.6197       7.4832 17.039      16.777")
 
-  expect_output(summary(re3, digits = 5), "95 98.0  8.8631 17.039")
-  expect_output(summary(re3, digits = 5), "95 98.5 10.1748 17.039")
-  expect_output(summary(re3, digits = 5), "95 99.0 11.4405 17.039")
+  expect_output(summary(re3, digits = 5),
+                "95 98.0  8.8631        8.725 17.039      16.777")
+  expect_output(summary(re3, digits = 5),
+                "95 98.5 10.1748       11.221 17.039      16.777")
+  expect_output(summary(re3, digits = 5),
+                "95 99.0 11.4405       11.277 17.039      16.777")
 })
 
 test_that("print.expirest_wisle_succeeds", {

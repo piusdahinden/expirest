@@ -121,30 +121,28 @@ containing the following elements:
   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
   representing the first item.}
 \item{Models}{A list of four elements named \code{cics}, \code{dics},
-  \code{dids} and \code{individual}. The first three elements contain the
+  \code{dids.pmse} and \code{dids}. The first three elements contain the
   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
   and \dQuote{different intercept / different slope} (\code{dids}) models.
-  The fourth element is a list of the \sQuote{\code{lm}} objects of the
-  models obtained from fitting the data of each batch individually. The
-  \code{cics}, \code{dics} and \code{dids} elements are \code{NA} if data
-  of only a single batch were provided.}
+  The fourth element is a list of the \sQuote{\code{lm}} objects that is
+  obtained from fitting a regression model to the data of each level of the
+  categorical variable separately. The \code{cics}, \code{dics} and
+  \code{dids.pmse} elements are \code{NA} if data of only a single batch
+  are available.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-  values of the \code{cics}, \code{dics} and \code{dids} models.}
+  values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-  values of each of the \code{cics}, \code{dics} and \code{dids} models.}
-\item{wc.icpt}{A numeric value of the intercept of the worst case batch. In
-  case of the \code{dids} model, the worst case batch is determined on the
-  basis of the models fitted to each batch individually.}
-\item{wc.batch}{A numeric value of the worst case batch. In case of the
- \code{dids} model, the worst case batch is determined on the basis of the
-  models fitted to each batch individually.}
+  values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+  models.}
+\item{wc.icpt}{A numeric named vector of the intercepts of the worst case
+  batches.}
+\item{wc.batch}{A numeric named vector of the worst case batches.}
 \item{Limits}{A list of all limits.}
 \item{Intercepts}{A list of the intercepts of all models.}
 \item{All.POI}{A list of the POI values of all models.}
 \item{POI}{A numeric named vector of the (worst case) POI values of all
-  models. In case of the \code{dids} model, the worst case batch is
-  determined on the basis of the models fitted to each batch individually.}
+  models.}
 }
 \description{
 Based on a linear regression model fitted to a stability data set the

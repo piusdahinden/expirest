@@ -33,7 +33,7 @@ test_that("extract_from_ll_wcsl_succeeds", {
 
   # <-><-><-><->
 
-  expect_equivalent(names(l_dlim), c("cics", "dics", "dids", "individual"))
+  expect_equivalent(names(l_dlim), c("cics", "dics", "dids.pmse", "dids"))
   expect_equivalent(vapply(l_dlim, is.matrix, logical(1)), rep(TRUE, 4))
   expect_equivalent(colnames(l_dlimo[["dics"]]), c("b2", "b5", "b7"))
   expect_equivalent(l_wcsl, l_wcslo)

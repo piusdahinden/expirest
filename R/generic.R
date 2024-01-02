@@ -61,24 +61,36 @@ summary.expirest_osle <- function(object, ...) {
              ")."))
 
   cat("\n\nWorst case intercept:",
-      ifelse(is.na(object$wc.icpt),
+      ifelse(is.na(object$wc.icpt[mtac]),
              NA,
-             formatC(as.numeric(object$wc.icpt), digits = digits)))
+             formatC(as.numeric(object$wc.icpt[mtac]), digits = digits)))
 
   cat("\nWorst case batch:",
-      ifelse(is.na(object$wc.batch),
+      ifelse(is.na(object$wc.batch[mtac]),
              NA,
              levels(object[["Data"]]
-                    [, object[["Variables"]]$batch])[object$wc.batch]))
+                    [, object[["Variables"]]$batch])[object$wc.batch[mtac]]))
 
-  cat("\n\nEstimated shelf life for",
+  cat("\nEstimated shelf life for",
       mtac,
       "model:",
       ifelse(is.na(object[["POI"]][mtac]),
              NA,
              formatC(object[["POI"]][mtac],
-                     digits)),
-      "\n")
+                     digits)))
+
+  cat("\n\nWorst case intercepts and batches of all models:\n")
+  d_res <- data.frame(
+    Batch = vapply(object$wc.batch, function(bn) {
+      ifelse(is.na(bn),
+             "NA",
+             levels(object[["Data"]][, object[["Variables"]]$batch])[bn])
+    },
+    character(1)),
+    Intercept = formatC(as.numeric(object$wc.icpt), digits = digits)
+  )
+  print(d_res)
+  cat("\n")
 
   invisible(object)
 }
@@ -226,7 +238,12 @@ summary.expirest_wisle <- function(object, ...) {
   tmp_1 <- tmp_1[, c("Exp.Spec.Report", "Rel.Spec.Report",
                      colnames(tmp_1)[grep(mtac,
                                           colnames(tmp_1))])]
-  colnames(tmp_1) <- c("SL", "RL", "wisle", "osle")
+  if (mtac %in% c("dids", "dids.pmse")) {
+    colnames(tmp_1) <-
+      c("SL", "RL", "wisle", "wisle (pmse)", "osle", "osle (pmse)")
+  } else {
+    colnames(tmp_1) <- c("SL", "RL", "wisle", "osle")
+  }
   rownames(tmp_1) <- NULL
 
   wc_batch <- rep(NA, length(object$wc.batch[[mtac]]))
@@ -261,17 +278,24 @@ summary.expirest_wisle <- function(object, ...) {
   }
 
   cat("\nEstimated shelf lives for",
-      mtac,
-      "model:\n")
+      mtac)
+  if (mtac != "dids") {
+    cat(" model:\n")
+  } else {
+    cat(" model (for information, the results
+        of the model fitted with pooled mean square error (pmse)
+        are also shown:\n")
+  }
+
   print(tmp_1, digits = digits)
-  cat("\nAbbreviations:\n")
-  cat("ARGPM: Australian Regulatory Guidelines for Prescription Medicines;",
-      "ICH: International Council for Harmonisation;",
-      "osle: Ordinary shelf life estimation (i.e. following the ICH guidance);",
-      "RL: Release Limit;",
-      "SL: Specification Limit;",
-      "wisle: What-if (approach for) shelf life estimation",
-      "(i.e. following ARGPM guidance).\n\n")
+  cat("\nAbbreviations:
+   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
+   ICH: International Council for Harmonisation;
+   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
+   RL: Release Limit;
+   SL: Specification Limit;
+   wisle: What-if (approach for) shelf life estimation
+          (i.e. following ARGPM guidance).\n\n")
 
   invisible(object)
 }

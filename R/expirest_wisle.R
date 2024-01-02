@@ -79,61 +79,78 @@
 #' \item{Variables}{A list of the variable names, i.e. the original names of
 #'   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
 #'   applicable, of the transformed variables.}
-#' \item{Model.Type}{A list of five elements specifying which model, based on
+#' \item{Model.Type}{A list of two elements specifying which model, based on
 #'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
 #'   is a numeric vector of length 2 specifying the best model accepted at the
-#'   significance level of 0.25. The first number represents the decision on
-#'   the intercept and the second on the slope, where \code{1} stands for
-#'   \dQuote{common} and \code{2} stands for \dQuote{different}.}
+#'   significance level specified by \code{alpha.pool}. The first number
+#'   represents the decision on the intercept and the second on the slope,
+#'   where \code{1} stands for \dQuote{common} and \code{2} stands for
+#'   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
+#'   representing the first item.}
 #' \item{Models}{A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids} and \code{individual}. The first three elements contain the
+#'   \code{dids.pmse} and \code{dids}. The first three elements contain the
 #'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
 #'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
 #'   and \dQuote{different intercept / different slope} (\code{dids}) models.
-#'   The fourth element is a list of the \sQuote{\code{lm}} objects of the
-#'   models obtained from fitting the data of each batch individually.}
+#'   The fourth element is a list of the \sQuote{\code{lm}} objects that is
+#'   obtained from fitting a regression model to the data of each level of the
+#'   categorical variable separately. The \code{cics}, \code{dics} and
+#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
+#'   are available.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-#'   values of each of the three fitted models.}
+#'   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-#'   values of each of the three fitted models.}
+#'   values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+#'   models.}
 #' \item{wc.icpt}{A data frame of the worst case intercepts of each of the
-#'   three fitted models.}
+#'   four fitted models.}
 #' \item{wc.batch}{A list of numeric value(s) of the worst case batch(es) per
-#'   model type. In case of the \code{dids} model type, the estimation is done
-#'   using the models obtained from fitting the data of each batch
-#'   individually.}
+#'   model type.}
 #' \item{Limits}{A list of all limits.}
 #' \item{POI}{A data frame of the intercepts, the differences between release
 #'   and shelf life limits, the WCSLs, the expiry and release specification
-#'   limits, the shelf lives and POI values. In case of the \code{dids} model
-#'   type, the estimation of the POI values is done using the models obtained
-#'   from fitting the data of each batch individually.}
+#'   limits, the shelf lives and POI values.}
 #'
 #' The \code{POI} data frame has the following columns:
-#' \item{Intercept.cics}{The intercept of the worst case batch for the cics
+#' \item{Intercept.cics}{The intercept of the worst case batch of the cics
 #'   model.}
-#' \item{Intercept.dics}{The intercept of the worst case batch for the dics
+#' \item{Intercept.dics}{The intercept of the worst case batch of the dics
 #'   model.}
-#' \item{Intercept.dids}{The intercept of the worst case batch for the dids
-#'   model.}
+#' \item{Intercept.dids.pmse}{The intercept of the worst case batch of the dids
+#'   model with pooled mean square error (pmse).}
+#' \item{Intercept.dids}{The intercept of the worst case batch of the dids
+#'   model obtained by fitting individual models to the data of each batch.}
 #' \item{Delta.cics}{Absolute difference between the release and and the shelf
-#'   life specification for the cics model.}
+#'   life specification of the cics model.}
 #' \item{Delta.dics}{Absolute difference between the release and and the shelf
-#'   life specification for the dics model.}
+#'   life specification of the dics model.}
+#' \item{Delta.dids.pmse}{Absolute difference between the release and and the
+#'   shelf life specification of the dids model with pooled mean square error
+#'   (pmse).}
 #' \item{Delta.dids}{Absolute difference between the release and and the shelf
-#'   life specification for the dids model.}
-#' \item{WCSL.cics}{WCSL for the cics model.}
-#' \item{WCSL.dics}{WCSL for the dics model.}
-#' \item{WCSL.dids}{WCSL for the dids model.}
+#'   life specification of the dids model obtained by fitting individual
+#'   models to the data of each batch.}
+#' \item{WCSL.cics}{WCSL of the cics model.}
+#' \item{WCSL.dics}{WCSL of the dics model.}
+#' \item{WCSL.dids.pmse}{WCSL of the dids model with pooled mean square error
+#'   (pmse).}
+#' \item{WCSL.dids}{WCSL of the dids model obtained by fitting individual
+#'   models to the data of each batch.}
 #' \item{Exp.Spec}{The (expiry) specification, i.e. the specification which is
 #'   relevant for the determination of the expiry.}
 #' \item{Rel.Spec}{The calculated release specification.}
-#' \item{Shelf.Life.cics}{The estiamted shelf life for the cics model.}
-#' \item{Shelf.Life.dics}{The estiamted shelf life for the dics model.}
-#' \item{Shelf.Life.dids}{The estiamted shelf life for the dids model.}
+#' \item{Shelf.Life.cics}{The estiamted shelf life of the cics model.}
+#' \item{Shelf.Life.dics}{The estiamted shelf life of the dics model.}
+#' \item{Shelf.Life.dids.pmse}{The estimated shelf life of the dids model with
+#'   pooled mean square error (pmse).}
+#' \item{Shelf.Life.dids}{The estimated shelf life of the dids model obtained
+#'   by fitting individual models to the data of each batch.}
 #' \item{POI.Model.cics}{The POI of the cics model.}
 #' \item{POI.Model.dics}{The POI of the dics model.}
-#' \item{POI.Model.dids}{The POI of the dids model.}
+#' \item{POI.Model.dids.pmse}{The POI of the dids model with pooled mean
+#'   square error (pmse).}
+#' \item{POI.Model.dids}{The POI of the dids model obtained by fitting
+#'   individual models to the data of each batch.}
 #'
 #' @references
 #' Therapeutic Goods Administration (TGA) of the Department of Health of the
@@ -372,7 +389,7 @@ expirest_wisle <-
   # all models (on the transformed scale, if data have been transformed)
 
   # List of all wcs_limit lists
-  ll_wcsl <- lapply(seq_along(l_icpt[-grep("individual", names(l_icpt))]),
+  ll_wcsl <- lapply(seq_along(l_icpt),
                     function(i) {
                       lapply(l_icpt[[i]]$icpt, function(xx) {
                         lapply(rl, function(j) {
@@ -382,7 +399,7 @@ expirest_wisle <-
                         })
                       })
                     })
-  names(ll_wcsl) <- names(l_icpt[-grep("individual", names(l_icpt))])
+  names(ll_wcsl) <- names(l_icpt)
 
   l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
 
@@ -402,18 +419,10 @@ expirest_wisle <-
   # specification limit so that their POI values are the POI values of
   # relevance.
 
-  # Note: in case of the "dids" model the POI is not determined using the model
-  # that was determined using the data from all batches (i.e. the full model
-  # with the batch_vbl * time_vbl interaction term). Instead, separate models
-  # are fitted to the data of each individual batch and the POI values are
-  # determined for each of these models. Of these POI values, the smallest is
-  # returned.
-
   l_poi <- vector(mode = "list", length = length(l_wcsl))
-  names(l_poi) <- c("cics", "dics", "dids")
+  names(l_poi) <- names(l_wcsl)
 
-  l_prl <- vector(mode = "list", length = length(l_wcsl))
-  names(l_prl) <- c("cics", "dics", "dids")
+  l_prl <- l_poi
 
   for (variety in names(l_wcsl)) {
     # Initialise empty arrays
@@ -439,7 +448,7 @@ expirest_wisle <-
         } else {
           tmp_poi <- try_get_model(
             find_poi(srch_range = srch_range,
-                     model = l_models[["individual"]][[k]],
+                     model = l_models[["dids"]][[k]],
                      sl = l_wcsl[[variety]][j, k], alpha = alpha,
                      ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
         }
@@ -465,7 +474,7 @@ expirest_wisle <-
               tmp_prl <- try_get_model(
                 get_intvl_limit(
                   x_new = tmp_poi[["Model"]],
-                  model = l_models[["individual"]][[kk]], alpha = alpha,
+                  model = l_models[["dids"]][[kk]], alpha = alpha,
                   ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
               )
 
@@ -566,12 +575,10 @@ expirest_wisle <-
   # Worst case intercepts (wc_icpt_argpm) (on the original scale)
 
   if (xform[2] == "no") {
-    wc_icpt_argpm <-
-      extract_wc_x(l1 = l_icpt[-grep("individual", names(l_icpt))],
-                   l2 = l_wc_batch)
+    wc_icpt_argpm <- extract_wc_x(l1 = l_icpt, l2 = l_wc_batch)
   } else {
     l_icpt_sub <-
-      lapply(l_icpt[-grep("individual", names(l_icpt))],
+      lapply(l_icpt,
              function(x) list(x$icpt.orig))
     wc_icpt_argpm <- extract_wc_x(l1 = l_icpt_sub, l2 = l_wc_batch)
   }
@@ -600,12 +607,15 @@ expirest_wisle <-
     Intercept.cics = wc_icpt_argpm[, "cics"],
     Intercept.dics = wc_icpt_argpm[, "dics"],
     Intercept.dids = wc_icpt_argpm[, "dids"],
+    Intercept.dids.pmse = wc_icpt_argpm[, "dids.pmse"],
     Delta.cics = m_delta[, "cics"],
     Delta.dics = m_delta[, "dics"],
     Delta.dids = m_delta[, "dids"],
+    Delta.dids.pmse = m_delta[, "dids.pmse"],
     WCSL.cics = m_wcsl[, "cics"],
     WCSL.dics = m_wcsl[, "dics"],
     WCSL.dids = m_wcsl[, "dids"],
+    WCSL.dids.pmse = m_wcsl[, "dids.pmse"],
     Exp.Spec.Report = rep(sl_orig, nrow(m_poi)),
     Exp.Spec = rep(sl, nrow(m_poi)),
     Rel.Spec.Report = rl_orig,
@@ -613,9 +623,11 @@ expirest_wisle <-
     Shelf.Life.cics = m_poi[, "cics"],
     Shelf.Life.dics = m_poi[, "dics"],
     Shelf.Life.dids = m_poi[, "dids"],
+    Shelf.Life.dids.pmse = m_poi[, "dids.pmse"],
     POI.Model.cics = rep(r_ret[["POI"]]["cics"], nrow(m_poi)),
     POI.Model.dics = rep(r_ret[["POI"]]["dics"], nrow(m_poi)),
-    POI.Model.dids = rep(r_ret[["POI"]]["dids"], nrow(m_poi)))
+    POI.Model.dids = rep(r_ret[["POI"]]["dids"], nrow(m_poi)),
+    POI.Model.dids.pmse = rep(r_ret[["POI"]]["dids.pmse"], nrow(m_poi)))
 
   if (xform[2] != "no") {
     d_poi[, "Exp.Spec"] <- rep(sl_bt, nrow(m_poi))
@@ -803,26 +815,9 @@ plot_expirest_wisle <- function(
   l_models <- expob[["Models"]]
 
   if (show_grouping == "yes") {
-    switch(mtbs,
-           "verified" = {
-             model_name <- expob[["Model.Type"]][["type.acronym"]]
-
-             # if (model_name == "dids") {
-             #   model_name = "individual"
-             # }
-           },
-           "cics" = {
-             model_name <- "cics"
-           },
-           "dics" = {
-             model_name <- "dics"
-           },
-           "dids" = {
-             model_name <- "dids"
-           },
-           "dids.pmse" = {
-             model_name <- "dids"
-           })
+    model_name <- ifelse(mtbs == "verified",
+                         expob[["Model.Type"]][["type.acronym"]],
+                         mtbs)
   } else {
     model_name <- "cics"
   }
@@ -995,12 +990,12 @@ plot_expirest_wisle <- function(
   colnames(d_new) <- c(batch_vbl, time_vbl)
 
   # Prediction
-  if (model_name != "individual") {
+  if (model_name != "dids") {
     m_pred <- predict(model, newdata = d_new, interval = ivl,
                       level = 1 - alpha)
   } else {
     l_pred <- lapply(t_batches, function(x) {
-      predict(l_models$individual[[x]],
+      predict(l_models$dids[[x]],
               newdata = d_new[d_new[, batch_vbl] == x, ],
               interval = ivl, level = 1 - alpha)
     })

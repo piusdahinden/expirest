@@ -24,10 +24,10 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
                     100.566878981)
   expect_equivalent(signif(re[["Models"]][["cics"]]$coefficients[2], 12),
                     -0.192993630573)
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(0.435993484727, 0.228684731019))
   expect_equivalent(
@@ -62,10 +62,10 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
                     c(102.175653109, 104.255189423, 100.820021871))
   expect_equivalent(signif(re[["Models"]][["dics"]]$coefficients[4], 12),
                     -0.213120866465)
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(21.7380213596, 0.183108926252))
   expect_equivalent(
@@ -101,18 +101,19 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
   expect_equivalent(signif(re[["POI"]]["dids"], 12), 15.8448655130)
   expect_equivalent(signif(re[["Intercepts"]][["dids"]]$icpt, 12),
                     c(104.070645793, 100.781872268, 101.259375000))
-  expect_equivalent(signif(c(re[["Models"]][["dids"]]$coefficients[4],
-                             re[["Models"]][["dids"]]$coefficients[4] +
-                               re[["Models"]][["dids"]]$coefficients[5:6]), 12),
+  expect_equivalent(signif(
+    c(re[["Models"]][["dids.pmse"]]$coefficients[4],
+      re[["Models"]][["dids.pmse"]]$coefficients[4] +
+        re[["Models"]][["dids.pmse"]]$coefficients[5:6]), 12),
                     c(-0.196151337247, -0.208608547839, -0.330208333333))
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(72.1242158003, 1.95541944320))
   expect_equivalent(
-    signif(summary(re[["Models"]][["dids"]])[["fstatistic"]][1], 12),
+    signif(summary(re[["Models"]][["dids.pmse"]])[["fstatistic"]][1], 12),
     49.8306556826)
 
   # Results presented in LeBlond 2011
@@ -151,18 +152,19 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
   expect_equivalent(signif(re[["POI"]]["dids"], 12), 15.8448655130)
   expect_equivalent(signif(re[["Intercepts"]][["dids"]]$icpt, 12),
                     c(0.027880626223, 0.126543831957, 0.112218750000))
-  expect_equivalent(signif(c(re[["Models"]][["dids"]]$coefficients[4],
-                             re[["Models"]][["dids"]]$coefficients[4] +
-                               re[["Models"]][["dids"]]$coefficients[5:6]), 12),
+  expect_equivalent(signif(
+    c(re[["Models"]][["dids.pmse"]]$coefficients[4],
+      re[["Models"]][["dids.pmse"]]$coefficients[4] +
+        re[["Models"]][["dids.pmse"]]$coefficients[5:6]), 12),
                     c(0.005884540117, 0.006258256435, 0.009906250000))
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(72.1242158003, 1.95541944320))
   expect_equivalent(
-    signif(summary(re[["Models"]][["dids"]])[["fstatistic"]][1], 12),
+    signif(summary(re[["Models"]][["dids.pmse"]])[["fstatistic"]][1], 12),
     49.8306556826)
 
   # Results presented in LeBlond 2011
@@ -203,10 +205,10 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
                     2.45678204711)
   expect_equivalent(signif(reu[["Models"]][["cics"]]$coefficients[2], 12),
                     0.002272338514)
-  expect_equal(signif(c(stats::anova(reu[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(reu[["Models"]][["dids.pmse"]],
                                      reu[["Models"]][["dics"]],
                                      reu[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(reu[["Models"]][["dids"]],
+                        stats::anova(reu[["Models"]][["dids.pmse"]],
                                      reu[["Models"]][["dics"]])[2, "F"]), 12),
                c(0.353853883257, 0.748152729736))
   expect_equivalent(
@@ -257,16 +259,16 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
 
   expect_is(re, "expirest_osle")
   expect_equal(re[["Model.Type"]]$type.acronym, "dics")
-  expect_equivalent(re$wc.batch, 2)
+  expect_equivalent(re$wc.batch["dics"], 2)
   expect_equivalent(signif(re[["POI"]], 12),
-                    c(29.9856687174, 23.4750503440, 23.1159717387,
-                      23.2441996167))
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+                    c(29.9856687174, 23.4750503440,
+                      23.2441996167, 23.1159717387))
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["cics"]])[2, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(10.1083606518, 19.8876404032, 0.329080900382))
 
@@ -282,11 +284,12 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
   expect_equivalent(signif(re[["Intercepts"]][["dids"]]$icpt, 12),
                     c(101.817460317, 100.249139280, 102.384126984,
                       104.070645793))
-  expect_equivalent(signif(c(re[["Models"]][["dids"]]$coefficients[5],
-                             re[["Models"]][["dids"]]$coefficients[5] +
-                               re[["Models"]][["dids"]]$coefficients[6:8]), 12),
-                    c(-0.200634920635, -0.180125195618153, -0.233968253968254,
-                      -0.196151337247228))
+  expect_equivalent(signif(
+    c(re[["Models"]][["dids.pmse"]]$coefficients[5],
+      re[["Models"]][["dids.pmse"]]$coefficients[5] +
+        re[["Models"]][["dids.pmse"]]$coefficients[6:8]), 12),
+    c(-0.200634920635,
+      -0.180125195618153, -0.233968253968254, -0.196151337247228))
 
   # Transcription of results shown in Figure 6.27 Stability Models
   # The best model accepted at the significance level of 0.25 has Different

@@ -24,18 +24,20 @@ differentiation of the observations of the different batches.}
 A list of three elements is returned,
 containing the following elements:
 \item{Models}{A list of four elements named \code{cics}, \code{dics},
-  \code{dids} and \code{individual}. The first three elements contain the
+  \code{dids.pmse} and \code{dids}. The first three elements contain the
   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
   and \dQuote{different intercept / different slope} (\code{dids}) models.
-  The fourth element is a list of the \sQuote{\code{lm}} objects of the
-  models obtained from fitting the data of each batch individually. The
-  \code{cics}, \code{dics} and \code{dids} elements are \code{NA} if data
-  of only a single batch were provided.}
+  The fourth element is a list of the \sQuote{\code{lm}} objects that is
+  obtained from fitting a regression model to the data of each level of the
+  categorical variable separately. The \code{cics}, \code{dics} and
+  \code{dids.pmse} elements are \code{NA} if data of only a single batch
+  are available.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-  values of the \code{cics}, \code{dics} and \code{dids} models.}
+  values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-  values of each of the \code{cics}, \code{dics} and \code{dids} models.}
+  values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+  models.}
 }
 \description{
 The function \code{get_linear_models()} fits four types of linear regression
@@ -46,18 +48,20 @@ the estimation of the shelf life or retest period.
 The function \code{get_linear_models()} expects a data frame with
 a response variable, a time variable and a categorical variable which
 usually has factor levels of multiple batches of a drug product that was
-assessed over a certain period of time with respect to the time-dependen
+assessed over a certain period of time with respect to the time-dependent
 behavior of characteristic parameters. Using these results, the function
 fits
 \itemize{
  \item a \emph{common intercept / common slope} model (cics),
  \item a \emph{different intercept / common slope} model (dics) or
- \item a \emph{different intercept / different slope} model (dids) and
- \item individual regression models
+ \item a \emph{different intercept / different slope} model with pooled
+   mean square error (dids.pmse) and
+ \item a \emph{different intercept / different slope} model (dids) in which
+   individual models are fitted to each level of the categorical variable.
 }
 
 If the categorical variable has only a single factor level, then the first
-three models are \code{NA} and only an individual regression model is fitted.
+three models are \code{NA} and only a single regression model is fitted.
 }
 \seealso{
 \code{\link{expirest_osle}}.

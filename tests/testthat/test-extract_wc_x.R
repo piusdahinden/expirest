@@ -30,7 +30,7 @@ test_that("extract_wc_x_succeeds", {
 
   # Determination of worst case scenario (wcs) limits
   ll_wcsl <-
-    lapply(seq_along(l_icpt[-grep("individual", names(l_icpt))]),
+    lapply(seq_along(l_icpt),
            function(i) {
              lapply(l_icpt[[i]]$icpt, function(xx) {
                lapply(rl, function(j) {
@@ -40,16 +40,13 @@ test_that("extract_wc_x_succeeds", {
              })
            })
 
-  names(ll_wcsl) <- names(l_icpt[-grep("individual", names(l_icpt))])
+  names(ll_wcsl) <- names(l_icpt)
   l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
 
   # Calculation of POI values for all wcs limits
   # Determination of worst case POI values
-  l_poi <- vector(mode = "list", length = length(l_wcsl))
-  names(l_poi) <- c("cics", "dics", "dids")
-
-  l_prl <- vector(mode = "list", length = length(l_wcsl))
-  names(l_prl) <- c("cics", "dics", "dids")
+  l_poi <- l_prl <- vector(mode = "list", length = length(l_wcsl))
+  names(l_poi) <- names(l_wcsl)
 
   for (variety in names(l_wcsl)) {
     # Initialise empty arrays
@@ -75,7 +72,7 @@ test_that("extract_wc_x_succeeds", {
         } else {
           tmp_poi <- try_get_model(
             find_poi(srch_range = srch_range,
-                     model = l_models[["individual"]][[k]],
+                     model = l_models[["dids"]][[k]],
                      sl = l_wcsl[[variety]][j, k], alpha = alpha,
                      ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
         }
@@ -101,7 +98,7 @@ test_that("extract_wc_x_succeeds", {
               tmp_prl <- try_get_model(
                 get_intvl_limit(
                   x_new = tmp_poi[["Model"]],
-                  model = l_models[["individual"]][[kk]], alpha = alpha,
+                  model = l_models[["dids"]][[kk]], alpha = alpha,
                   ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
               )
 
@@ -124,12 +121,15 @@ test_that("extract_wc_x_succeeds", {
   # Worst case batches
   l_wcb1 <- list(cics = rep(NA, 3),
                  dics = rep(1, 3),
+                 dids.pmse = rep(1, 3),
                  dids = rep(1, 3))
   l_wcb2 <- list(cics = rep(NA, 3),
                  dics = rep(2, 3),
+                 dids.pmse = rep(2, 3),
                  dids = rep(2, 3))
   l_wcb3 <- list(cics = rep(NA, 3),
                  dics = rep(3, 3),
+                 dids.pmse = rep(3, 3),
                  dids = rep(3, 3))
 
   # <-><-><-><->
@@ -141,25 +141,32 @@ test_that("extract_wc_x_succeeds", {
   # <-><-><-><->
 
   expect_equivalent(signif(m_poi1[1, ], 12),
-                    c(21.6549171662, 3.17687698779, 22.9097844894))
+                    c(21.6549171662, 3.17687698779, 4.96381362600,
+                      22.9097844894))
   expect_equivalent(signif(m_poi1[2, ], 12),
-                    c(17.4818579854, NA, 18.4046501763))
+                    c(17.4818579854, NA, 1.16584959141, 18.4046501763))
   expect_equivalent(signif(m_poi1[3, ], 12),
-                    c(13.0333154143, NA, 13.7263312141))
+                    c(13.0333154143, NA, NA, 13.7263312141))
 
   expect_equivalent(signif(m_poi2[1, ], 12),
-                    c(21.6549171662, 18.7469763190, 20.0994160261))
+                    c(21.6549171662, 18.7469763190, 13.7589542372,
+                      20.0994160261))
   expect_equivalent(signif(m_poi2[2, ], 12),
-                    c(17.4818579854, 14.3890859543, 16.1214018480))
+                    c(17.4818579854, 14.3890859543, 11.3444065974,
+                      16.1214018480))
   expect_equivalent(signif(m_poi2[3, ], 12),
-                    c(13.0333154143, 9.9092777658, 11.9517450346))
+                    c(13.0333154143, 9.9092777658, 8.79836497613,
+                      11.9517450346))
 
   expect_equivalent(signif(m_poi3[1, ], 12),
-                    c(21.6549171662, 20.1820835353, 12.8002095693))
+                    c(21.6549171662, 20.1820835353, 12.6158455989,
+                      12.8002095693))
   expect_equivalent(signif(m_poi3[2, ], 12),
-                    c(17.4818579854, 15.8554616662, 10.3030302984))
+                    c(17.4818579854, 15.8554616662, 10.1533440336,
+                      10.3030302984))
   expect_equivalent(signif(m_poi3[3, ], 12),
-                    c(13.0333154143, 11.4214113200, 7.61966072158))
+                    c(13.0333154143, 11.4214113200, 7.4832233337,
+                      7.61966072158))
 })
 
 test_that("extract_wc_x_fails", {

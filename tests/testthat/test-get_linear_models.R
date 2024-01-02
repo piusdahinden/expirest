@@ -12,10 +12,10 @@ test_that("get_linear_models_succeeds", {
                   numeric(1))
 
   t_indiv_icpt <-
-    vapply(l_res$Models$individual, function(x) coef(x)["(Intercept)"],
+    vapply(l_res$Models$dids, function(x) coef(x)["(Intercept)"],
            numeric(1))
   t_indiv_slp <-
-    vapply(l_res$Models$individual, function(x) coef(x)["Month"],
+    vapply(l_res$Models$dids, function(x) coef(x)["Month"],
            numeric(1))
 
   # <-><-><-><->
