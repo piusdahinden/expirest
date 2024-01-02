@@ -35,33 +35,33 @@ test_that("plot_expirest_osle_succeeds", {
   tmp1 <-
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = "%",
-      y_range = c(-0.01, 0.5), x_range = NULL, plot_option = "full",
-      ci_app = "line")
+      y_range = c(-0.01, 0.5), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line")
   tmp2 <-
     plot_expirest_osle(
       model = re2, show_grouping = "yes", response_vbl_unit = " mg/kg",
-      y_range = c(92, 107), x_range = c(-1, 29),  plot_option = "full",
-      ci_app = "line")
+      y_range = c(92, 107), x_range = c(-1, 29), mtbs = "verified",
+      plot_option = "full", ci_app = "line")
   tmp3 <-
     plot_expirest_osle(
       model = re2, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(92, 107), x_range = c(-1, 29),  plot_option = "full",
-      ci_app = "ribbon")
-  tmp4 <-
+      y_range = c(92, 107), x_range = c(-1, 29), mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
+  suppressWarnings(tmp4 <-
     plot_expirest_osle(
       model = re2, show_grouping = "no", response_vbl_unit = NULL,
-      y_range = c(92, 107), x_range = c(-1, 29), plot_option = "full",
-      ci_app = "ribbon")
-  tmp5 <-
+      y_range = c(92, 107), x_range = c(-1, 29), mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon"))
+    suppressWarnings(tmp5 <-
     plot_expirest_osle(
       model = re3, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, plot_option = "full",
-      ci_app = "line")
-  tmp6 <-
+      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"))
+    suppressWarnings(tmp6 <-
     plot_expirest_osle(
       model = re4, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, plot_option = "full",
-      ci_app = "line")
+      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"))
 
   # <-><-><-><->
 
@@ -206,49 +206,49 @@ test_that("plot_expirest_osle_succeeds_with_transformations", {
   tmp1 <-
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = "%",
-      y_range = c(-0.01, 0.5), x_range = NULL, plot_option = "full",
-      ci_app = "line")
+      y_range = c(-0.01, 0.5), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line")
   tmp2 <-
     plot_expirest_osle(
       model = re2, show_grouping = "yes", response_vbl_unit = "%",
-      y_range = c(-0.01, 0.5), x_range = NULL, plot_option = "full",
-      ci_app = "line")
+      y_range = c(-0.01, 0.5), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line")
   tmp3 <-
     plot_expirest_osle(
       model = re3, show_grouping = "yes", response_vbl_unit = "%",
-      y_range = c(-0.01, 0.5), x_range = NULL, plot_option = "full",
-      ci_app = "line")
+      y_range = c(-0.01, 0.5), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line")
 
-  tmp4 <-
+  suppressWarnings(tmp4 <-
     plot_expirest_osle(
       model = re4, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, plot_option = "full",
-      ci_app = "line")
-  tmp5 <-
+      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"))
+    suppressWarnings(tmp5 <-
     plot_expirest_osle(
       model = re5, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, plot_option = "full",
-      ci_app = "ribbon")
-  tmp6 <-
+      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon"))
+    suppressWarnings(tmp6 <-
     plot_expirest_osle(
       model = re5, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, plot_option = "full",
-      ci_app = "ribbon")
-  tmp7 <-
+      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon"))
+    suppressWarnings(tmp7 <-
     plot_expirest_osle(
       model = re7, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, plot_option = "lean",
-      ci_app = "line")
-  tmp8 <-
+      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      plot_option = "lean", ci_app = "line"))
+    suppressWarnings(tmp8 <-
     plot_expirest_osle(
       model = re8, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, plot_option = "lean",
-      ci_app = "ribbon")
-  tmp9 <-
+      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      plot_option = "lean", ci_app = "ribbon"))
+    suppressWarnings(tmp9 <-
     plot_expirest_osle(
       model = re9, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, plot_option = "lean",
-      ci_app = "ribbon")
+      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      plot_option = "lean", ci_app = "ribbon"))
 
   # <-><-><-><->
 
@@ -334,73 +334,73 @@ test_that("plot_expirest_osle_fails", {
   expect_error(
     plot_expirest_osle(
       model = ree, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(93, 107), x_range = NULL, plot_option = "full",
-      ci_app = "line"),
+      y_range = c(93, 107), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "model must be an object of class expirest_osle")
   expect_error(
     plot_expirest_osle(
-      model = re1, show_grouping = "incorrect", response_vbl_unit = NULL,
-      y_range = c(93, 107), x_range = NULL, plot_option = "full",
-      ci_app = "line"),
-    "specify show_grouping either as \"yes\" or \"no\"")
-  expect_error(
-    plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = 1,
-      y_range = c(93, 107), x_range = NULL, plot_option = "full",
-      ci_app = "line"),
+      y_range = c(93, 107), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "response_vbl_unit must be a string")
   expect_error(
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = "range", x_range = NULL, plot_option = "full",
-      ci_app = "line"),
+      y_range = "range", x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "y_range must be a vector of length 2")
   expect_error(
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = 107, x_range = NULL, plot_option = "full",
-      ci_app = "line"),
+      y_range = 107, x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "y_range must be a vector of length 2")
   expect_error(
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(107, 93), x_range = NULL, plot_option = "full",
-      ci_app = "line"),
+      y_range = c(107, 93), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "y_range must be of the form")
   expect_error(
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(93, 107), x_range = "range", plot_option = "full",
-      ci_app = "line"),
+      y_range = c(93, 107), x_range = "range", mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "x_range must be a vector of length 2")
   expect_error(
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(93, 107), x_range = 36, plot_option = "full",
-      ci_app = "line"),
+      y_range = c(93, 107), x_range = 36, mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "x_range must be a vector of length 2")
   expect_error(
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(93, 107), x_range = c(36, 0), plot_option = "full",
-      ci_app = "line"),
+      y_range = c(93, 107), x_range = c(36, 0), mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "x_range must be of the form")
   expect_error(
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(93, 107), x_range = NULL, plot_option = "incorrect",
-      ci_app = "line"),
+      y_range = c(93, 107), x_range = NULL, mtbs = "incorrect",
+      plot_option = "incorrect", ci_app = "line"),
+    "specify mtbs either as \"verified\", \"cics\", \"dics\", ")
+  expect_error(
+    plot_expirest_osle(
+      model = re1, show_grouping = "yes", response_vbl_unit = NULL,
+      y_range = c(93, 107), x_range = NULL, mtbs = "verified",
+      plot_option = "incorrect", ci_app = "line"),
     "specify plot_option either as \"full\" or \"lean\"")
   expect_error(
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(93, 107), x_range = NULL, plot_option = "full",
-      ci_app = "points"),
+      y_range = c(93, 107), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "points"),
     "specify ci_app either as \"line\" or \"ribbon\"")
   expect_error(
     plot_expirest_osle(
       model = re2, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(93, 107), x_range = NULL, plot_option = "full",
-      ci_app = "line"),
+      y_range = c(93, 107), x_range = NULL, mtbs = "verified",
+      plot_option = "full", ci_app = "line"),
     "Expiry determination was not successful")
 })

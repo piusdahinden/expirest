@@ -111,15 +111,16 @@
 #' slopes are significantly different, there is no point comparing intercepts.
 #' The dids model has individual intercepts and individual slopes, and the
 #' calculation of confidence intervals is based on the corresponding individual
-#' mean squared errors. The \emph{different intercept / different slope} model
-#' where the mean squared error is pooled across batches is reported as
+#' mean square errors. The \emph{different intercept / different slope} model
+#' where the mean square error is pooled across batches is reported as
 #' dids.pmse.
 #'
 #' These requirements can be checked by aid of an \dQuote{ANalysis of
-#' COVAriance} (ANCOVA) including the batch variable as interaction term. The
-#' full ANCOVA model simultaneously tests all the effects, and non-significant
-#' effects can be identified and removed for fitting of the final regression
-#' model that is used for the estimation of the shelf life or retest period.
+#' COVAriance} (ANCOVA) including the batch variable as main effect and as
+#' \eqn{batch \times time} interaction term. The full ANCOVA model
+#' simultaneously tests all the effects, and non-significant effects can be
+#' identified and removed for fitting of the final regression model that is
+#' used for the estimation of the shelf life or retest period.
 #'
 #' The significance level (\code{alpha_pool = 0.25}, Type I error) is used to
 #' increase the power of the test to detect cases where the data should not be
@@ -342,7 +343,6 @@ expirest_osle <-
                                time_vbl = time_vbl, batch_vbl = batch_vbl,
                                alpha = alpha_pool)
 
-
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Fitting of all possible models that are relevant
 
@@ -514,9 +514,9 @@ expirest_osle <-
       switch(l_model_type[[2]],
              "cics" = {
                if (xform[2] != "no") {
-                 wc_icpt_ich <- l_icpt[["cics"]][["icpt.orig"]]
+                 wc_icpt_ich <- unname(l_icpt[["cics"]][["icpt.orig"]])
                } else {
-                 wc_icpt_ich <- l_icpt[["cics"]][["icpt"]]
+                 wc_icpt_ich <- unname(l_icpt[["cics"]][["icpt"]])
                }
              },
              "dics" = {
@@ -545,9 +545,9 @@ expirest_osle <-
       wc_batch_ich <- which.min(l_poi[["individual"]])
 
       if (xform[2] != "no") {
-        wc_icpt_ich <- l_icpt[["individual"]][[wc_batch_ich]][["icpt.orig"]]
+        wc_icpt_ich <- l_icpt[["individual"]][["icpt.orig"]][wc_batch_ich]
       } else {
-        wc_icpt_ich <- l_icpt[["individual"]][[wc_batch_ich]][["icpt"]]
+        wc_icpt_ich <- l_icpt[["individual"]][["icpt"]][wc_batch_ich]
       }
     }
   }
@@ -603,12 +603,11 @@ expirest_osle <-
 #'
 #' @param model An \sQuote{\code{expirest_osle}} object, i.e. a list returned
 #'   by the \code{\link{expirest_osle}()} function.
-#' @param show_grouping A character string specifying if the grouping of the
-#'   data should be taken into account (\dQuote{yes}) or not (\dQuote{no}),
-#'   i.e. if the results of the most appropriate model should be shown or
-#'   the results from the marginal analysis ignoring the grouping (being
-#'   equivalent with the \emph{common intercept / common slope case}). The
-#'   default is \code{"yes"}.
+#' @param show_grouping `r lifecycle::badge("deprecated")`
+#'   `show_grouping = \"yes\" or \"no\"` is no longer supported. Use the
+#'   \code{mtbs} parameter instead which allows choosing a specific model,
+#'   i.e. also the \emph{common intercept / common slope case} model which
+#'   was the default model when \code{show_grouping} was \code{"no"}.
 #' @param response_vbl_unit A character string specifying the unit associated
 #'   with the response variable. The default is \code{NULL}.
 #' @param y_range A numeric vector of the form \code{c(min, max)} specifying
@@ -617,8 +616,18 @@ expirest_osle <-
 #'   the range of the time  variable to be plotted. The default is \code{NULL}
 #'   and the \eqn{x} range is calculated automatically on the basis of the
 #'   estimated shelf life.
+#' @param mtbs A characters string specifying the \dQuote{model to be shown},
+#'   i.e. either \code{verified}, which is the default, or one of \code{cics},
+#'   \code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
+#'   is the model that was identified through the poolability check. It is
+#'   thus also one of the possible optional models. The \code{dids} model
+#'   represents the case where a separate model is fitted to the data of each
+#'   individual batch while the \code{dids.pmse} model is the interaction
+#'   model which includes the \eqn{batch} variable as main effect and in the
+#'   interaction term with the \eqn{time} variable (\eqn{batch \times time}),
+#'   i.e. a model where the mean square error is pooled across batches.
 #' @param plot_option A character string of either \code{"full"} or
-#'   \code{"lean"}, i.e. specifying if all the information should be put out
+#'   \code{"lean"}, i.e. specifying if additional information should be put out
 #'   on the plot (option \code{"full"}) or only basic information (option
 #'   \code{"lean"}), i.e. the data points, the fitted regression line with
 #'   the confidence interval, the specification limit(s) and the estimated
@@ -684,17 +693,26 @@ expirest_osle <-
 #' @importFrom ggplot2 element_rect
 #' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 unit
+#' @importFrom lifecycle deprecated
 #'
 #' @export
 
 plot_expirest_osle <- function(
   model, show_grouping = "yes", response_vbl_unit = NULL, y_range,
-  x_range = NULL, plot_option = "full", ci_app = "line") {
+  x_range = NULL, mtbs = "verified", plot_option = "full", ci_app = "line") {
   if (!inherits(model, "expirest_osle")) {
     stop("The model must be an object of class expirest_osle.")
   }
-  if (!(show_grouping %in% c("yes", "no"))) {
-    stop("Please specify show_grouping either as \"yes\" or \"no\".")
+  if (show_grouping == "no") {
+    lifecycle::deprecate_warn(
+      when = "0.1.7",
+      what = "plot_expirest_osle(show_grouping)",
+      with = "plot_expirest_osle(mtbs)",
+      details =
+        c("If you do not want to see the grouping, use mtbs = \"cics\". ",
+          "If you have set show_grouping = \"no\", mtbs is set to \"cics\".",
+          "If you have set show_grouping = \"yes\", the settings in mtbs
+          apply."))
   }
   if (!is.numeric(y_range) || length(y_range) != 2) {
     stop("The parameter y_range must be a vector of length 2.")
@@ -709,6 +727,13 @@ plot_expirest_osle <- function(
     if (x_range[1] > x_range[2]) {
       stop("The parameter x_range must be of the form c(min, max).")
     }
+  }
+  if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify mtbs either as \"verified\", \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
+  }
+  if (!(plot_option %in% c("full", "lean"))) {
+    stop("Please specify plot_option either as \"full\" or \"lean\".")
   }
   if (!(plot_option %in% c("full", "lean"))) {
     stop("Please specify plot_option either as \"full\" or \"lean\".")
@@ -734,24 +759,47 @@ plot_expirest_osle <- function(
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Extraction of models and of the model type
-  # If show_grouping = "no" the model_type is "cics"
+  # If show_grouping = "no", the model_type is "cics"
 
   l_models <- expob[["Models"]]
 
   if (show_grouping == "yes") {
-    model_name <- expob[["Model.Type"]][["type.acronym"]]
+    switch(mtbs,
+           "verified" = {
+             model_name <- expob[["Model.Type"]][["type.acronym"]]
+
+             if (model_name == "dids") {
+               model_name = "individual"
+             }
+           },
+           "cics" = {
+             model_name <- "cics"
+           },
+           "dics" = {
+             model_name <- "dics"
+           },
+           "dids" = {
+             model_name <- "individual"
+           },
+           "dids.pmse" = {
+             model_name <- "dids"
+           })
   } else {
     model_name <- "cics"
   }
 
-  # Most appropriate model based on the ANCOVA analysis (show_grouping = "yes")
-  # or marginal model (show_grouping = "no")
+  # Most appropriate model based on the ANCOVA analysis, or as specified
+  # via the mtbs parameter
   model <- l_models[[model_name]]
 
   # <-><-><->
   # Checking if estimation of POI.Model or Shelf.Life was successful
 
   t_exp <- expob[["POI"]]
+
+  # Rename the models
+  names(t_exp) <- sub("dids", "individual", names(t_exp))
+  names(t_exp) <- sub("individual.pmse", "dids", names(t_exp))
 
   if (sum(is.na(t_exp)) > 0) {
     stop("Expiry determination was not successful.")
@@ -887,8 +935,17 @@ plot_expirest_osle <- function(
   colnames(d_new) <- c(batch_vbl, time_vbl)
 
   # Prediction
-  m_pred <- predict(model, newdata = d_new, interval = ivl,
-                    level = 1 - alpha)
+  if (model_name != "individual") {
+    m_pred <- predict(model, newdata = d_new, interval = ivl,
+                      level = 1 - alpha)
+  } else {
+    l_pred <- lapply(t_batches, function(x) {
+      predict(l_models$individual[[x]],
+              newdata = d_new[d_new[, batch_vbl] == x, ],
+              interval = ivl, level = 1 - alpha)
+    })
+    m_pred <- do.call(rbind, l_pred)
+  }
 
   # Back-transformation of predicted (response) values, if necessary
   switch(xform[2],
@@ -1062,7 +1119,7 @@ plot_expirest_osle <- function(
     }
   }
 
-  if (show_grouping == "no") {
+  if (model_name == "cics") {
     ggraph <-
       ggplot(d_dat,
              aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +

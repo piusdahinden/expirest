@@ -10,6 +10,7 @@ plot_expirest_osle(
   response_vbl_unit = NULL,
   y_range,
   x_range = NULL,
+  mtbs = "verified",
   plot_option = "full",
   ci_app = "line"
 )
@@ -18,12 +19,11 @@ plot_expirest_osle(
 \item{model}{An \sQuote{\code{expirest_osle}} object, i.e. a list returned
 by the \code{\link{expirest_osle}()} function.}
 
-\item{show_grouping}{A character string specifying if the grouping of the
-data should be taken into account (\dQuote{yes}) or not (\dQuote{no}),
-i.e. if the results of the most appropriate model should be shown or
-the results from the marginal analysis ignoring the grouping (being
-equivalent with the \emph{common intercept / common slope case}). The
-default is \code{"yes"}.}
+\item{show_grouping}{`r lifecycle::badge("deprecated")`
+`show_grouping = \"yes\" or \"no\"` is no longer supported. Use the
+\code{mtbs} parameter instead which allows choosing a specific model,
+i.e. also the \emph{common intercept / common slope case} model which
+was the default model when \code{show_grouping} was \code{"no"}.}
 
 \item{response_vbl_unit}{A character string specifying the unit associated
 with the response variable. The default is \code{NULL}.}
@@ -36,8 +36,19 @@ the range of the time  variable to be plotted. The default is \code{NULL}
 and the \eqn{x} range is calculated automatically on the basis of the
 estimated shelf life.}
 
+\item{mtbs}{A characters string specifying the \dQuote{model to be shown},
+i.e. either \code{verified}, which is the default, or one of \code{cics},
+\code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
+is the model that was identified through the poolability check. It is
+thus also one of the possible optional models. The \code{dids} model
+represents the case where a separate model is fitted to the data of each
+individual batch while the \code{dids.pmse} model is the interaction
+model which includes the \eqn{batch} variable as main effect and in the
+interaction term with the \eqn{time} variable (\eqn{batch \times time}),
+i.e. a model where the mean square error is pooled across batches.}
+
 \item{plot_option}{A character string of either \code{"full"} or
-\code{"lean"}, i.e. specifying if all the information should be put out
+\code{"lean"}, i.e. specifying if additional information should be put out
 on the plot (option \code{"full"}) or only basic information (option
 \code{"lean"}), i.e. the data points, the fitted regression line with
 the confidence interval, the specification limit(s) and the estimated

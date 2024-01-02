@@ -260,15 +260,16 @@ relevance because the corresponding model is missing an effect. If the
 slopes are significantly different, there is no point comparing intercepts.
 The dids model has individual intercepts and individual slopes, and the
 calculation of confidence intervals is based on the corresponding individual
-mean squared errors. The \emph{different intercept / different slope} model
-where the mean squared error is pooled across batches is reported as
+mean square errors. The \emph{different intercept / different slope} model
+where the mean square error is pooled across batches is reported as
 dids.pmse.
 
 These requirements can be checked by aid of an \dQuote{ANalysis of
-COVAriance} (ANCOVA) including the batch variable as interaction term. The
-full ANCOVA model simultaneously tests all the effects, and non-significant
-effects can be identified and removed for fitting of the final regression
-model that is used for the estimation of the shelf life or retest period.
+COVAriance} (ANCOVA) including the batch variable as main effect and as
+\eqn{batch \times time} interaction term. The full ANCOVA model
+simultaneously tests all the effects, and non-significant effects can be
+identified and removed for fitting of the final regression model that is
+used for the estimation of the shelf life or retest period.
 
 The significance level (\code{alpha_pool = 0.25}, Type I error) is used to
 increase the power of the test to detect cases where the data should not be

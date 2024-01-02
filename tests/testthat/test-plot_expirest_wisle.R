@@ -38,68 +38,68 @@ test_that("plot_expirest_wisle_succeeds", {
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = "%", y_range = c(-0.01, 0.50),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "line")
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line")
   tmp2 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = " mg/kg", y_range = c(92, 107),
-      x_range = c(-1, 29), scenario = "standard", plot_option = "full",
-      ci_app = "line")
+      x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line")
   tmp3stsc <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(92, 107),
-      x_range = c(-1, 29), scenario = "standard", plot_option = "full",
-      ci_app = "ribbon")
+      x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
   tmp3wcsc <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(92, 107),
-      x_range = NULL, scenario = "worst", plot_option = "full",
-      ci_app = "ribbon")
-  tmp4 <-
-    plot_expirest_wisle(
-      model = re2, rl_index = 1, show_grouping = "no",
-      response_vbl_unit = NULL, y_range = c(92, 107),
-      x_range = c(-1, 29), scenario = "standard",
+      x_range = NULL, scenario = "worst", mtbs = "verified",
       plot_option = "full", ci_app = "ribbon")
-  tmp4l1 <-
+  suppressWarnings(tmp4 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "no",
       response_vbl_unit = NULL, y_range = c(92, 107),
-      x_range = c(-1, 29), scenario = "standard",
-      plot_option = "lean1", ci_app = "ribbon")
-  tmp4l2 <-
+      x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon"))
+    suppressWarnings(tmp4l1 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "no",
       response_vbl_unit = NULL, y_range = c(92, 107),
-      x_range = c(-1, 29), scenario = "standard",
-      plot_option = "lean2", ci_app = "ribbon")
-  tmp4b1 <-
+      x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
+      plot_option = "lean1", ci_app = "ribbon"))
+    suppressWarnings(tmp4l2 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "no",
       response_vbl_unit = NULL, y_range = c(92, 107),
-      x_range = c(-1, 29), scenario = "standard",
-      plot_option = "basic1", ci_app = "ribbon")
-  tmp4b2 <-
+      x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
+      plot_option = "lean2", ci_app = "ribbon"))
+    suppressWarnings(tmp4b1 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "no",
       response_vbl_unit = NULL, y_range = c(92, 107),
-      x_range = c(-1, 29), scenario = "standard",
-      plot_option = "basic2", ci_app = "ribbon")
-  tmp5 <-
+      x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
+      plot_option = "basic1", ci_app = "ribbon"))
+    suppressWarnings(tmp4b2 <-
+    plot_expirest_wisle(
+      model = re2, rl_index = 1, show_grouping = "no",
+      response_vbl_unit = NULL, y_range = c(92, 107),
+      x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
+      plot_option = "basic2", ci_app = "ribbon"))
+    suppressWarnings(tmp5 <-
     plot_expirest_wisle(
       model = re3, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "line")
-  tmp6 <-
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line"))
+    suppressWarnings(tmp6 <-
     plot_expirest_wisle(
       model = re4, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "line")
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line"))
 
   # <-><-><-><->
 
@@ -434,57 +434,57 @@ test_that("plot_expirest_wisle_succeeds_with_transformations", {
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = "%", y_range = c(-0.01, 0.50),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "line")
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line")
   tmp2 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = "%", y_range = c(-0.01, 0.50),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "line")
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line")
   tmp3 <-
     plot_expirest_wisle(
       model = re3, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = "%", y_range = c(-0.01, 0.50),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "line")
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line")
 
-  tmp4 <-
+  suppressWarnings(tmp4 <-
     plot_expirest_wisle(
       model = re4, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "line")
-  tmp5 <-
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line"))
+    suppressWarnings(tmp5 <-
     plot_expirest_wisle(
       model = re5, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "ribbon")
-  tmp6 <-
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon"))
+    suppressWarnings(tmp6 <-
     plot_expirest_wisle(
       model = re6, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "ribbon")
-  tmp7 <-
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon"))
+    suppressWarnings(tmp7 <-
     plot_expirest_wisle(
       model = re7, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "lean1",
-      ci_app = "line")
-  tmp8 <-
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "lean1", ci_app = "line"))
+    suppressWarnings(tmp8 <-
     plot_expirest_wisle(
       model = re8, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "lean1",
-      ci_app = "ribbon")
-  tmp9 <-
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "lean1", ci_app = "ribbon"))
+    suppressWarnings(tmp9 <-
     plot_expirest_wisle(
       model = re9, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "lean1",
-      ci_app = "ribbon")
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "lean1", ci_app = "ribbon"))
 
   # <-><-><-><->
 
@@ -585,25 +585,29 @@ test_that("plot_expirest_wisle_fails", {
     plot_expirest_wisle(
       model = ree, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "model must be an object of class expirest_wisle")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = "x", show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "rl_index must be a positive integer of length 1")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1.1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "rl_index must be a positive integer of length 1")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = c(1, 2), show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "rl_index must be a positive integer of length 1")
   expect_error(
     plot_expirest_wisle(
@@ -615,78 +619,91 @@ test_that("plot_expirest_wisle_fails", {
     plot_expirest_wisle(
       model = re1, rl_index = 2, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "rl_index must be between 1 and the number of rl values")
-  expect_error(
-    plot_expirest_wisle(
-      model = re1, rl_index = 1, show_grouping = "incorrect",
-      response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
-    "specify show_grouping either as \"yes\" or \"no\"")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = 1, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "response_vbl_unit must be a string")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = "range", x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "y_range must be a vector of length 2")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = 107, x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "y_range must be a vector of length 2")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(107, 93), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "y_range must be of the form")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = "range",
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "x_range must be a vector of length 2")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = 36,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "x_range must be a vector of length 2")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = c(36, 0),
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "x_range must be of the form")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "incorrect", plot_option = "full", ci_app = "line"),
+      scenario = "incorrect", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "specify scenario either as \"standard\" or \"worst\"")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "incorrect", ci_app = "line"),
+      scenario = "standard", mtbs = "incorrect", plot_option = "full",
+      ci_app = "line"),
+    "specify mtbs either as \"verified\", \"cics\", \"dics\", ")
+  expect_error(
+    plot_expirest_wisle(
+      model = re1, rl_index = 1, show_grouping = "yes",
+      response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
+      scenario = "standard", mtbs = "verified", plot_option = "incorrect",
+      ci_app = "line"),
     "specify plot_option either as \"full\", \"lean1\"")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "points"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "points"),
     "specify ci_app either as \"line\" or \"ribbon\"")
   expect_error(
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = NULL,
-      scenario = "standard", plot_option = "full", ci_app = "line"),
+      scenario = "standard", mtbs = "verified", plot_option = "full",
+      ci_app = "line"),
     "Expiry determination was not successful")
 })

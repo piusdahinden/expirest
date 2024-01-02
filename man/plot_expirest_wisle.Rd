@@ -12,6 +12,7 @@ plot_expirest_wisle(
   y_range,
   x_range = NULL,
   scenario = "standard",
+  mtbs = "verified",
   plot_option = "full",
   ci_app = "line"
 )
@@ -24,12 +25,11 @@ by the \code{\link{expirest_wisle}()} function.}
 values that have been handed over to \code{\link{expirest_wisle}()} should
 be displayed. The default value is \code{1}.}
 
-\item{show_grouping}{A character string specifying if the grouping of the
-data should be taken into account (\dQuote{yes}) or not (\dQuote{no}),
-i.e. if the results of the most appropriate model should be shown or
-the results from the marginal analysis ignoring the grouping (being
-equivalent with the \emph{common intercept / common slope case}). The
-default is \code{"yes"}.}
+\item{show_grouping}{`r lifecycle::badge("deprecated")`
+`show_grouping = \"yes\" or \"no\"` is no longer supported. Use the
+\code{mtbs} parameter instead which allows choosing a specific model,
+i.e. also the \emph{common intercept / common slope case} model which
+was the default model when \code{show_grouping} was \code{"no"}.}
 
 \item{response_vbl_unit}{A character string specifying the unit associated
 with the response variable. The default is \code{NULL}.}
@@ -47,9 +47,20 @@ estimated shelf life.}
 (\code{"standard"}) or up to the \dQuote{worst case scenario}
 (\code{"worst"}). The default is \code{"standard"}.}
 
+\item{mtbs}{A characters string specifying the \dQuote{model to be shown},
+i.e. either \code{verified}, which is the default, or one of \code{cics},
+\code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
+is the model that was identified through the poolability check. It is
+thus also one of the possible optional models. The \code{dids} model
+represents the case where a separate model is fitted to the data of each
+individual batch while the \code{dids.pmse} model is the interaction
+model which includes the \eqn{batch} variable as main effect and in the
+interaction term with the \eqn{time} variable (\eqn{batch \times time}),
+i.e. a model where the mean square error is pooled across batches.}
+
 \item{plot_option}{A character string of either \code{"full"},
 \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
-specifying if all the information should be shown in the plot (option
+specifying if additional information should be shown in the plot (option
 \code{"full"}) or only basic information (options \code{"lean"} and
 \code{"basic"}). Full means the data points, the fitted regression line
 with the confidence or prediction interval, the specification limit(s)

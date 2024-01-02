@@ -655,7 +655,7 @@ expirest_wisle <-
 #'   (\code{"worst"}). The default is \code{"standard"}.
 #' @param plot_option A character string of either \code{"full"},
 #'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
-#'   specifying if all the information should be shown in the plot (option
+#'   specifying if additional information should be shown in the plot (option
 #'   \code{"full"}) or only basic information (options \code{"lean"} and
 #'   \code{"basic"}). Full means the data points, the fitted regression line
 #'   with the confidence or prediction interval, the specification limit(s)
@@ -720,13 +720,14 @@ expirest_wisle <-
 #' @importFrom ggplot2 element_rect
 #' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 unit
+#' @importFrom lifecycle deprecated
 #'
 #' @export
 
 plot_expirest_wisle <- function(
   model, rl_index = 1, show_grouping = "yes", response_vbl_unit = NULL,
-  y_range, x_range = NULL, scenario = "standard", plot_option = "full",
-  ci_app = "line") {
+  y_range, x_range = NULL, scenario = "standard", mtbs = "verified",
+  plot_option = "full", ci_app = "line") {
   if (!inherits(model, "expirest_wisle")) {
     stop("The model must be an object of class expirest_wisle.")
   }
@@ -740,8 +741,16 @@ plot_expirest_wisle <- function(
     stop("The parameter rl_index must be between 1 and the number of rl ",
          "values.")
   }
-  if (!(show_grouping %in% c("yes", "no"))) {
-    stop("Please specify show_grouping either as \"yes\" or \"no\".")
+  if (show_grouping == "no") {
+    lifecycle::deprecate_warn(
+      when = "0.1.7",
+      what = "plot_expirest_wisle(show_grouping)",
+      with = "plot_expirest_osle(mtbs)",
+      details =
+        c("If you do not want to see the grouping, use mtbs = \"cics\". ",
+          "If you have set show_grouping = \"no\", mtbs is set to \"cics\".",
+          "If you have set show_grouping = \"yes\", the settings in mtbs
+          apply."))
   }
   if (!is.numeric(y_range) || length(y_range) != 2) {
     stop("The parameter y_range must be a vector of length 2.")
@@ -759,6 +768,10 @@ plot_expirest_wisle <- function(
   }
   if (!(scenario %in% c("standard", "worst"))) {
     stop("Please specify scenario either as \"standard\" or \"worst\".")
+  }
+  if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify mtbs either as \"verified\", \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
   }
   if (!(plot_option %in% c("full", "lean1", "lean2", "basic1", "basic2"))) {
     stop("Please specify plot_option either as \"full\", \"lean1\", ",
@@ -785,18 +798,37 @@ plot_expirest_wisle <- function(
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Extraction of models and of the model type
-  # If show_grouping = "no" the model_type is "cics"
+  # If show_grouping = "no", the model_type is "cics"
 
   l_models <- expob[["Models"]]
 
   if (show_grouping == "yes") {
-    model_name <- expob[["Model.Type"]][["type.acronym"]]
+    switch(mtbs,
+           "verified" = {
+             model_name <- expob[["Model.Type"]][["type.acronym"]]
+
+             # if (model_name == "dids") {
+             #   model_name = "individual"
+             # }
+           },
+           "cics" = {
+             model_name <- "cics"
+           },
+           "dics" = {
+             model_name <- "dics"
+           },
+           "dids" = {
+             model_name <- "dids"
+           },
+           "dids.pmse" = {
+             model_name <- "dids"
+           })
   } else {
     model_name <- "cics"
   }
 
-  # Most appropriate model based on the ANCOVA analysis (show_grouping = "yes")
-  # or marginal model (show_grouping = "no")
+  # Most appropriate model based on the ANCOVA analysis, or as specified
+  # via the mtbs parameter
   model <- l_models[[model_name]]
   poi_model_name <- paste("POI.Model", model_name, sep = ".")
   sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
@@ -963,7 +995,7 @@ plot_expirest_wisle <- function(
   colnames(d_new) <- c(batch_vbl, time_vbl)
 
   # Prediction
-  if (model_name != "dids") {
+  if (model_name != "individual") {
     m_pred <- predict(model, newdata = d_new, interval = ivl,
                       level = 1 - alpha)
   } else {
@@ -1475,7 +1507,7 @@ plot_expirest_wisle <- function(
     }
   }
 
-  if (show_grouping == "no") {
+  if (model_name == "cics") {
     ggraph <- ggplot(d_dat,
                      aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
       geom_point(size = 2, shape = 1) +
