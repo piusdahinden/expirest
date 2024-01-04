@@ -852,12 +852,8 @@ plot_expirest_osle <- function(
     }
   }
 
-  # Setting x_range and the x_breaks where the number of ticks should be 5
+  # Setting x_range
   x_range <- c(t_min, t_max)
-  x_breaks <- pretty(x_range, 5)
-
-  # Setting the y_breaks where the number of ticks should be 5
-  y_breaks <- pretty(y_range, 5)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Prediction based on linear model
@@ -950,6 +946,8 @@ plot_expirest_osle <- function(
   # The rows in data frame d_text have the following meaning and position
   # (position in brackets):
   # LSL (lower right), USL (upper right), POI model (low at poi.model)
+
+  y_breaks <- pretty(y_range, 5)
 
   if (length(sl) == 2) {
     d_text <- data.frame(
@@ -1145,8 +1143,6 @@ plot_expirest_osle <- function(
                colour = d_hlines$Colour, linetype = d_hlines$Type) +
     geom_vline(xintercept = d_vlines[, time_vbl],
                colour = d_vlines$Colour, linetype = d_vlines$Type) +
-    scale_x_continuous(breaks = x_breaks) +
-    scale_y_continuous(breaks = y_breaks) +
     coord_cartesian(xlim = x_range, ylim = y_range) +
     theme_bw()  +
     theme(panel.grid.major = element_line(colour = "grey90"),

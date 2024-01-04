@@ -945,16 +945,12 @@ plot_expirest_wisle <- function(
            })
   }
 
-  # Setting x_range and the x_breaks where the number of ticks should be 5
+  # Setting x_range
   x_range <- c(t_min, t_max)
-  x_breaks <- pretty(x_range, 5)
 
   if (plot_option == "full") {
-    x_range[1] <- x_breaks[1] - x_breaks[2]
+    x_range[1] <- x_range[1] - x_range[2] / 5
   }
-
-  # Setting the y_breaks where the number of ticks should be 5.
-  y_breaks <- pretty(y_range, 5)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Prediction based on linear model
@@ -1052,6 +1048,8 @@ plot_expirest_wisle <- function(
   # WCSL (left, at RL), Intercept (left, at intercept),
   # POI worst case (low at poi.woca), POI model (low at poi.model)
   # RL (lower right or upper right)
+
+  y_breaks <- pretty(y_range, 5)
 
   if (length(sl) == 2) {
     d_text <- data.frame(
@@ -1567,8 +1565,6 @@ plot_expirest_wisle <- function(
   ggraph <- ggraph +
     geom_hline(yintercept = d_hlines[, response_vbl],
                colour = d_hlines$Colour, linetype = d_hlines$Type) +
-    scale_x_continuous(breaks = x_breaks) +
-    scale_y_continuous(breaks = y_breaks) +
     coord_cartesian(xlim = x_range, ylim = y_range) +
     theme_bw()  +
     theme(panel.grid.major = element_line(colour = "grey90"),
