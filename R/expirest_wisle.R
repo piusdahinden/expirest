@@ -738,7 +738,7 @@ expirest_wisle <-
 
 plot_expirest_wisle <- function(
   model, rl_index = 1, show_grouping = "yes", response_vbl_unit = NULL,
-  y_range, x_range = NULL, scenario = "standard", mtbs = "verified",
+  x_range = NULL, y_range = NULL, scenario = "standard", mtbs = "verified",
   plot_option = "full", ci_app = "line") {
   if (!inherits(model, "expirest_wisle")) {
     stop("The model must be an object of class expirest_wisle.")
@@ -764,18 +764,14 @@ plot_expirest_wisle <- function(
           "If you have set show_grouping = \"yes\", the settings in mtbs
           apply."))
   }
-  if (!is.numeric(y_range) || length(y_range) != 2) {
-    stop("The parameter y_range must be a vector of length 2.")
-  }
-  if (y_range[1] > y_range[2]) {
-    stop("The parameter y_range must be of the form c(min, max).")
-  }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {
       stop("The parameter x_range must be a vector of length 2.")
     }
-    if (x_range[1] > x_range[2]) {
-      stop("The parameter x_range must be of the form c(min, max).")
+  }
+  if (!is.null(y_range)) {
+    if (!is.numeric(y_range) || length(y_range) != 2) {
+      stop("The parameter y_range must be a vector of length 2.")
     }
   }
   if (!(scenario %in% c("standard", "worst"))) {
@@ -914,38 +910,31 @@ plot_expirest_wisle <- function(
   poi_woca <- t_exp[rl_index, sl_model_name]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Setting ranges and ticks
-
-  # Find a sequence for a graph with 10 ticks displaying numbers divisible by
-  # 3 and which contains 10 numbers between each tick, i.e. a sequence with a
-  # maximal length of 100. The value of scenario ("standard" or "worst") must
-  # be taken into account.
-  # For the setting of the optimal x range t_min and t_max are determined.
+  # Setting x_range and ticks
 
   if (!is.null(x_range)) {
-    t_min <- x_range[1]
+    x_min <- min(x_range)
   } else {
     if (xform[1] == "no") {
-      t_min <- pretty(d_dat[, time_vbl], n = 1)[1]
+      x_min <- pretty(d_dat[, time_vbl], n = 1)[1]
     } else {
-      t_min <- pretty(d_dat[, old_time_vbl], n = 1)[1]
+      x_min <- pretty(d_dat[, old_time_vbl], n = 1)[1]
     }
   }
 
   if (!is.null(x_range)) {
-    t_max <- x_range[2]
+    x_max <- max(x_range)
   } else {
     switch(scenario,
            "standard" = {
-             t_max <- pretty(poi_model, n = 1)[2]
+             x_max <- pretty(poi_model, n = 1)[2]
            },
            "worst" = {
-             t_max <- pretty(poi_woca, n = 1)[2]
+             x_max <- pretty(poi_woca, n = 1)[2]
            })
   }
 
-  # Setting x_range
-  x_range <- c(t_min, t_max)
+  x_range <- c(x_min, x_max)
 
   if (plot_option == "full") {
     x_range[1] <- x_range[1] - x_range[2] / 5
@@ -955,7 +944,7 @@ plot_expirest_wisle <- function(
   # Prediction based on linear model
 
   # Generate the new x values (on the original scale) for prediction
-  x_new <- seq(t_min, t_max, length.out = 100)
+  x_new <- seq(x_min, x_max, length.out = 100)
 
   # Transformation of new x values, if necessary
   switch(xform[1],
@@ -1035,6 +1024,20 @@ plot_expirest_wisle <- function(
       colnames(d_pred) <- c(batch_vbl, time_vbl, old_response_vbl, "LL", "UL")
     }
   }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Setting y_range and ticks
+
+  if (!is.null(y_range)) {
+    y_min <- min(y_range)
+    y_max <- max(y_range)
+  } else {
+    tmp <- pretty(c(d_pred$LL, d_pred$UL), n = 1)
+    y_min <- tmp[1]
+    y_max <- tmp[length(tmp)]
+  }
+
+  y_range <- c(y_min, y_max)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ancillary data frames for plotting

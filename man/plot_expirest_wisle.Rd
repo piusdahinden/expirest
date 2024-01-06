@@ -9,8 +9,8 @@ plot_expirest_wisle(
   rl_index = 1,
   show_grouping = "yes",
   response_vbl_unit = NULL,
-  y_range,
   x_range = NULL,
+  y_range = NULL,
   scenario = "standard",
   mtbs = "verified",
   plot_option = "full",
@@ -34,13 +34,15 @@ was the default model when \code{show_grouping} was \code{"no"}.}
 \item{response_vbl_unit}{A character string specifying the unit associated
 with the response variable. The default is \code{NULL}.}
 
-\item{y_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the response variable to be plotted.}
-
 \item{x_range}{A numeric vector of the form \code{c(min, max)} specifying
 the range of the time variable to be plotted. The default is \code{NULL}
 and the \eqn{x} range is calculated automatically on the basis of the
 estimated shelf life.}
+
+\item{y_range}{A numeric vector of the form \code{c(min, max)} specifying
+the range of the response variable to be plotted. The default is
+\code{NULL} and the \eqn{y} range is calculated automatically on the
+basis of the confidence or prediction interval of the verified model.}
 
 \item{scenario}{A character string specifying if the plot should be extended
 (with respect to the \eqn{x} axis) up to the \dQuote{standard scenario}

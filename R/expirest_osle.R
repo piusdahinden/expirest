@@ -589,12 +589,14 @@ expirest_osle <-
 #'   was the default model when \code{show_grouping} was \code{"no"}.
 #' @param response_vbl_unit A character string specifying the unit associated
 #'   with the response variable. The default is \code{NULL}.
-#' @param y_range A numeric vector of the form \code{c(min, max)} specifying
-#'   the range of the response variable to be plotted.
 #' @param x_range A numeric vector of the form \code{c(min, max)} specifying
 #'   the range of the time variable to be plotted. The default is \code{NULL}
 #'   and the \eqn{x} range is calculated automatically on the basis of the
 #'   estimated shelf life.
+#' @param y_range A numeric vector of the form \code{c(min, max)} specifying
+#'   the range of the response variable to be plotted. The default is
+#'   \code{NULL} and the \eqn{y} range is calculated automatically on the
+#'   basis of the confidence or prediction interval of the verified model.
 #' @param mtbs A characters string specifying the \dQuote{model to be shown},
 #'   i.e. either \code{verified}, which is the default, or one of \code{cics},
 #'   \code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
@@ -677,8 +679,8 @@ expirest_osle <-
 #' @export
 
 plot_expirest_osle <- function(
-  model, show_grouping = "yes", response_vbl_unit = NULL, y_range,
-  x_range = NULL, mtbs = "verified", plot_option = "full", ci_app = "line") {
+  model, show_grouping = "yes", response_vbl_unit = NULL, x_range = NULL,
+  y_range = NULL, mtbs = "verified", plot_option = "full", ci_app = "line") {
   if (!inherits(model, "expirest_osle")) {
     stop("The model must be an object of class expirest_osle.")
   }
@@ -693,18 +695,14 @@ plot_expirest_osle <- function(
           "If you have set show_grouping = \"yes\", the settings in mtbs
           apply."))
   }
-  if (!is.numeric(y_range) || length(y_range) != 2) {
-    stop("The parameter y_range must be a vector of length 2.")
-  }
-  if (y_range[1] > y_range[2]) {
-    stop("The parameter y_range must be of the form c(min, max).")
-  }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {
       stop("The parameter x_range must be a vector of length 2.")
     }
-    if (x_range[1] > x_range[2]) {
-      stop("The parameter x_range must be of the form c(min, max).")
+  }
+  if (!is.null(y_range)) {
+    if (!is.numeric(y_range) || length(y_range) != 2) {
+      stop("The parameter y_range must be a vector of length 2.")
     }
   }
   if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
@@ -831,34 +829,29 @@ plot_expirest_osle <- function(
   poi_model <- t_exp[model_name]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Setting ranges and ticks
-
-  # Find a sequence for a graph with 10 ticks displaying numbers divisible by
-  # 3 and which contains 10 numbers between each tick, i.e. a sequence with a
-  # maximal length of 100. The value of t_min is assumed to be the minimal
-  # observed time_vbl value and t_max the maximal one.
+  # Setting x_range and ticks
+  # For the setting of the y_range, a prediction must be done first
 
   if (!is.null(x_range)) {
-    t_min <- x_range[1]
-    t_max <- x_range[2]
+    x_min <- min(x_range)
+    x_max <- max(x_range)
   } else {
     if (xform[1] == "no") {
-      t_min <- pretty(d_dat[, time_vbl], n = 1)[1]
-      t_max <- pretty(poi_model, n = 1)[2]
+      x_min <- pretty(d_dat[, time_vbl], n = 1)[1]
+      x_max <- pretty(poi_model, n = 1)[2]
     } else {
-      t_min <- pretty(d_dat[, old_time_vbl], n = 1)[1]
-      t_max <- pretty(poi_model, n = 1)[2]
+      x_min <- pretty(d_dat[, old_time_vbl], n = 1)[1]
+      x_max <- pretty(poi_model, n = 1)[2]
     }
   }
 
-  # Setting x_range
-  x_range <- c(t_min, t_max)
+  x_range <- c(x_min, x_max)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Prediction based on linear model
 
   # Generate the new x values (on the original scale) for prediction
-  x_new <- seq(t_min, t_max, length.out = 100)
+  x_new <- seq(x_min, x_max, length.out = 100)
 
   # Transformation of new x values, if necessary
   switch(xform[1],
@@ -936,6 +929,20 @@ plot_expirest_osle <- function(
       colnames(d_pred) <- c(batch_vbl, time_vbl, old_response_vbl, "LL", "UL")
     }
   }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Setting y_range and ticks
+
+  if (!is.null(y_range)) {
+    y_min <- min(y_range)
+    y_max <- max(y_range)
+  } else {
+    tmp <- pretty(c(d_pred$LL, d_pred$UL), n = 1)
+    y_min <- tmp[1]
+    y_max <- tmp[length(tmp)]
+  }
+
+  y_range <- c(y_min, y_max)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ancillary data frames for plotting

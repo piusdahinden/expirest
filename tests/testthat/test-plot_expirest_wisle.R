@@ -646,13 +646,6 @@ test_that("plot_expirest_wisle_fails", {
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
-      response_vbl_unit = NULL, y_range = c(107, 93), x_range = NULL,
-      scenario = "standard", mtbs = "verified", plot_option = "full",
-      ci_app = "line"),
-    "y_range must be of the form")
-  expect_error(
-    plot_expirest_wisle(
-      model = re1, rl_index = 1, show_grouping = "yes",
       response_vbl_unit = NULL, y_range = c(93, 107), x_range = "range",
       scenario = "standard", mtbs = "verified", plot_option = "full",
       ci_app = "line"),
@@ -664,13 +657,6 @@ test_that("plot_expirest_wisle_fails", {
       scenario = "standard", mtbs = "verified", plot_option = "full",
       ci_app = "line"),
     "x_range must be a vector of length 2")
-  expect_error(
-    plot_expirest_wisle(
-      model = re1, rl_index = 1, show_grouping = "yes",
-      response_vbl_unit = NULL, y_range = c(93, 107), x_range = c(36, 0),
-      scenario = "standard", mtbs = "verified", plot_option = "full",
-      ci_app = "line"),
-    "x_range must be of the form")
   expect_error(
     plot_expirest_wisle(
       model = re1, rl_index = 1, show_grouping = "yes",
