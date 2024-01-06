@@ -592,7 +592,7 @@ expirest_osle <-
 #' @param y_range A numeric vector of the form \code{c(min, max)} specifying
 #'   the range of the response variable to be plotted.
 #' @param x_range A numeric vector of the form \code{c(min, max)} specifying
-#'   the range of the time  variable to be plotted. The default is \code{NULL}
+#'   the range of the time variable to be plotted. The default is \code{NULL}
 #'   and the \eqn{x} range is calculated automatically on the basis of the
 #'   estimated shelf life.
 #' @param mtbs A characters string specifying the \dQuote{model to be shown},
@@ -827,8 +827,7 @@ plot_expirest_osle <- function(
   sl <- l_lim[["sl"]]
 
   # POI with the upper or lower confidence or prediction interval of the
-  # linear regression model
-  # Most appropriate model
+  # most appropriate model
   poi_model <- t_exp[model_name]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -947,99 +946,15 @@ plot_expirest_osle <- function(
   # (position in brackets):
   # LSL (lower right), USL (upper right), POI model (low at poi.model)
 
-  y_breaks <- pretty(y_range, 5)
-
-  if (length(sl) == 2) {
-    d_text <- data.frame(
-      Time = c(rep(x_range[2], 2), poi_model),
-      Response = c(sl, sl[1]),
-      Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
-                print_val("USL: ", sl[2], rvu, sl_sf[2]),
-                print_val("", poi_model, "", get_n_whole_part(poi_model) + 1)),
-      Colour = c("black", "black", "forestgreen"),
-      stringsAsFactors = FALSE)
-
-    d_text$Response <- d_text$Response +
-      rep(diff(y_breaks[1:2]), 3) * 1 / c(-10, 10, -2)
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_text <- data.frame(
-               Time = c(x_range[2], poi_model),
-               Response = rep(sl, 2),
-               Label =
-                 c(print_val("LSL: ", sl, rvu, sl_sf),
-                   print_val("", poi_model, "",
-                             get_n_whole_part(poi_model) + 1)),
-               Colour = c("black", "forestgreen"),
-               stringsAsFactors = FALSE)
-
-             d_text$Response <- d_text$Response +
-               rep(diff(y_breaks[1:2]), 2) * 1 / c(-10, -2)
-           },
-           "upper" = {
-             d_text <- data.frame(
-               Time = c(x_range[2], poi_model),
-               Response = rep(sl, 2),
-               Label =
-                 c(print_val("USL: ", sl, rvu, sl_sf),
-                   print_val("", poi_model, "",
-                             get_n_whole_part(poi_model) + 1)),
-               Colour = c("black", "forestgreen"),
-               stringsAsFactors = FALSE)
-
-             d_text$Response <- d_text$Response +
-               rep(diff(y_breaks[1:2]), 2) * 1 / c(10, 2)
-           })
-  }
-
-  if (sum(xform %in% "no") == 2) {
-    colnames(d_text) <- c(time_vbl, response_vbl, "Label", "Colour")
-  }
-  if (sum(xform %in% "no") == 0) {
-    colnames(d_text) <- c(old_time_vbl, old_response_vbl, "Label", "Colour")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      colnames(d_text) <- c(old_time_vbl, response_vbl, "Label", "Colour")
-    }
-    if (xform[2] != "no") {
-      colnames(d_text) <- c(time_vbl, old_response_vbl, "Label", "Colour")
-    }
-  }
+  d_text <-
+    get_text_annotation(rvu = rvu, x_range = x_range, y_range = y_range,
+                        sl = sl, sl_sf = sl_sf, poi_model = poi_model,
+                        ivl_side = ivl_side)
 
   # <-><-><->
   # d_hlines - display of horizontal lines
 
-  if (length(sl) == 2) {
-    d_hlines <- data.frame(Response = sl,
-                           Item = c("LSL", "USL"),
-                           Colour = as.character(c("black", "black")),
-                           Type = as.character(c("dotted", "dotted")),
-                           stringsAsFactors = FALSE)
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_hlines <- data.frame(Response = sl,
-                                    Item = c("LSL"),
-                                    Colour = as.character(c("black")),
-                                    Type = as.character(c("dotted")),
-                                    stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_hlines <- data.frame(Response = sl,
-                                    Item = c("USL"),
-                                    Colour = as.character(c("black")),
-                                    Type = as.character(c("dotted")),
-                                    stringsAsFactors = FALSE)
-           })
-  }
-
-  if (xform[2] != "no") {
-    colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
-  } else {
-    colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
-  }
+  d_hlines <- get_hlines(sl, ivl_side)
 
   # <-><-><->
   # d_vlines - display of vertical lines
@@ -1050,10 +965,32 @@ plot_expirest_osle <- function(
                          Type = c("dotdash"),
                          stringsAsFactors = FALSE)
 
-  if (xform[1] != "no") {
-    colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
-  } else {
+  # <-><-><->
+  # Renaming of columns for plotting on the original scale
+
+  if (sum(xform %in% "no") == 2) {
+    colnames(d_text) <- c(time_vbl, response_vbl, "Label", "Colour")
+    colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
     colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
+  }
+  if (sum(xform %in% "no") == 0) {
+    colnames(d_text) <- c(old_time_vbl, old_response_vbl, "Label", "Colour")
+    colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
+    colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
+  }
+  if (sum(xform %in% "no") == 1) {
+    if (xform[1] != "no") {
+      colnames(d_text) <- c(old_time_vbl, response_vbl, "Label", "Colour")
+      colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
+    } else {
+      colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
+    }
+    if (xform[2] != "no") {
+      colnames(d_text) <- c(time_vbl, old_response_vbl, "Label", "Colour")
+      colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
+    } else {
+      colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
+    }
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

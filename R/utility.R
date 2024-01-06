@@ -1621,3 +1621,522 @@ get_n_list_levels <- function(x) {
    0L
   }
 }
+
+#' Prepare text annotation
+#'
+#' The function \code{get_text_annotation()} prepares a data frame for putting
+#' text on a plot prepared by the \code{ggplot()} function from
+#' the \sQuote{\code{ggplot2}} package.
+#'
+#' @param rvu A character string specifying the unit associated with the
+#'   response variable.
+#' @param x_range A numeric vector of the form \code{c(min, max)} specifying
+#'   the range of the time variable to be plotted.
+#' @param y_range A numeric vector of the form \code{c(min, max)} specifying
+#'   the range of the response variable to be plotted.
+#' @param sl A numeric value or a numeric vector of length \code{2} specifying
+#'   the specification limit or limits.
+#' @param sl_sf A positive integer or a vector of positive integers specifying
+#'   the number of \dQuote{significant figures} (sf) of \code{sl}.
+#' @param poi_model Point of intersection (POI) with the upper or lower
+#'   confidence or prediction interval of the most appropriate model according
+#'   to the ICH Q1E guideline.
+#' @param ivl_side A character string specifying if the \dQuote{upper} or the
+#'   \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
+#'   \code{"lower"}, respectively.
+#' @param poi_woca Point of intersection (POI) with the upper or lower
+#'   confidence or prediction interval of the linear regression model
+#'   representing the worst case scenario (woca) model. The default is
+#'   \code{NULL}.
+#' @param t_exp A data frame of the intercepts, the differences between release
+#'   and shelf life limits, the worst case scenario limits (WCSLs), the expiry
+#'   and release specification limits, the shelf lives and POI values. The
+#'   default is \code{NULL}.
+#' @param wc_icpt A data frame of the worst case intercepts of each of the
+#'   four fitted models. The default is \code{NULL}.
+#' @param rl_sf A positive integer or a vector of positive integers specifying
+#'   the number of \dQuote{significant figures} (sf) of \code{rl}. The default
+#'   is \code{NULL}.
+#' @param rl_index A positive integer specifying which of the release limit
+#'   values that have been handed over to \code{\link{expirest_wisle}()} should
+#'   be displayed. The default is \code{NULL}.
+#' @param wcsl_model_name A character string specifying the name of the
+#'   model with the worst case scenario limit. The default is \code{NULL}.
+#' @param plot_option A character string of either \code{"full"},
+#'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
+#'   specifying if additional information should be shown in the plot (option
+#'   \code{"full"}) or only basic information (options \code{"lean"} and
+#'   \code{"basic"}). Full means the data points, the fitted regression line
+#'   with the confidence or prediction interval, the specification limit(s)
+#'   and the estimated shelf life. The default is \code{"full"}.
+#'
+#' @details The function \code{get_text_annotation()} expects various pieces
+#' of information characterising an \sQuote{\code{expirest_osle}} or an
+#' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
+#' the function prepares a data frame that can be handed over to the
+#' \code{geom_text()} function from the \sQuote{\code{ggplot2}} package.
+#'
+#' @return A data frame with the columns Time, Response, Label and Colour
+#' is returned.
+#'
+#' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
+#'   \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#'
+#' @keywords internal
+
+get_text_annotation <-
+  function(rvu, x_range, y_range, sl, sl_sf, poi_model, ivl_side,
+           poi_woca = NULL, t_exp = NULL, wc_icpt = NULL, rl_sf = NULL,
+           rl_index = NULL, wcsl_model_name = NULL, plot_option = "full") {
+
+  y_breaks <- pretty(y_range, 5)
+
+  if (is.null(poi_woca)) {
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Display of text elements for plot_expirest_osle()
+    # The rows in data frame d_text have the following meaning and position
+    # (position in brackets):
+    # LSL (lower right), USL (upper right), POI model (low at poi.model)
+
+    if (length(sl) == 2) {
+      d_text <- data.frame(
+        Time = c(rep(x_range[2], 2), poi_model),
+        Response = c(sl, sl[1]),
+        Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
+                  print_val("USL: ", sl[2], rvu, sl_sf[2]),
+                  print_val("", poi_model, "", get_n_whole_part(poi_model) + 1)),
+        Colour = c("black", "black", "forestgreen"),
+        stringsAsFactors = FALSE)
+
+      d_text$Response <- d_text$Response +
+        rep(diff(y_breaks[1:2]), 3) * 1 / c(-10, 10, -2)
+    } else {
+      switch(ivl_side,
+             "lower" = {
+               d_text <- data.frame(
+                 Time = c(x_range[2], poi_model),
+                 Response = rep(sl, 2),
+                 Label =
+                   c(print_val("LSL: ", sl, rvu, sl_sf),
+                     print_val("", poi_model, "",
+                               get_n_whole_part(poi_model) + 1)),
+                 Colour = c("black", "forestgreen"),
+                 stringsAsFactors = FALSE)
+
+               d_text$Response <- d_text$Response +
+                 rep(diff(y_breaks[1:2]), 2) * 1 / c(-10, -2)
+             },
+             "upper" = {
+               d_text <- data.frame(
+                 Time = c(x_range[2], poi_model),
+                 Response = rep(sl, 2),
+                 Label =
+                   c(print_val("USL: ", sl, rvu, sl_sf),
+                     print_val("", poi_model, "",
+                               get_n_whole_part(poi_model) + 1)),
+                 Colour = c("black", "forestgreen"),
+                 stringsAsFactors = FALSE)
+
+               d_text$Response <- d_text$Response +
+                 rep(diff(y_breaks[1:2]), 2) * 1 / c(10, 2)
+             })
+    }
+  } else {
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Display of text elements for plot_expirest_wisle()
+    # The rows in data frame d_text have the following meaning and position
+    # (position in brackets):
+    # LSL (lower right), USL (upper right),
+    # WCSL (left, at RL), Intercept (left, at intercept),
+    # POI worst case (low at poi.woca), POI model (low at poi.model)
+    # RL (lower right or upper right)
+
+    if (length(sl) == 2) {
+      d_text <- data.frame(
+        Time = c(rep(x_range[2], 2), 0, 0, poi_woca, poi_model),
+        Response = c(sl, t_exp[rl_index, wcsl_model_name], wc_icpt[rl_index],
+                     rep(sl[1], 2)),
+        Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
+                  print_val("USL: ", sl[2], rvu, sl_sf[2]),
+                  print_val("", t_exp[rl_index, wcsl_model_name], rvu,
+                            rl_sf[rl_index], suffix = " "),
+                  print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index]),
+                  ifelse(plot_option %in% "lean2",
+                         print_val("", poi_woca, "",
+                                   get_n_whole_part(poi_woca) + 1),
+                         print_val("", poi_woca, "",
+                                   get_n_whole_part(poi_woca) + 1,
+                                   suffix = "\n(worst case scenario)")),
+                  ifelse(plot_option %in% "lean2",
+                         print_val("", poi_model, "",
+                                   get_n_whole_part(poi_model) + 1),
+                         print_val("", poi_model, "",
+                                   get_n_whole_part(poi_model) + 1,
+                                   suffix = "\n(standard scenario)"))),
+        Colour = c("black", "black", "red", "royalblue", "forestgreen",
+                   "grey50"),
+        stringsAsFactors = FALSE)
+
+      switch(ivl_side,
+             "lower" = {
+               d_text <- rbind(d_text, d_text[nrow(d_text), ])
+               d_text[nrow(d_text), "Time"] <- x_range[2]
+               d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
+               d_text[nrow(d_text), "Label"] <-
+                 print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
+                           rl_sf[rl_index])
+               d_text[nrow(d_text), "Colour"] <- "grey0"
+
+               d_text$Response <- d_text$Response +
+                 c(rep(diff(y_breaks[1:2]), 2), 0, 0,
+                   rep(diff(y_breaks[1:2]), 2),
+                   diff(y_breaks[1:2])) * 1 / c(-10, 10, 1, 1, -2, -2, -10)
+             },
+             "upper" = {
+               d_text <- rbind(d_text, d_text[nrow(d_text), ])
+               d_text[nrow(d_text), "Time"] <- x_range[2]
+               d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
+               d_text[nrow(d_text), "Label"] <-
+                 print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
+                           rl_sf[rl_index])
+               d_text[nrow(d_text), "Colour"] <- "grey0"
+               d_text[5:6, "Response"] <- rep(sl[2], 2)
+
+               d_text$Response <- d_text$Response +
+                 c(rep(diff(y_breaks[1:2]), 2), 0, 0,
+                   rep(diff(y_breaks[1:2]), 2),
+                   diff(y_breaks[1:2])) * 1 / c(10, 10, 1, 1, 2, 2, 1)
+             })
+    } else {
+      switch(ivl_side,
+             "lower" = {
+               d_text <- data.frame(
+                 Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
+                 Response = c(sl, t_exp[rl_index, wcsl_model_name],
+                              wc_icpt[rl_index], rep(sl, 2),
+                              t_exp[rl_index, "Rel.Spec"]),
+                 Label =
+                   c(print_val("LSL: ", sl, rvu, sl_sf),
+                     print_val("", t_exp[rl_index, wcsl_model_name], rvu,
+                               rl_sf[rl_index], suffix = " "),
+                     print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
+                               suffix = " "),
+                     ifelse(plot_option %in% "lean2",
+                            print_val("", poi_woca, "",
+                                      get_n_whole_part(poi_woca) + 1),
+                            print_val("", poi_woca, "",
+                                      get_n_whole_part(poi_woca) + 1,
+                                      suffix = "\n(worst case scenario)")),
+                     ifelse(plot_option %in% "lean2",
+                            print_val("", poi_model, "",
+                                      get_n_whole_part(poi_model) + 1),
+                            print_val("", poi_model, "",
+                                      get_n_whole_part(poi_model) + 1,
+                                      suffix = "\n(standard scenario)")),
+                     print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
+                               rl_sf[rl_index])),
+                 Colour = c("black", "red", "royalblue", "forestgreen",
+                            "grey50", "grey0"),
+                 stringsAsFactors = FALSE)
+               d_text$Response <- d_text$Response +
+                 c(diff(y_breaks[1:2]), 0, 0,
+                   rep(diff(y_breaks[1:2]), 2),
+                   diff(y_breaks[1:2])) * 1 / c(-10, 1, 1, -2, -2, -10)
+             },
+             "upper" = {
+               d_text <- data.frame(
+                 Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
+                 Response = c(sl, t_exp[rl_index, wcsl_model_name],
+                              wc_icpt[rl_index], rep(sl, 2),
+                              t_exp[rl_index, "Rel.Spec"]),
+                 Label =
+                   c(print_val("USL: ", sl, rvu, sl_sf),
+                     print_val("",  t_exp[rl_index, wcsl_model_name], rvu,
+                               rl_sf[rl_index], suffix = " "),
+                     print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
+                               suffix = " "),
+                     ifelse(plot_option %in% "lean2",
+                            print_val("", poi_woca, "",
+                                      get_n_whole_part(poi_woca) + 1),
+                            print_val("", poi_woca, "",
+                                      get_n_whole_part(poi_woca) + 1,
+                                      suffix = "\n(worst case scenario)")),
+                     ifelse(plot_option %in% "lean2",
+                            print_val("", poi_model, "",
+                                      get_n_whole_part(poi_model) + 1),
+                            print_val("", poi_model, "",
+                                      get_n_whole_part(poi_model) + 1,
+                                      suffix = "\n(standard scenario)")),
+                     print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
+                               rl_sf[rl_index])),
+                 Colour = c("black", "red", "royalblue", "forestgreen",
+                            "grey50", "grey0"),
+                 stringsAsFactors = FALSE)
+               d_text$Response <- d_text$Response +
+                 c(diff(y_breaks[1:2]), 0, 0,
+                   rep(diff(y_breaks[1:2]), 2),
+                   diff(y_breaks[1:2])) * 1 / c(10, 1, 1, 2, 2, 10)
+             })
+    }
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  return(d_text)
+}
+
+#' Prepare horizontal lines
+#'
+#' The function \code{get_hlines()} prepares a data frame for putting
+#' horizontal lines on a plot prepared by the \code{ggplot()} function from
+#' the \sQuote{\code{ggplot2}} package
+#'
+#' @inheritParams get_text_annotation
+#'
+#' @details The function \code{get_hlines()} expects various pieces
+#' of information characterising an \sQuote{\code{expirest_osle}} or an
+#' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
+#' the function prepares a data frame that can be handed over to the
+#' \code{geom_hline()} function from the \sQuote{\code{ggplot2}} package.
+#'
+#' @return A data frame with the columns Response, Item, Colour and Type
+#' is returned.
+#'
+#' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
+#'   \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#'
+#' @keywords internal
+
+get_hlines <- function(sl, ivl_side) {
+  if (length(sl) == 2) {
+    d_hlines <- data.frame(Response = sl,
+                           Item = c("LSL", "USL"),
+                           Colour = as.character(c("black", "black")),
+                           Type = as.character(c("dotted", "dotted")),
+                           stringsAsFactors = FALSE)
+  } else {
+    switch(ivl_side,
+           "lower" = {
+             d_hlines <- data.frame(Response = sl,
+                                    Item = c("LSL"),
+                                    Colour = as.character(c("black")),
+                                    Type = as.character(c("dotted")),
+                                    stringsAsFactors = FALSE)
+           },
+           "upper" = {
+             d_hlines <- data.frame(Response = sl,
+                                    Item = c("USL"),
+                                    Colour = as.character(c("black")),
+                                    Type = as.character(c("dotted")),
+                                    stringsAsFactors = FALSE)
+           })
+  }
+
+  return(d_hlines)
+}
+
+#' Prepare segments explaining graphical elements
+#'
+#' The function \code{get_segments()} prepares a data frame for putting
+#' segments on a plot prepared by the \code{ggplot()} function from
+#' the \sQuote{\code{ggplot2}} package
+#'
+#' @param rl A numeric value or a numeric vector specifying the release
+#'   specification limit(s) for which the corresponding expiry should be
+#'   estimated.
+#' @param sl_model_name A character string specifying the name of the
+#'   model with the shelf life limit.
+#' @inheritParams get_text_annotation
+#'
+#' @details The function \code{get_segments()} expects various pieces
+#' of information characterising an \sQuote{\code{expirest_osle}} or an
+#' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
+#' the function prepares a data frame that can be handed over to the
+#' \code{geom_vline()} function from the \sQuote{\code{ggplot2}} package.
+#'
+#' @return A data frame with the columns Time.1, Time.2, Response.1,
+#' Response.2, Item, Colour, Type, Size. Time.1 and Time.2 represent the
+#' maximal allowed difference over time from intercept and Response.1 and
+#' Response.2 represent the release limit.
+#'
+#' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
+#'   \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#'
+#' @keywords internal
+
+get_segments <- function(sl, ivl_side, t_exp, rl, rl_index, poi_woca,
+                         wc_icpt, x_range, sl_model_name, wcsl_model_name) {
+  if (length(sl) == 2) {
+    switch(ivl_side,
+           "lower" = {
+             d_seg <- data.frame(
+               Time.1 =
+                 c(0, 0,
+                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
+                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
+               Time.2 =
+                 c(poi_woca, x_range[2],
+                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
+                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
+               Response.1 =
+                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl[1],
+                   t_exp[rl_index, wcsl_model_name]),
+               Response.2 =
+                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
+                   wc_icpt[rl_index]),
+               Item = c("x.delta", "x.delta.shifted", "y.delta",
+                        "y.delta.shifted"),
+               Colour = c("red", "grey0", "grey50", "grey50"),
+               Type = c("dashed", "dotted", rep("solid", 2)),
+               Size = c(rep(0.5, 2), rep(1, 2)),
+               stringsAsFactors = FALSE)
+           },
+           "upper" = {
+             d_seg <- data.frame(
+               Time.1 =
+                 c(0, 0,
+                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
+                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
+               Time.2 =
+                 c(poi_woca, x_range[2],
+                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
+                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
+               Response.1 =
+                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl[2],
+                   t_exp[rl_index, wcsl_model_name]),
+               Response.2 =
+                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
+                   wc_icpt[rl_index]),
+               Item = c("x.delta", "x.delta.shifted", "y.delta",
+                        "y.delta.shifted"),
+               Colour = c("red", "grey0", "grey50", "grey50"),
+               Type = c("dashed", "dotted", rep("solid", 2)),
+               Size = c(rep(0.5, 2), rep(1, 2)),
+               stringsAsFactors = FALSE)
+           })
+  } else {
+    d_seg <- data.frame(
+      Time.1 = c(0, 0,
+                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
+                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
+      Time.2 = c(poi_woca, x_range[2],
+                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
+                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
+      Response.1 =
+        c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl,
+          t_exp[rl_index, wcsl_model_name]),
+      Response.2 =
+        c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
+          wc_icpt[rl_index]),
+      Item = c("x.delta", "x.delta.shifted", "y.delta", "y.delta.shifted"),
+      Colour = c("red", "grey0", "grey50", "grey50"),
+      Type = c("dashed", "dotted", rep("solid", 2)),
+      Size = c(rep(0.5, 2), rep(1, 2)),
+      stringsAsFactors = FALSE)
+  }
+
+  return(d_seg)
+}
+
+#' Prepare arrow supporting the explanation of graphical elements
+#'
+#' The function \code{get_arrows()} prepares a data frame for putting an
+#' arrow on a plot prepared by the \code{ggplot()} function from
+#' the \sQuote{\code{ggplot2}} package
+#'
+#' @inheritParams get_segments
+#'
+#' @details The function \code{get_arrows()} expects various pieces
+#' of information characterising an \sQuote{\code{expirest_osle}} or an
+#' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
+#' the function prepares a data frame that can be handed over to the
+#' \code{geom_vline()} function from the \sQuote{\code{ggplot2}} package.
+#'
+#' @return A data frame with the columns Time.1, Time.2, Response.1, Response.2,
+#' Item, Colour, Line.Type, Arrow.Type, Size, Curvature, Angle and Length.
+#' Time.1 and Time.2 represent the maximal allowed difference over time from
+#' intercept and Response.1 and Response.2 represent the release limit.
+#'
+#' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
+#'   \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#'
+#' @keywords internal
+
+get_arrow <- function(sl, ivl_side, t_exp, rl, rl_index, poi_woca,
+                         wc_icpt, x_range, sl_model_name, wcsl_model_name) {
+  if (length(sl) == 2) {
+    switch(ivl_side,
+           "lower" = {
+             d_arr <- data.frame(
+               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
+               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
+               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
+                                 wc_icpt[rl_index]) / 2),
+               Response.2 = c((sl[1] + rl[rl_index]) / 2),
+               Item = c("arrow"),
+               Colour = c("grey50"),
+               Line.Type = c("solid"),
+               Arrow.Type = c("closed"),
+               Size = 0.5,
+               Curvature = 0.5,
+               Angle = 90,
+               Length = ceiling(log2(x_range[2])),
+               stringsAsFactors = FALSE)
+           },
+           "upper" = {
+             d_arr <- data.frame(
+               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
+               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
+               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
+                                 wc_icpt[rl_index]) / 2),
+               Response.2 = c((sl[2] + rl[rl_index]) / 2),
+               Item = c("arrow"),
+               Colour = c("grey50"),
+               Line.Type = c("solid"),
+               Arrow.Type = c("closed"),
+               Size = 0.5,
+               Curvature = -0.5,
+               Angle = 90,
+               Length = ceiling(log2(x_range[2])),
+               stringsAsFactors = FALSE)
+           })
+  } else {
+    switch(ivl_side,
+           "lower" = {
+             d_arr <- data.frame(
+               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
+               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
+               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
+                                 wc_icpt[rl_index]) / 2),
+               Response.2 = c((sl + rl[rl_index]) / 2),
+               Item = c("arrow"),
+               Colour = c("grey50"),
+               Line.Type = c("solid"),
+               Arrow.Type = c("closed"),
+               Size = 0.5,
+               Curvature = 0.5,
+               Angle = 90,
+               Length = ceiling(log2(x_range[2])),
+               stringsAsFactors = FALSE)
+           },
+           "upper" = {
+             d_arr <- data.frame(
+               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
+               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
+               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
+                                 wc_icpt[rl_index]) / 2),
+               Response.2 = c((sl + rl[rl_index]) / 2),
+               Item = c("arrow"),
+               Colour = c("grey50"),
+               Line.Type = c("solid"),
+               Arrow.Type = c("closed"),
+               Size = 0.5,
+               Curvature = -0.5,
+               Angle = 90,
+               Length = ceiling(log2(x_range[2])),
+               stringsAsFactors = FALSE)
+           })
+  }
+
+  return(d_arr)
+}

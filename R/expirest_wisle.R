@@ -909,8 +909,7 @@ plot_expirest_wisle <- function(
   rl <- l_lim[["rl"]]
 
   # POI with the upper or lower confidence or prediction interval of the
-  # linear regression model and worst case scenario (woca) case
-  # Most appropriate model
+  # linear regression model representing the worst case scenario (woca) case
   poi_model <- t_exp[rl_index, poi_model_name]
   poi_woca <- t_exp[rl_index, sl_model_name]
 
@@ -1049,205 +1048,18 @@ plot_expirest_wisle <- function(
   # POI worst case (low at poi.woca), POI model (low at poi.model)
   # RL (lower right or upper right)
 
-  y_breaks <- pretty(y_range, 5)
-
-  if (length(sl) == 2) {
-    d_text <- data.frame(
-      Time = c(rep(x_range[2], 2), 0, 0, poi_woca, poi_model),
-      Response = c(sl, t_exp[rl_index, wcsl_model_name], wc_icpt[rl_index],
-                   rep(sl[1], 2)),
-      Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
-                print_val("USL: ", sl[2], rvu, sl_sf[2]),
-                print_val("", t_exp[rl_index, wcsl_model_name], rvu,
-                          rl_sf[rl_index], suffix = " "),
-                print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index]),
-                ifelse(plot_option %in% "lean2",
-                       print_val("", poi_woca, "",
-                                 get_n_whole_part(poi_woca) + 1),
-                       print_val("", poi_woca, "",
-                                 get_n_whole_part(poi_woca) + 1,
-                                 suffix = "\n(worst case scenario)")),
-                ifelse(plot_option %in% "lean2",
-                       print_val("", poi_model, "",
-                                 get_n_whole_part(poi_model) + 1),
-                       print_val("", poi_model, "",
-                                 get_n_whole_part(poi_model) + 1,
-                                 suffix = "\n(standard scenario)"))),
-      Colour = c("black", "black", "red", "royalblue", "forestgreen", "grey50"),
-      stringsAsFactors = FALSE)
-
-    switch(ivl_side,
-           "lower" = {
-             d_text <- rbind(d_text, d_text[nrow(d_text), ])
-             d_text[nrow(d_text), "Time"] <- x_range[2]
-             d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
-             d_text[nrow(d_text), "Label"] <-
-               print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                         rl_sf[rl_index])
-             d_text[nrow(d_text), "Colour"] <- "grey0"
-
-             d_text$Response <- d_text$Response +
-               c(rep(diff(y_breaks[1:2]), 2), 0, 0,
-                 rep(diff(y_breaks[1:2]), 2),
-                 diff(y_breaks[1:2])) * 1 / c(-10, 10, 1, 1, -2, -2, -10)
-           },
-           "upper" = {
-             d_text <- rbind(d_text, d_text[nrow(d_text), ])
-             d_text[nrow(d_text), "Time"] <- x_range[2]
-             d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
-             d_text[nrow(d_text), "Label"] <-
-               print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                         rl_sf[rl_index])
-             d_text[nrow(d_text), "Colour"] <- "grey0"
-             d_text[5:6, "Response"] <- rep(sl[2], 2)
-
-             d_text$Response <- d_text$Response +
-               c(rep(diff(y_breaks[1:2]), 2), 0, 0,
-                 rep(diff(y_breaks[1:2]), 2),
-                 diff(y_breaks[1:2])) * 1 / c(10, 10, 1, 1, 2, 2, 1)
-           })
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_text <- data.frame(
-               Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
-               Response = c(sl, t_exp[rl_index, wcsl_model_name],
-                            wc_icpt[rl_index], rep(sl, 2),
-                            t_exp[rl_index, "Rel.Spec"]),
-               Label =
-                 c(print_val("LSL: ", sl, rvu, sl_sf),
-                   print_val("", t_exp[rl_index, wcsl_model_name], rvu,
-                             rl_sf[rl_index], suffix = " "),
-                   print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
-                             suffix = " "),
-                   ifelse(plot_option %in% "lean2",
-                          print_val("", poi_woca, "",
-                                    get_n_whole_part(poi_woca) + 1),
-                          print_val("", poi_woca, "",
-                                    get_n_whole_part(poi_woca) + 1,
-                                    suffix = "\n(worst case scenario)")),
-                   ifelse(plot_option %in% "lean2",
-                          print_val("", poi_model, "",
-                                    get_n_whole_part(poi_model) + 1),
-                          print_val("", poi_model, "",
-                                    get_n_whole_part(poi_model) + 1,
-                                    suffix = "\n(standard scenario)")),
-                   print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                             rl_sf[rl_index])),
-               Colour = c("black", "red", "royalblue", "forestgreen", "grey50",
-                          "grey0"),
-               stringsAsFactors = FALSE)
-             d_text$Response <- d_text$Response +
-               c(diff(y_breaks[1:2]), 0, 0,
-                 rep(diff(y_breaks[1:2]), 2),
-                 diff(y_breaks[1:2])) * 1 / c(-10, 1, 1, -2, -2, -10)
-           },
-           "upper" = {
-             d_text <- data.frame(
-               Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
-               Response = c(sl, t_exp[rl_index, wcsl_model_name],
-                            wc_icpt[rl_index], rep(sl, 2),
-                            t_exp[rl_index, "Rel.Spec"]),
-               Label =
-                 c(print_val("USL: ", sl, rvu, sl_sf),
-                   print_val("",  t_exp[rl_index, wcsl_model_name], rvu,
-                             rl_sf[rl_index], suffix = " "),
-                   print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
-                             suffix = " "),
-                   ifelse(plot_option %in% "lean2",
-                          print_val("", poi_woca, "",
-                                    get_n_whole_part(poi_woca) + 1),
-                          print_val("", poi_woca, "",
-                                    get_n_whole_part(poi_woca) + 1,
-                                    suffix = "\n(worst case scenario)")),
-                   ifelse(plot_option %in% "lean2",
-                          print_val("", poi_model, "",
-                                    get_n_whole_part(poi_model) + 1),
-                          print_val("", poi_model, "",
-                                    get_n_whole_part(poi_model) + 1,
-                                    suffix = "\n(standard scenario)")),
-                   print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                             rl_sf[rl_index])),
-               Colour = c("black", "red", "royalblue", "forestgreen", "grey50",
-                          "grey0"),
-               stringsAsFactors = FALSE)
-             d_text$Response <- d_text$Response +
-               c(diff(y_breaks[1:2]), 0, 0,
-                 rep(diff(y_breaks[1:2]), 2),
-                 diff(y_breaks[1:2])) * 1 / c(10, 1, 1, 2, 2, 10)
-           })
-  }
-
-  if (sum(xform %in% "no") == 2) {
-    colnames(d_text) <- c(time_vbl, response_vbl, "Label", "Colour")
-  }
-  if (sum(xform %in% "no") == 0) {
-    colnames(d_text) <- c(old_time_vbl, old_response_vbl, "Label", "Colour")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      colnames(d_text) <- c(old_time_vbl, response_vbl, "Label", "Colour")
-    }
-    if (xform[2] != "no") {
-      colnames(d_text) <- c(time_vbl, old_response_vbl, "Label", "Colour")
-    }
-  }
-
-  # If plot_option is "full": plot the complete information.
-  # If plot_option is "lean1" or "lean2": plot LRL or URL, USL and / or LSL,
-  # worst case and standard scenario.
-  # If plot_option is "basic1" or "basic2": plot USL and / or LSL.
-  switch(plot_option,
-         "full" = {
-           show_text <- rep(TRUE, nrow(d_text))
-         },
-         "lean1" = {
-           show_text <- d_text$Colour %in% c("black", "forestgreen", "grey50")
-         },
-         "lean2" = {
-           show_text <- d_text$Colour %in% c("black", "forestgreen", "grey50")
-         },
-         "basic1" = {
-           show_text <- d_text$Colour %in% c("black")
-         },
-         "basic2" = {
-           show_text <- rep(FALSE, nrow(d_text))
-         })
+  d_text <-
+    get_text_annotation(rvu = rvu, x_range = x_range, y_range = y_range,
+                        sl = sl, sl_sf = sl_sf, poi_model = poi_model,
+                        ivl_side = ivl_side, poi_woca = poi_woca,
+                        t_exp = t_exp, wc_icpt = wc_icpt, rl_sf = rl_sf,
+                        rl_index = rl_index, wcsl_model_name = wcsl_model_name,
+                        plot_option = plot_option)
 
   # <-><-><->
   # d_hlines - display of horizontal lines
 
-  if (length(sl) == 2) {
-    d_hlines <- data.frame(Response = sl,
-                           Item = c("LSL", "USL"),
-                           Colour = as.character(c("black", "black")),
-                           Type = as.character(c("dotted", "dotted")),
-                           stringsAsFactors = FALSE)
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_hlines <-
-               data.frame(Response = sl,
-                          Item = c("LSL"),
-                          Colour = as.character(c("black")),
-                          Type = as.character(c("dotted")),
-                          stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_hlines <-
-               data.frame(Response = sl,
-                          Item = c("USL"),
-                          Colour = as.character(c("black")),
-                          Type = as.character(c("dotted")),
-                          stringsAsFactors = FALSE)
-           })
-  }
-
-  if (xform[2] != "no") {
-    colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
-  } else {
-    colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
-  }
+  d_hlines <- get_hlines(sl, ivl_side)
 
   # <-><-><->
   # d_vlines - display of vertical lines
@@ -1257,12 +1069,6 @@ plot_expirest_wisle <- function(
                          Colour = c("forestgreen", "grey50"),
                          Type = c("dashed", "dotdash"),
                          stringsAsFactors = FALSE)
-
-  if (xform[1] != "no") {
-    colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
-  } else {
-    colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
-  }
 
   # <-><-><->
   # d_seg - display of segments explaining the TGA method
@@ -1274,195 +1080,42 @@ plot_expirest_wisle <- function(
   # Maximal allowed difference over time from intercept (vertical)
   # The elements of d_seg are not displayed if plot_option is "basic".
 
-  if (length(sl) == 2) {
-    switch(ivl_side,
-           "lower" = {
-             d_seg <- data.frame(
-               Time.1 =
-                 c(0, 0,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-               Time.2 =
-                 c(poi_woca, x_range[2],
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-               Response.1 =
-                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl[1],
-                   t_exp[rl_index, wcsl_model_name]),
-               Response.2 =
-                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
-                   wc_icpt[rl_index]),
-               Item = c("x.delta", "x.delta.shifted", "y.delta",
-                        "y.delta.shifted"),
-               Colour = c("red", "grey0", "grey50", "grey50"),
-               Type = c("dashed", "dotted", rep("solid", 2)),
-               Size = c(rep(0.5, 2), rep(1, 2)),
-               stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_seg <- data.frame(
-               Time.1 =
-                 c(0, 0,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-               Time.2 =
-                 c(poi_woca, x_range[2],
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-               Response.1 =
-                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl[2],
-                   t_exp[rl_index, wcsl_model_name]),
-               Response.2 =
-                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
-                   wc_icpt[rl_index]),
-               Item = c("x.delta", "x.delta.shifted", "y.delta",
-                        "y.delta.shifted"),
-               Colour = c("red", "grey0", "grey50", "grey50"),
-               Type = c("dashed", "dotted", rep("solid", 2)),
-               Size = c(rep(0.5, 2), rep(1, 2)),
-               stringsAsFactors = FALSE)
-           })
-  } else {
-    d_seg <- data.frame(
-      Time.1 = c(0, 0,
-                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-      Time.2 = c(poi_woca, x_range[2],
-                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-      Response.1 =
-        c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl,
-          t_exp[rl_index, wcsl_model_name]),
-      Response.2 =
-        c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
-          wc_icpt[rl_index]),
-      Item = c("x.delta", "x.delta.shifted", "y.delta", "y.delta.shifted"),
-      Colour = c("red", "grey0", "grey50", "grey50"),
-      Type = c("dashed", "dotted", rep("solid", 2)),
-      Size = c(rep(0.5, 2), rep(1, 2)),
-      stringsAsFactors = FALSE)
-  }
-
-  if (sum(xform %in% "no") == 2) {
-    colnames(d_seg) <- c(paste(time_vbl, 1:2, sep = "."),
-                         paste(response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Type", "Size")
-  }
-  if (sum(xform %in% "no") == 0) {
-    colnames(d_seg) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                         paste(old_response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Type", "Size")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      colnames(d_seg) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                           paste(response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Type", "Size")
-    }
-    if (xform[2] != "no") {
-      colnames(d_seg) <- c(paste(time_vbl, 1:2, sep = "."),
-                           paste(old_response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Type", "Size")
-    }
-  }
-
-  # If plot_option is "full": plot the complete information.
-  # If plot_option is "lean1" or "lean2": do not plot vertical grey segments.
-  # If plot_option is "basic1" or "basic2": no segments are plotted (and thus
-  # the object show_seg is not needed.
-  if (plot_option == "full") {
-    show_seg <- rep(TRUE, nrow(d_seg))
-  }
-
-  if (plot_option %in% c("lean1", "lean2")) {
-    show_seg <- d_seg$Colour != "grey50"
-  }
+  d_seg <- get_segments(sl = sl, ivl_side = ivl_side, t_exp = t_exp, rl = rl,
+                        rl_index = rl_index, sl_model_name = sl_model_name,
+                        poi_woca = poi_woca, wc_icpt = wc_icpt,
+                        x_range = x_range, wcsl_model_name = wcsl_model_name)
 
   # <-><-><->
   # d_arr - display of arrow explaining the TGA method
   # The elements of d_arr are not displayed if plot_option is not "full".
 
-  if (length(sl) == 2) {
-    switch(ivl_side,
-           "lower" = {
-             d_arr <- data.frame(
-               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
-               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
-               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
-                                 wc_icpt[rl_index]) / 2),
-               Response.2 = c((sl[1] + rl[rl_index]) / 2),
-               Item = c("arrow"),
-               Colour = c("grey50"),
-               Line.Type = c("solid"),
-               Arrow.Type = c("closed"),
-               Size = 0.5,
-               Curvature = 0.5,
-               Angle = 90,
-               Length = ceiling(log2(x_range[2])),
-               stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_arr <- data.frame(
-               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
-               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
-               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
-                                 wc_icpt[rl_index]) / 2),
-               Response.2 = c((sl[2] + rl[rl_index]) / 2),
-               Item = c("arrow"),
-               Colour = c("grey50"),
-               Line.Type = c("solid"),
-               Arrow.Type = c("closed"),
-               Size = 0.5,
-               Curvature = -0.5,
-               Angle = 90,
-               Length = ceiling(log2(x_range[2])),
-               stringsAsFactors = FALSE)
-           })
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_arr <- data.frame(
-               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
-               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
-               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
-                                 wc_icpt[rl_index]) / 2),
-               Response.2 = c((sl + rl[rl_index]) / 2),
-               Item = c("arrow"),
-               Colour = c("grey50"),
-               Line.Type = c("solid"),
-               Arrow.Type = c("closed"),
-               Size = 0.5,
-               Curvature = 0.5,
-               Angle = 90,
-               Length = ceiling(log2(x_range[2])),
-               stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_arr <- data.frame(
-               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
-               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
-               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
-                                 wc_icpt[rl_index]) / 2),
-               Response.2 = c((sl + rl[rl_index]) / 2),
-               Item = c("arrow"),
-               Colour = c("grey50"),
-               Line.Type = c("solid"),
-               Arrow.Type = c("closed"),
-               Size = 0.5,
-               Curvature = -0.5,
-               Angle = 90,
-               Length = ceiling(log2(x_range[2])),
-               stringsAsFactors = FALSE)
-           })
-  }
+  d_arr <- get_arrow(sl = sl, ivl_side = ivl_side, t_exp = t_exp, rl = rl,
+                     rl_index = rl_index, sl_model_name = sl_model_name,
+                     wc_icpt = wc_icpt, x_range = x_range,
+                     wcsl_model_name = wcsl_model_name)
+
+  # <-><-><->
+  # Renaming of columns for plotting on the original scale
 
   if (sum(xform %in% "no") == 2) {
+    colnames(d_text) <- c(time_vbl, response_vbl, "Label", "Colour")
+    colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
+    colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
+    colnames(d_seg) <- c(paste(time_vbl, 1:2, sep = "."),
+                         paste(response_vbl, 1:2, sep = "."),
+                         "Item", "Colour", "Type", "Size")
     colnames(d_arr) <- c(paste(time_vbl, 1:2, sep = "."),
                          paste(response_vbl, 1:2, sep = "."),
                          "Item", "Colour", "Line.Type", "Arrow.Type",
                          "Size", "Curvature", "Angle", "Length")
   }
   if (sum(xform %in% "no") == 0) {
+    colnames(d_text) <- c(old_time_vbl, old_response_vbl, "Label", "Colour")
+    colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
+    colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
+    colnames(d_seg) <- c(paste(old_time_vbl, 1:2, sep = "."),
+                         paste(old_response_vbl, 1:2, sep = "."),
+                         "Item", "Colour", "Type", "Size")
     colnames(d_arr) <- c(paste(old_time_vbl, 1:2, sep = "."),
                          paste(old_response_vbl, 1:2, sep = "."),
                          "Item", "Colour", "Line.Type", "Arrow.Type",
@@ -1470,18 +1123,63 @@ plot_expirest_wisle <- function(
   }
   if (sum(xform %in% "no") == 1) {
     if (xform[1] != "no") {
+      colnames(d_text) <- c(old_time_vbl, response_vbl, "Label", "Colour")
+      colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
+      colnames(d_seg) <- c(paste(old_time_vbl, 1:2, sep = "."),
+                           paste(response_vbl, 1:2, sep = "."),
+                           "Item", "Colour", "Type", "Size")
       colnames(d_arr) <- c(paste(old_time_vbl, 1:2, sep = "."),
                            paste(response_vbl, 1:2, sep = "."),
                            "Item", "Colour", "Line.Type", "Arrow.Type",
                            "Size", "Curvature", "Angle", "Length")
+    } else {
+      colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
     }
     if (xform[2] != "no") {
+      colnames(d_text) <- c(time_vbl, old_response_vbl, "Label", "Colour")
+      colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
+      colnames(d_seg) <- c(paste(time_vbl, 1:2, sep = "."),
+                           paste(old_response_vbl, 1:2, sep = "."),
+                           "Item", "Colour", "Type", "Size")
       colnames(d_arr) <- c(paste(time_vbl, 1:2, sep = "."),
                            paste(old_response_vbl, 1:2, sep = "."),
                            "Item", "Colour", "Line.Type", "Arrow.Type",
                            "Size", "Curvature", "Angle", "Length")
+    } else {
+      colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
     }
   }
+
+  # <-><-><->
+  # Determination of items to be shown depending on plot_option
+
+  # If plot_option is "full": plot the complete information.
+  # If plot_option is "lean1" or "lean2":
+  # - Plot LRL or URL, USL and / or LSL, worst case and standard scenario.
+  # -  Do not plot vertical grey segments.
+  # If plot_option is "basic1" or "basic2":
+  # - Plot USL and / or LSL.
+  # - Do not show segments (no need for show_seg at all)
+
+  switch(plot_option,
+         "full" = {
+           show_text <- rep(TRUE, nrow(d_text))
+           show_seg <- rep(TRUE, nrow(d_seg))
+         },
+         "lean1" = {
+           show_text <- d_text$Colour %in% c("black", "forestgreen", "grey50")
+           show_seg <- d_seg$Colour != "grey50"
+         },
+         "lean2" = {
+           show_text <- d_text$Colour %in% c("black", "forestgreen", "grey50")
+           show_seg <- d_seg$Colour != "grey50"
+         },
+         "basic1" = {
+           show_text <- d_text$Colour %in% c("black")
+         },
+         "basic2" = {
+           show_text <- rep(FALSE, nrow(d_text))
+         })
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ggplot object

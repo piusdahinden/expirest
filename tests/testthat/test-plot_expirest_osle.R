@@ -224,27 +224,27 @@ test_that("plot_expirest_osle_succeeds_with_transformations", {
       model = re4, show_grouping = "no", response_vbl_unit = "% (w/w)",
       y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
       plot_option = "full", ci_app = "line"))
-    suppressWarnings(tmp5 <-
+  suppressWarnings(tmp5 <-
     plot_expirest_osle(
       model = re5, show_grouping = "no", response_vbl_unit = "% (w/w)",
       y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
       plot_option = "full", ci_app = "ribbon"))
-    suppressWarnings(tmp6 <-
+  suppressWarnings(tmp6 <-
     plot_expirest_osle(
       model = re5, show_grouping = "no", response_vbl_unit = "% (w/w)",
       y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
       plot_option = "full", ci_app = "ribbon"))
-    suppressWarnings(tmp7 <-
+  suppressWarnings(tmp7 <-
     plot_expirest_osle(
       model = re7, show_grouping = "no", response_vbl_unit = "% (w/w)",
       y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
       plot_option = "lean", ci_app = "line"))
-    suppressWarnings(tmp8 <-
+  suppressWarnings(tmp8 <-
     plot_expirest_osle(
       model = re8, show_grouping = "no", response_vbl_unit = "% (w/w)",
       y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
       plot_option = "lean", ci_app = "ribbon"))
-    suppressWarnings(tmp9 <-
+  suppressWarnings(tmp9 <-
     plot_expirest_osle(
       model = re9, show_grouping = "no", response_vbl_unit = "% (w/w)",
       y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",

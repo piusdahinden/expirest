@@ -38,7 +38,7 @@ with the response variable. The default is \code{NULL}.}
 the range of the response variable to be plotted.}
 
 \item{x_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the time  variable to be plotted. The default is \code{NULL}
+the range of the time variable to be plotted. The default is \code{NULL}
 and the \eqn{x} range is calculated automatically on the basis of the
 estimated shelf life.}
 
