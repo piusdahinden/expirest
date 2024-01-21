@@ -1,68 +1,63 @@
 context("What-if (approach for) shelf life estimation")
 
 test_that("expirest_wisle_estimation_succeeds_for_poi", {
-  usl <- 4.5
-  lsl <- 0.5
-  lrl <- 2.0
-  url <- 3.0
-
-  l_res <- list()
+  l_res <- vector(mode = "list", length = 8)
 
   # <-><-><-><->
 
-  l_res[[length(l_res) + 1]] <-
+  l_res[[1]] <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = lrl, rl_sf = 3, sl = lsl, sl_sf = 2,
+      batch_vbl = "Batch", rl = 2.0, rl_sf = 3, sl = 0.5, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")[["POI"]]
-  l_res[[length(l_res) + 1]] <-
+  l_res[[2]] <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = lrl, rl_sf = 3, sl = lsl, sl_sf = 2,
+      batch_vbl = "Batch", rl = 2.0, rl_sf = 3, sl = 0.5, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "prediction", ivl_type = "one.sided", ivl_side = "lower")[["POI"]]
-  l_res[[length(l_res) + 1]] <-
+  l_res[[3]] <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = url, rl_sf = 3, sl = usl, sl_sf = 2,
+      batch_vbl = "Batch", rl = 3.0, rl_sf = 3, sl = 4.5, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "upper")[["POI"]]
-  l_res[[length(l_res) + 1]] <-
+  l_res[[4]] <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = url, rl_sf = 3, sl = usl, sl_sf = 2,
+      batch_vbl = "Batch", rl = 3.0, rl_sf = 3, sl = 4.5, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "prediction", ivl_type = "one.sided", ivl_side = "upper")[["POI"]]
-  l_res[[length(l_res) + 1]] <-
+  l_res[[5]] <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = lrl, rl_sf = 3, sl = lsl, sl_sf = 2,
+      batch_vbl = "Batch", rl = 2.0, rl_sf = 3, sl = 0.5, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "two.sided", ivl_side = "lower")[["POI"]]
-  l_res[[length(l_res) + 1]] <-
+  l_res[[6]] <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = lrl, rl_sf = 3, sl = lsl, sl_sf = 2,
+      batch_vbl = "Batch", rl = 2.0, rl_sf = 3, sl = 0.5, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "prediction", ivl_type = "two.sided", ivl_side = "lower")[["POI"]]
-  l_res[[length(l_res) + 1]] <-
+  l_res[[7]] <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = url, rl_sf = 3, sl = usl, sl_sf = 2,
+      batch_vbl = "Batch", rl = 3.0, rl_sf = 3, sl = 4.5, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "two.sided", ivl_side = "upper")[["POI"]]
-  l_res[[length(l_res) + 1]] <-
+  l_res[[8]] <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = url, rl_sf = 3, sl = usl, sl_sf = 2,
+      batch_vbl = "Batch", rl = 3.0, rl_sf = 3, sl = 4.5, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "prediction", ivl_type = "two.sided", ivl_side = "upper")[["POI"]]
@@ -77,6 +72,10 @@ test_that("expirest_wisle_estimation_succeeds_for_poi", {
                              double(1)), 12),
                c(89.8717192065, 72.2813738660, 71.7431531307, 53.3870614673,
                  74.1940890259, 50.8809265809, 61.3857588081, 36.7607873047))
+  expect_equal(signif(vapply(l_res, function(x) x[1, "Shelf.Life.dids.pmse"],
+                             double(1)), 12),
+               c(33.1646535749, 21.6496175929, 31.4687060221, 19.7997864734,
+                 29.8437393901, NA, 28.4629285602, NA))
   expect_equal(signif(vapply(l_res, function(x) x[1, "Shelf.Life.dids"],
                              double(1)), 12),
                c(32.0995817441, 28.3162280937, 34.6801744921, 18.8338397352,
@@ -151,6 +150,85 @@ test_that("expirest_wisle_estimation_succeeds_with_transformations", {
   expect_equal(signif(tmp, 12),
                c(1.24633645239, 9.92303429998, 14.2215253811, 24.0097015693,
                  26.9485678209, 33.2240413518, 29.2139414080))
+})
+
+test_that("expirest_wisle_estimation_succeeds_with_a_single_batch", {
+  l_res <- vector(mode = "list", length = 3)
+
+  # <-><-><-><->
+
+  l_res[[1]] <-
+    expirest_wisle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", rl = 1.5, rl_sf = 3,
+      sl = 4.5, sl_sf = 2, srch_range = c(0, 5000), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")[["POI"]]
+  l_res[[2]] <-
+    expirest_wisle(
+      data = exp3[exp3$Batch == "b2", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", rl = 1.5, rl_sf = 3,
+      sl = 4.5, sl_sf = 2, srch_range = c(0, 5000), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")[["POI"]]
+  l_res[[3]] <-
+    expirest_wisle(
+      data = exp3[exp3$Batch == "b3", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", rl = 1.5, rl_sf = 3,
+      sl = 4.5, sl_sf = 2, srch_range = c(0, 5000), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")[["POI"]]
+
+  # <-><-><-><->
+
+  expect_equal(is.na(vapply(l_res, function(x) x[1, "Shelf.Life.cics"],
+                            double(1))), rep(TRUE, 3))
+  expect_equal(is.na(vapply(l_res, function(x) x[1, "Shelf.Life.dics"],
+                            double(1))), rep(TRUE, 3))
+  expect_equal(is.na(vapply(l_res, function(x) x[1, "Shelf.Life.dids.pmse"],
+                            double(1))), rep(TRUE, 3))
+  expect_equal(signif(vapply(l_res, function(x) x[1, "Shelf.Life.dids"],
+                             double(1)), 12),
+               c(64.7437051332, 152.223693637, 63.9895243084))
+})
+
+test_that("expirest_wisle_estimation_succeeds_with_a_single_batch_xfrmd", {
+  tmp <- rep(NA, 3)
+
+  # <-><-><-><->
+
+  tmp[1] <-
+    expirest_wisle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", rl = 1.5, rl_sf = 3,
+      sl = 4.5, sl_sf = 2, srch_range = c(0, 5000), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("sq", "sq"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")[["POI"]][1, "Shelf.Life.dids"]
+  tmp[2] <-
+    expirest_wisle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", rl = 1.5, rl_sf = 3,
+      sl = 4.5, sl_sf = 2, srch_range = c(0, 5000), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("sq", "no"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")[["POI"]][1, "Shelf.Life.dids"]
+  tmp[3] <-
+    expirest_wisle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", rl = 1.5, rl_sf = 3,
+      sl = 4.5, sl_sf = 2, srch_range = c(0, 5000), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("no", "sq"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")[["POI"]][1, "Shelf.Life.dids"]
+
+  # <-><-><-><->
+
+  expect_equal(signif(tmp, 12),
+               c(43.2875229176, 40.2443864798, 74.4096683313))
 })
 
 test_that("expirest_wisle_estimation_succeeds_for_model_type", {
@@ -601,7 +679,15 @@ test_that("expirest_wisle_fails_with_error", {
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "middle"),
-    "specify ivl_side either as \"lower\" or \"upper\"")
+    "specify ivl_side either as \"lower\", \"upper\" or \"both\"")
+  expect_error(
+    expirest_wisle(
+      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
+      batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95, sl_sf = 3,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
+      ivl = "confidence", ivl_type = "one.sided", ivl_side = "both"),
+    "Please provide a specification with two sides.")
   expect_error(
     expirest_wisle(
       data = t_dat, response_vbl = "Potency", time_vbl = "Month",

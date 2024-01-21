@@ -8,14 +8,14 @@ extract_wc_x(l1, l2)
 }
 \arguments{
 \item{l1}{A list of matrices of \eqn{x} values or a list of lists of one
-element being a numeric vector. The list must have three elements named
-\code{"cics"}, \code{"dics"} and \code{"dids"}.}
+element being a numeric vector. The list must have four elements named
+\code{"cics"}, \code{"dics"}, \code{"dids.pmse"} and \code{"dids"}.}
 
 \item{l2}{A list of vectors of indices which specify the worst case elements.
-The list must have three elements named \code{"cics"}, \code{"dics"} and
-\code{"dids"}. The length of \code{l2} must be equal to the length of
-\code{l1} and the length of the vectors of \code{l2} must be equal to the
-number of rows of the matrices in \code{l1}.}
+As \code{l1}, the list must have four elements named \code{"cics"},
+\code{"dics"}, \code{"dids.pmse"} and \code{"dids"}. The length of the
+vectors of \code{l2} must be equal to the number of rows of the matrices
+in \code{l1} or the length of the vectors of the list elements.}
 }
 \value{
 A matrix of the worst case values with the number of rows

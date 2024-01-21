@@ -162,6 +162,11 @@ test_that("find_poi_fails", {
              ivl_type = "one.sided", ivl_side = "lower"),
     "sl must be a numeric value of length 1")
   expect_error(
+    find_poi(srch_range = c(0, 500), model = r_moist, sl = c(95, 105),
+             mode = "minimal", alpha = 0.05, ivl = "confidence",
+             ivl_type = "one.sided", ivl_side = "lower"),
+    "sl must be a numeric value of length 1")
+  expect_error(
     find_poi(srch_range = c(0, 500), model = r_moist, sl = lsl,
              mode = "maximal", alpha = 0.05, ivl = "confidence",
              ivl_type = "one.sided", ivl_side = "lower"),

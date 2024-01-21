@@ -32,7 +32,7 @@ containing the following elements:
   obtained from fitting a regression model to the data of each level of the
   categorical variable separately. The \code{cics}, \code{dics} and
   \code{dids.pmse} elements are \code{NA} if data of only a single batch
-  are available.}
+  is available.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)

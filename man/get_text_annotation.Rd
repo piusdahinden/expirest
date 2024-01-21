@@ -13,7 +13,7 @@ get_text_annotation(
   poi_model,
   ivl_side,
   poi_woca = NULL,
-  t_exp = NULL,
+  wisle_est = NULL,
   wc_icpt = NULL,
   rl_sf = NULL,
   rl_index = NULL,
@@ -50,10 +50,10 @@ confidence or prediction interval of the linear regression model
 representing the worst case scenario (woca) model. The default is
 \code{NULL}.}
 
-\item{t_exp}{A data frame of the intercepts, the differences between release
-and shelf life limits, the worst case scenario limits (WCSLs), the expiry
-and release specification limits, the shelf lives and POI values. The
-default is \code{NULL}.}
+\item{wisle_est}{A data frame of the intercepts, the differences between
+release and shelf life limits, the worst case scenario limits (WCSLs),
+the expiry and release specification limits, the shelf lives and POI
+values. The default is \code{NULL}.}
 
 \item{wc_icpt}{A data frame of the worst case intercepts of each of the
 four fitted models. The default is \code{NULL}.}

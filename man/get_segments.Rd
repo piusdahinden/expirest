@@ -7,7 +7,7 @@
 get_segments(
   sl,
   ivl_side,
-  t_exp,
+  wisle_est,
   rl,
   rl_index,
   poi_woca,
@@ -25,10 +25,10 @@ the specification limit or limits.}
 \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
 \code{"lower"}, respectively.}
 
-\item{t_exp}{A data frame of the intercepts, the differences between release
-and shelf life limits, the worst case scenario limits (WCSLs), the expiry
-and release specification limits, the shelf lives and POI values. The
-default is \code{NULL}.}
+\item{wisle_est}{A data frame of the intercepts, the differences between
+release and shelf life limits, the worst case scenario limits (WCSLs),
+the expiry and release specification limits, the shelf lives and POI
+values. The default is \code{NULL}.}
 
 \item{rl}{A numeric value or a numeric vector specifying the release
 specification limit(s) for which the corresponding expiry should be

@@ -100,6 +100,12 @@ test_that("plot_expirest_wisle_succeeds", {
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
       x_range = NULL, scenario = "standard", mtbs = "verified",
       plot_option = "full", ci_app = "line"))
+    suppressWarnings(tmp7 <-
+    plot_expirest_wisle(
+      model = re4, rl_index = 1, show_grouping = "no",
+      response_vbl_unit = "% (w/w)", y_range = NULL,
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "line"))
 
   # <-><-><-><->
 
@@ -354,6 +360,57 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(tmp6[["arrow"]][1, "Curvature"], 0.5)
   expect_equal(tmp6[["arrow"]][1, "Angle"], 90)
   expect_equal(tmp6[["arrow"]][1, "Length"], 7)
+
+  expect_equal(signif(tmp7[["text"]][, "Month"], 5),
+               c(70.000, 0.00000, 0.00000, 90.540, 60.761, 70.000))
+  expect_equal(signif(tmp7[["text"]][, "Moisture"], 5),
+               c(1.4000, 0.95678, 2.4568, 1.0000, 1.0000, 2.9000))
+  expect_equal(tmp7[["text"]][, "Label"],
+               c("LSL: 1.5% (w/w)", "0.957% (w/w) ", "2.46% (w/w) ",
+                 "90.5\n(worst case scenario)", "60.8\n(standard scenario)",
+                 "LRL: 3.00% (w/w)"))
+  expect_equal(tmp7[["text"]][, "Colour"],
+               c("black", "red", "royalblue", "forestgreen",
+                 "grey50", "grey0"))
+
+  expect_equal(tmp7[["hlines"]][, "Moisture"], 1.5)
+  expect_equal(tmp7[["hlines"]][, "Item"], "LSL")
+  expect_equal(tmp7[["hlines"]][, "Colour"], "black")
+  expect_equal(tmp7[["hlines"]][, "Type"], "dotted")
+
+  expect_equal(signif(tmp7[["vlines"]][, "Month"], 5), c(90.540, 60.761))
+  expect_equal(tmp7[["vlines"]][, "Item"], c("poi.woca", "poi.model"))
+  expect_equal(tmp7[["vlines"]][, "Colour"], c("forestgreen", "grey50"))
+  expect_equal(tmp7[["vlines"]][, "Type"], c("dashed", "dotdash"))
+
+  expect_equal(signif(tmp7[["segments"]][, "Month.1"], 5),
+               c(0.00000, 0.00000, -1.0000, -0.33333))
+  expect_equal(signif(tmp7[["segments"]][, "Month.2"], 5),
+               c(90.540, 70.000, -1.0000, -0.33333))
+  expect_equal(signif(tmp7[["segments"]][, "Moisture.1"], 5),
+               c(0.95678, 3.0000, 1.5000, 0.95678))
+  expect_equal(signif(tmp7[["segments"]][, "Moisture.2"], 5),
+               c(0.95678, 3.0000, 3.0000, 2.4568))
+  expect_equal(tmp7[["segments"]][, "Item"],
+               c("x.delta", "x.delta.shifted", "y.delta", "y.delta.shifted"))
+  expect_equal(tmp7[["segments"]][, "Colour"],
+               c("red", "grey0", "grey50", "grey50"))
+  expect_equal(tmp7[["segments"]][, "Type"],
+               c("dashed", "dotted", "solid", "solid"))
+  expect_equal(tmp7[["segments"]][, "Size"], c(0.5, 0.5, 1.0, 1.0))
+
+  expect_equal(signif(tmp7[["arrow"]][, "Month.1"], 5), -0.33333)
+  expect_equal(signif(tmp7[["arrow"]][, "Month.2"], 5), -1.5000)
+  expect_equal(signif(tmp7[["arrow"]][, "Moisture.1"], 5), 1.7068)
+  expect_equal(signif(tmp7[["arrow"]][, "Moisture.2"], 5), 2.2500)
+  expect_equal(tmp7[["arrow"]][1, "Item"], "arrow")
+  expect_equal(tmp7[["arrow"]][1, "Colour"], "grey50")
+  expect_equal(tmp7[["arrow"]][1, "Line.Type"], "solid")
+  expect_equal(tmp7[["arrow"]][1, "Arrow.Type"], "closed")
+  expect_equal(tmp7[["arrow"]][1, "Size"], 0.5)
+  expect_equal(tmp7[["arrow"]][1, "Curvature"], 0.5)
+  expect_equal(tmp7[["arrow"]][1, "Angle"], 90)
+  expect_equal(tmp7[["arrow"]][1, "Length"], 7)
 })
 
 test_that("plot_expirest_wisle_succeeds_with_transformations", {

@@ -353,7 +353,7 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
   # Slope	     4_14                -0.19615
 })
 
-test_that("expirest_osle_succeeds_for_poi", {
+test_that("expirest_osle_estimation_succeeds_for_poi", {
   usl <- 4.5
   lsl <- 0.5
 
@@ -425,7 +425,7 @@ test_that("expirest_osle_succeeds_for_poi", {
                  95.4652197782, 79.6924982370, 82.6037890116, 67.2979863914))
 })
 
-test_that("expirest_osle_succeeds_with_transformations", {
+test_that("expirest_osle_estimation_succeeds_with_transformations", {
   tmp <- rep(NA, 7)
 
   # <-><-><-><->
@@ -493,34 +493,75 @@ test_that("expirest_osle_succeeds_with_transformations", {
                  31.8950504925, 37.1116679193, 33.9520528257))
 })
 
-test_that("expirest_osle_succeeds_for_model_type", {
+test_that("expirest_osle_estimation_succeeds_with_a_single_batch", {
+  tmp <- rep(NA, 4)
+
+  # <-><-><-><->
+
+  tmp[1] <-
+    expirest_osle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = 0.5, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "lower")[["POI"]]["dids"]
+  tmp[2] <-
+    expirest_osle(
+      data = exp3[exp3$Batch == "b2", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = 0.5, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "lower")[["POI"]]["dids"]
+  tmp[3] <-
+    expirest_osle(
+      data = exp3[exp3$Batch == "b3", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = 0.5, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "lower")[["POI"]]["dids"]
+  tmp[4] <-
+    expirest_osle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = c(0.5, 4.5),
+      sl_sf = c(2, 2), srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "two.sided",
+      ivl_side = "both")[["POI"]]["dids"]
+
+  # <-><-><-><->
+
+  expect_equal(signif(tmp, 12),
+               c(50.0621475632, 43.7101461304, 199.8917947989, 41.1584877869))
+})
+
+test_that("expirest_osle_estimation_succeeds_for_model_type", {
   t_dat1 <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dat2 <- exp1[exp1$Batch %in% c("b3", "b4", "b5"), ]
   t_dat3 <- exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]
-
-  usl <- 105
-  lsl <- 95
 
   # <-><-><-><->
 
   r_ret1 <-
     expirest_osle(
       data = t_dat1, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", sl = lsl, sl_sf = 3, srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "tight", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "lower")
   r_ret2 <-
     expirest_osle(
       data = t_dat2, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", sl = lsl, sl_sf = 3, srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "tight", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "lower")
   r_ret3 <-
     expirest_osle(
       data = t_dat3, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", sl = lsl, sl_sf = 3, srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "tight", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "lower")
@@ -590,14 +631,9 @@ test_that("expirest_osle_succeeds_for_variables", {
 })
 
 test_that("expirest_osle_warns", {
-  usl <- 3.5
-  lsl <- 1.5
-
-  # <-><-><-><->
-
   expect_warning(
     expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-                  batch_vbl = "Batch", sl = lsl, sl_sf = 2,
+                  batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
                   srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
                   xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
                   ivl = "prediction", ivl_type = "one.sided",
@@ -605,12 +641,37 @@ test_that("expirest_osle_warns", {
     "Not for all model types POI values obtained.")
   expect_warning(
     expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-                  batch_vbl = "Batch", sl = lsl, sl_sf = 2,
+                  batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
+                  srch_range = c(5, 500), alpha = 0.05, alpha_pool = 0.25,
+                  xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+                  ivl = "prediction", ivl_type = "one.sided",
+                  ivl_side = "lower"),
+    "Not for all model types POI values obtained.")
+  expect_warning(
+    expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+                  batch_vbl = "Batch", sl = c(1.5, 3.5), sl_sf = c(2, 2),
+                  srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+                  xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+                  ivl = "prediction", ivl_type = "two.sided",
+                  ivl_side = "both"),
+    "Not for all model types POI values obtained.")
+
+  expect_warning(
+    expirest_osle(data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+                  time_vbl = "Month", batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
                   srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
                   xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
                   ivl = "prediction", ivl_type = "one.sided",
-                  ivl_side = "upper"),
-    "Not for all model types POI values obtained.")
+                  ivl_side = "lower"),
+    "No POI value was obtained.")
+  expect_warning(
+    expirest_osle(data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+                  time_vbl = "Month", batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
+                  srch_range = c(5, 500), alpha = 0.05, alpha_pool = 0.25,
+                  xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+                  ivl = "prediction", ivl_type = "one.sided",
+                  ivl_side = "lower"),
+    "No POI value was obtained.")
 
   expect_warning(
     expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
@@ -644,6 +705,15 @@ test_that("expirest_osle_warns", {
                   ivl = "confidence", ivl_type = "one.sided",
                   ivl_side = "lower"),
     "You specified ivl_side = \"lower\".")
+  expect_warning(
+    expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+                  batch_vbl = "Batch", sl = c(1.5, 3.5), sl_sf = c(2, 2),
+                  srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+                  xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+                  ivl = "confidence", ivl_type = "one.sided",
+                  ivl_side = "both"),
+    "ivl_side is specified as \"both\" "
+  )
 })
 
 test_that("expirest_osle_fails_with_warning_tight_spec_limits", {
@@ -975,5 +1045,22 @@ test_that("expirest_osle_fails_with_error", {
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "loose", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "incorrect"),
-    "specify ivl_side either as \"lower\" or \"upper\"")
+    "specify ivl_side either as \"lower\", \"upper\" or \"both\"")
+  expect_error(
+    expirest_osle(
+      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
+      batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500),
+      alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
+      shift = c(0, 0), sf_option = "loose", ivl = "confidence",
+      ivl_type = "one.sided", ivl_side = "both"),
+    "Please provide a specification with two sides.")
+  expect_error(
+    expirest_osle(
+      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
+      batch_vbl = "Batch", sl = c(95, 105), sl_sf = c(3, 3),
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
+      ivl = "confidence", ivl_type = "two.sided", ivl_side = "both",
+      rl = c(100, 99, 08)),
+    "ivl_side must be either \"lower\" or \"upper\"")
 })

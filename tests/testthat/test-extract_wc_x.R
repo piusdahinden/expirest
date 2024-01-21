@@ -171,32 +171,41 @@ test_that("extract_wc_x_succeeds", {
 
 test_that("extract_wc_x_fails", {
   ll1a <- list(cics = list(NA),
-                 dics = list(1),
-                 dids = list(1))
+               dics = list(1),
+               dids.pmse = list(1),
+               dids = list(1))
   ll1b <- list(csci = list(NA),
                csdi = list(1),
+               dsdi.pmse = list(1),
                dsdi = list(1))
   ll1c1 <- list(cics = NA,
-               dics = matrix(rep(1, 3), nrow = 1),
-               dids = matrix(rep(1, 3), nrow = 1))
+                dics = matrix(rep(1, 3), nrow = 1),
+                dids.pmse = matrix(rep(1, 3), nrow = 1),
+                dids = matrix(rep(1, 3), nrow = 1))
   ll1c2 <- list(cics = "cics",
                 dics = list(rep(1, 3)),
+                dids.pmse = list(rep(1, 3)),
                 dids = list(rep(1, 3)))
   ll1d <- list(cics = matrix(rep(1, 3), nrow = 1),
                dics = matrix(rep(1, 3), nrow = 1),
+               dids.pmse = matrix(rep(1, 3), nrow = 1),
                dids = matrix(rep(1, 3), nrow = 1))
 
   ll2a <- list(cics = NA,
-                 dics = 2,
-                 dids = 2)
+               dics = 2,
+               dids.pmse = 2,
+               dids = 2)
   ll2b <- list(csci = NA,
                csdi = 1,
+               dsdi.pmse = 1,
                dsdi = 1)
   ll2c <- list(cics = list(NA),
                dics = 1,
+               dids.pmse = 1,
                dids = 1)
   ll2d <- list(cics = c(1, 2, 3),
                dics = c(1, 2, 3),
+               dids.pmse = c(1, 2, 3),
                dids = c(1, 2, 3))
 
   # <-><-><-><->
@@ -209,10 +218,10 @@ test_that("extract_wc_x_fails", {
     "l2 must be a list")
   expect_error(
     extract_wc_x(l1 = ll1b, l2 = ll2a),
-    "list l1 must have three elements named")
+    "list l1 must have four elements named")
   expect_error(
     extract_wc_x(l1 = ll1a, l2 = ll2b),
-    "list l2 must have three elements named")
+    "list l2 must have four elements named")
   expect_error(
     extract_wc_x(l1 = ll1c1, l2 = ll2a),
     "elements of l1 must be matrices or lists of vectors")

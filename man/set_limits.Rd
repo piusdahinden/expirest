@@ -52,9 +52,13 @@ purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
 default is \code{c(0, 0)}.}
 
-\item{ivl_side}{A character string specifying if the \dQuote{upper} or the
-\dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-\code{"lower"}, respectively. The default is \code{"lower"}.}
+\item{ivl_side}{A character string specifying if the specification limit,
+given that the limit has only one side, is an \dQuote{upper} or a
+\dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
+\code{"lower"}, respectively. The default is \code{"lower"}. If the
+specification has two boundaries, then this parameter specifies the
+preferred side. If no side is preferred over the other, \code{"both"} can
+be used.}
 }
 \value{
 A list with the following elements is returned:

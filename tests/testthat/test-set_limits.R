@@ -153,5 +153,10 @@ test_that("set_limits_fails", {
     set_limits(rl = 97.0, rl_sf = 3, sl = c(95.0, 105.0), sl_sf = c(3, 3),
                sf_option = "tight", xform = c("no", "no"), shift = c(0, 0),
                ivl_side = "middle"),
-    "specify ivl_side either as \"lower\" or \"upper\"")
+    "specify ivl_side either as \"lower\", \"upper\" or \"both\"")
+  expect_error(
+    set_limits(rl = 97.0, rl_sf = 3, sl = 95, sl_sf = 3,
+               sf_option = "tight", xform = c("no", "no"), shift = c(0, 0),
+               ivl_side = "both"),
+    "Please provide a specification with two sides.")
 })

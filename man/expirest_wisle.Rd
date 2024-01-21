@@ -107,7 +107,13 @@ a \dQuote{two sided} interval should be calculated, i.e. either
 
 \item{ivl_side}{A character string specifying if the \dQuote{upper} or the
 \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-\code{"lower"}, respectively. The default is \code{"lower"}.}
+\code{"lower"}, respectively. The default is \code{"lower"}. Since this
+parameter additionally specifies the relationship of \code{rl} with
+\code{sl}, i.e. which of the two sides of \code{sl} the \code{rl} is
+compared to, only either either \code{"upper"} or \code{"lower"} is
+possible. In this respect, the usage of \code{ivl_side} differs from its
+usage in the \code{expirest_osle()} function where \code{ivl_side} in
+addition can be \code{"both"}.}
 
 \item{...}{Additional named or unnamed arguments passed on to
 \code{uniroot()}.}
@@ -139,7 +145,7 @@ containing the following elements:
   obtained from fitting a regression model to the data of each level of the
   categorical variable separately. The \code{cics}, \code{dics} and
   \code{dids.pmse} elements are \code{NA} if data of only a single batch
-  are available.}
+  is available.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)

@@ -35,33 +35,38 @@ test_that("plot_expirest_osle_succeeds", {
   tmp1 <-
     plot_expirest_osle(
       model = re1, show_grouping = "yes", response_vbl_unit = "%",
-      y_range = c(-0.01, 0.5), x_range = NULL, mtbs = "verified",
+      x_range = NULL, y_range = c(-0.01, 0.5), mtbs = "verified",
       plot_option = "full", ci_app = "line")
   tmp2 <-
     plot_expirest_osle(
       model = re2, show_grouping = "yes", response_vbl_unit = " mg/kg",
-      y_range = c(92, 107), x_range = c(-1, 29), mtbs = "verified",
+      x_range = c(-1, 29), y_range = c(92, 107), mtbs = "verified",
       plot_option = "full", ci_app = "line")
   tmp3 <-
     plot_expirest_osle(
       model = re2, show_grouping = "yes", response_vbl_unit = NULL,
-      y_range = c(92, 107), x_range = c(-1, 29), mtbs = "verified",
+      x_range = c(-1, 29), y_range = c(92, 107), mtbs = "verified",
       plot_option = "full", ci_app = "ribbon")
   suppressWarnings(tmp4 <-
     plot_expirest_osle(
       model = re2, show_grouping = "no", response_vbl_unit = NULL,
-      y_range = c(92, 107), x_range = c(-1, 29), mtbs = "verified",
+      x_range = c(-1, 29), y_range = c(92, 107), mtbs = "verified",
       plot_option = "full", ci_app = "ribbon"))
   suppressWarnings(tmp5 <-
     plot_expirest_osle(
       model = re3, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      x_range = NULL, y_range = c(0.2, 5.2), mtbs = "verified",
       plot_option = "full", ci_app = "line"))
   suppressWarnings(tmp6 <-
     plot_expirest_osle(
       model = re4, show_grouping = "no", response_vbl_unit = "% (w/w)",
-      y_range = c(0.2, 5.2), x_range = NULL, mtbs = "verified",
+      x_range = NULL, y_range = c(0.2, 5.2), mtbs = "verified",
       plot_option = "full", ci_app = "line"))
+  suppressWarnings(tmp7 <-
+  plot_expirest_osle(
+    model = re4, show_grouping = "no", response_vbl_unit = "% (w/w)",
+    x_range = NULL, y_range = NULL, mtbs = "verified",
+    plot_option = "full", ci_app = "line"))
 
   # <-><-><-><->
 
@@ -133,6 +138,18 @@ test_that("plot_expirest_osle_succeeds", {
   expect_equal(tmp6[["vlines"]][, "Item"], "poi.model")
   expect_equal(tmp6[["vlines"]][, "Colour"], "forestgreen")
   expect_equal(tmp6[["vlines"]][, "Type"], "dotdash")
+
+  expect_equal(signif(tmp7[["text"]][, "Month"], 5), c(70.000, 60.761))
+  expect_equal(tmp7[["text"]][, "Moisture"], c(1.4, 1.0))
+  expect_equal(tmp7[["text"]][, "Label"], c("LSL: 1.5% (w/w)", "60.8"))
+  expect_equal(tmp7[["hlines"]][, "Moisture"], 1.5)
+  expect_equal(tmp7[["hlines"]][, "Item"], "LSL")
+  expect_equal(tmp7[["hlines"]][, "Colour"], "black")
+  expect_equal(tmp7[["hlines"]][, "Type"], "dotted")
+  expect_equal(signif(tmp7[["vlines"]][, "Month"], 5), 60.761)
+  expect_equal(tmp7[["vlines"]][, "Item"], "poi.model")
+  expect_equal(tmp7[["vlines"]][, "Colour"], "forestgreen")
+  expect_equal(tmp7[["vlines"]][, "Type"], "dotdash")
 })
 
 test_that("plot_expirest_osle_succeeds_with_transformations", {

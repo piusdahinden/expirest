@@ -17,22 +17,61 @@ test_that("summary.expirest_osle_succeeds", {
                   xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
                   ivl = "confidence", ivl_type = "one.sided",
                   ivl_side = "lower")
+  re3 <- suppressWarnings(
+    expirest_osle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "prediction", ivl_type = "one.sided",
+      ivl_side = "lower"))
 
   # <-><-><-><->
 
   expect_s3_class(expect_output(summary(re1)), "expirest_osle")
-  expect_output(summary(re1), "cics")
-  expect_output(summary(re1), "NA")
+  expect_output(summary(re1), "acronym: cics")
+  expect_output(summary(re1), "batch: NA")
 
   expect_output(summary(re1, digits = 5), "intercept: 100.57")
   expect_output(summary(re1, digits = 5), "model: 25.996")
+  expect_output(summary(re1, digits = 5),
+                "cics         100.57 25.996 lower    NA")
+  expect_output(summary(re1, digits = 5),
+                "dics         100.36 24.567 lower    b2")
+  expect_output(summary(re1, digits = 5),
+                "dids.pmse    100.78  23.47 lower    b5")
+  expect_output(summary(re1, digits = 5),
+                "dids         100.78 23.148 lower    b5")
 
   expect_s3_class(expect_output(summary(re2)), "expirest_osle")
-  expect_output(summary(re2), "dids")
-  expect_output(summary(re2), "b8")
+  expect_output(summary(re2), "acronym: dids")
+  expect_output(summary(re2), "batch: b8")
 
   expect_output(summary(re2, digits = 5), "intercept: 101.26")
   expect_output(summary(re2, digits = 5), "model: 15.845")
+  expect_output(summary(re2, digits = 5),
+                "cics         101.55 27.925 lower    NA")
+  expect_output(summary(re2, digits = 5),
+                "dics         100.49 22.267 lower    b8")
+  expect_output(summary(re2, digits = 5),
+                "dids.pmse    101.26 15.606 lower    b8")
+  expect_output(summary(re2, digits = 5),
+                "dids         101.26 15.845 lower    b8")
+
+  expect_s3_class(expect_output(summary(re3)), "expirest_osle")
+  expect_output(summary(re3), "acronym: n.a.")
+  expect_output(summary(re3), "NA intercepts and NA slopes")
+
+  expect_output(summary(re3, digits = 5), "intercept: NA")
+  expect_output(summary(re3, digits = 5), "model: NA")
+  expect_output(summary(re3, digits = 5),
+                "cics             NA     NA lower    NA")
+  expect_output(summary(re3, digits = 5),
+                "dics             NA     NA lower    NA")
+  expect_output(summary(re3, digits = 5),
+                "dids.pmse        NA     NA lower    NA")
+  expect_output(summary(re3, digits = 5),
+                "dids             NA     NA lower    NA")
 })
 
 test_that("print.expirest_osle_succeeds", {
@@ -52,22 +91,61 @@ test_that("print.expirest_osle_succeeds", {
                   xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
                   ivl = "confidence", ivl_type = "one.sided",
                   ivl_side = "lower")
+  re3 <- suppressWarnings(
+    expirest_osle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "prediction", ivl_type = "one.sided",
+      ivl_side = "lower"))
 
   # <-><-><-><->
 
   expect_s3_class(expect_output(print(re1)), "expirest_osle")
-  expect_output(print(re1), "cics")
-  expect_output(print(re1), "NA")
+  expect_output(print(re1), "acronym: cics")
+  expect_output(print(re1), "batch: NA")
 
   expect_output(print(re1, digits = 5), "intercept: 100.57")
   expect_output(print(re1, digits = 5), "model: 25.996")
+  expect_output(print(re1, digits = 5),
+                "cics         100.57 25.996 lower    NA")
+  expect_output(print(re1, digits = 5),
+                "dics         100.36 24.567 lower    b2")
+  expect_output(print(re1, digits = 5),
+                "dids.pmse    100.78  23.47 lower    b5")
+  expect_output(print(re1, digits = 5),
+                "dids         100.78 23.148 lower    b5")
 
   expect_s3_class(expect_output(print(re2)), "expirest_osle")
-  expect_output(print(re2), "dids")
-  expect_output(print(re2), "b8")
+  expect_output(print(re2), "acronym: dids")
+  expect_output(print(re2), "batch: b8")
 
   expect_output(print(re2, digits = 5), "intercept: 101.26")
   expect_output(print(re2, digits = 5), "model: 15.845")
+  expect_output(print(re2, digits = 5),
+                "cics         101.55 27.925 lower    NA")
+  expect_output(print(re2, digits = 5),
+                "dics         100.49 22.267 lower    b8")
+  expect_output(print(re2, digits = 5),
+                "dids.pmse    101.26 15.606 lower    b8")
+  expect_output(print(re2, digits = 5),
+                "dids         101.26 15.845 lower    b8")
+
+  expect_s3_class(expect_output(print(re3)), "expirest_osle")
+  expect_output(print(re3), "acronym: n.a.")
+  expect_output(print(re3), "NA intercepts and NA slopes")
+
+  expect_output(print(re3, digits = 5), "intercept: NA")
+  expect_output(print(re3, digits = 5), "model: NA")
+  expect_output(print(re3, digits = 5),
+                "cics             NA     NA lower    NA")
+  expect_output(print(re3, digits = 5),
+                "dics             NA     NA lower    NA")
+  expect_output(print(re3, digits = 5),
+                "dids.pmse        NA     NA lower    NA")
+  expect_output(print(re3, digits = 5),
+                "dids             NA     NA lower    NA")
 })
 
 test_that("plot.plot_expirest_osle_succeeds", {

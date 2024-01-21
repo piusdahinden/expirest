@@ -36,7 +36,7 @@ estimated shelf life.}
 \item{y_range}{A numeric vector of the form \code{c(min, max)} specifying
 the range of the response variable to be plotted. The default is
 \code{NULL} and the \eqn{y} range is calculated automatically on the
-basis of the confidence or prediction interval of the verified model.}
+basis of the time course of the response.}
 
 \item{mtbs}{A characters string specifying the \dQuote{model to be shown},
 i.e. either \code{verified}, which is the default, or one of \code{cics},

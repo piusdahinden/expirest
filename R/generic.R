@@ -54,16 +54,25 @@ summary.expirest_osle <- function(object, ...) {
   cat("\n\nThe best model accepted at a significance level of",
       object[["Parameters"]]$alpha.pool,
       "has\n",
-      c("Different intercepts and", "Common intercepts and")[mt[1] + 1],
-      c("Different slopes", "Common slopes")[mt[2] + 1],
+      ifelse(
+        is.na(mt[1]),
+        c("NA intercepts and"),
+        c("Different intercepts and", "Common intercepts and")[mt[1] + 1]
+      ),
+      ifelse(
+        is.na(mt[2]),
+        c("NA slopes"),
+        c("Different slopes", "Common slopes")[mt[2] + 1]
+      ),
       paste0("(acronym: ",
              mtac,
              ")."))
 
-  cat("\n\nWorst case intercept:",
+  cat("\n\nWorst case intercept: ",
       ifelse(is.na(object$wc.icpt[mtac]),
              NA,
-             formatC(as.numeric(object$wc.icpt[mtac]), digits = digits)))
+             formatC(as.numeric(object$wc.icpt[mtac]), digits = digits)),
+      " (", object[["Variables"]]$response, ")", sep = "")
 
   cat("\nWorst case batch:",
       ifelse(is.na(object$wc.batch[mtac]),
@@ -71,23 +80,27 @@ summary.expirest_osle <- function(object, ...) {
              levels(object[["Data"]]
                     [, object[["Variables"]]$batch])[object$wc.batch[mtac]]))
 
-  cat("\nEstimated shelf life for",
+  cat("\nEstimated shelf life for ",
       mtac,
-      "model:",
+      " model: ",
       ifelse(is.na(object[["POI"]][mtac]),
              NA,
-             formatC(object[["POI"]][mtac],
-                     digits)))
+             formatC(object[["POI"]][mtac], digits)),
+      " (", object[["Variables"]]$time, ")", sep = "")
 
-  cat("\n\nWorst case intercepts and batches of all models:\n")
+  cat("\n\nWorst case intercepts, POIs and batches of all models
+   (Including information about the side where the confidence
+    interval crosses the specification boundary):\n")
   d_res <- data.frame(
+    Intercept = formatC(as.numeric(object$wc.icpt), digits = digits),
+    POI = formatC(as.numeric(object$POI), digits = digits),
+    Side = attributes(object$POI)$side,
     Batch = vapply(object$wc.batch, function(bn) {
       ifelse(is.na(bn),
              "NA",
              levels(object[["Data"]][, object[["Variables"]]$batch])[bn])
     },
-    character(1)),
-    Intercept = formatC(as.numeric(object$wc.icpt), digits = digits)
+    character(1))
   )
   print(d_res)
   cat("\n")
@@ -263,8 +276,16 @@ summary.expirest_wisle <- function(object, ...) {
   cat("\n\nThe best model accepted at a significance level of",
       object[["Parameters"]]$alpha.pool,
       "has\n",
-      c("Different intercepts and", "Common intercepts and")[mt[1] + 1],
-      c("Different slopes", "Common slopes")[mt[2] + 1],
+      ifelse(
+        is.na(mt[1]),
+              c("NA intercepts and"),
+              c("Different intercepts and", "Common intercepts and")[mt[1] + 1]
+        ),
+      ifelse(
+        is.na(mt[2]),
+        c("NA slopes"),
+        c("Different slopes", "Common slopes")[mt[2] + 1]
+      ),
       paste0("(acronym: ",
              mtac,
              ")."))
@@ -277,25 +298,24 @@ summary.expirest_wisle <- function(object, ...) {
     print(tmp_2, digits = digits)
   }
 
-  cat("\nEstimated shelf lives for",
+  cat("\nEstimated shelf lives for the",
       mtac)
   if (mtac != "dids") {
     cat(" model:\n")
   } else {
-    cat(" model (for information, the results
-        of the model fitted with pooled mean square error (pmse)
-        are also shown:\n")
+    cat(" model (for information, the results of
+  the model fitted with pooled mean square error (pmse) are also shown:\n")
   }
 
   print(tmp_1, digits = digits)
   cat("\nAbbreviations:
-   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
-   ICH: International Council for Harmonisation;
-   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
-   RL: Release Limit;
-   SL: Specification Limit;
-   wisle: What-if (approach for) shelf life estimation
-          (i.e. following ARGPM guidance).\n\n")
+  ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
+  ICH: International Council for Harmonisation;
+  osle: Ordinary shelf life estimation (i.e. following the ICH guidance);")
+  if (mtac == "dids") cat("\n  pmse: Pooled mean square error;")
+  cat("\n  RL: Release Limit;
+  SL: Specification Limit;
+  wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).")
 
   invisible(object)
 }

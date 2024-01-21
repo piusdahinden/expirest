@@ -66,7 +66,8 @@ test_that("extract_from_ll_wcsl_fails", {
 
   ll3 <- list(cics = ll2[[1]][[1]],
               dics = ll2[[2]][[1]],
-              dids = ll2[[3]][[1]])
+              dids.pmse = ll2[[3]][[1]],
+              dids = ll2[[4]][[1]])
 
   ll4 <- ll2
   names(ll4[[1]][[1]][[1]]) <-
@@ -77,7 +78,7 @@ test_that("extract_from_ll_wcsl_fails", {
 
   expect_error(
     extract_from_ll_wcsl(ll = ll1, element = "wcs.lim"),
-    "ll must have three elements named")
+    "ll must have four elements named")
   expect_error(
     extract_from_ll_wcsl(ll = ll2, element = "worst.case.limit"),
     "specify element either as")
@@ -86,5 +87,5 @@ test_that("extract_from_ll_wcsl_fails", {
     "parameter ll must be a list of lists")
   expect_error(
     extract_from_ll_wcsl(ll = ll4, element = "wcs.lim"),
-    "element was not found in the element names")
+    "element was not found in one of the sub-elements")
 })

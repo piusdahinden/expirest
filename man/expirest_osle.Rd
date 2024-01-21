@@ -95,9 +95,13 @@ a \dQuote{two sided} interval should be calculated, i.e. either
 \code{"one.sided"} or \code{"two.sided"}, respectively. The default is
 \code{"one.sided"}.}
 
-\item{ivl_side}{A character string specifying if the \dQuote{upper} or the
-\dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-\code{"lower"}, respectively. The default is \code{"lower"}.}
+\item{ivl_side}{A character string specifying if the specification limit,
+given that the limit has only one side, is an \dQuote{upper} or a
+\dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
+\code{"lower"}, respectively. The default is \code{"lower"}. If the
+specification has two boundaries, then this parameter specifies the
+preferred side. If no side is preferred over the other, \code{"both"} can
+be used.}
 
 \item{...}{Additional named or unnamed arguments passed on to
 \code{uniroot()}.}
@@ -129,20 +133,25 @@ containing the following elements:
   obtained from fitting a regression model to the data of each level of the
   categorical variable separately. The \code{cics}, \code{dics} and
   \code{dids.pmse} elements are \code{NA} if data of only a single batch
-  are available.}
+  is available.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
   values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
   models.}
-\item{wc.icpt}{A numeric named vector of the intercepts of the worst case
-  batches.}
-\item{wc.batch}{A numeric named vector of the worst case batches.}
+\item{wc.icpt}{A numeric named vector of the worst case intercepts. The
+  information about which limit the corresponding confidence interval
+  crosses is stored in the attribute named \code{side}.}
+\item{wc.batch}{A numeric named vector of the batches with the worst case
+  intercepts. The information about which limit the corresponding confidence
+  interval crosses is stored in the attribute named \code{side}.}
 \item{Limits}{A list of all limits.}
 \item{Intercepts}{A list of the intercepts of all models.}
-\item{All.POI}{A list of the POI values of all models.}
-\item{POI}{A numeric named vector of the (worst case) POI values of all
-  models.}
+\item{All.POI}{A list of two elements named \code{lower} and \code{upper}
+  that contain either NA or lists of the POI values of all models.}
+\item{POI}{A numeric named vector of the POI values of the worst case
+  batches of each model. The information about which limit the corresponding
+  confidence interval crosses is stored in the attribute named \code{side}.}
 }
 \description{
 Based on a linear regression model fitted to a stability data set the

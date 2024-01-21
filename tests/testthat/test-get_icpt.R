@@ -5,30 +5,43 @@ test_that("get_icpt_succeeds", {
   time_vbl <- "Month"
   batch_vbl <- "Batch"
 
-  l_models <- list()
+  l_models <- setNames(vector(mode = "list", length = 4),
+                       c("cics", "dics", "dids.pmse", "dids"))
 
   # ---------
   # common intercept / common slope
   t_formula <- paste(response_vbl, "~", time_vbl)
-  l_models[[length(l_models) + 1]] <-
+  l_models[["cics"]] <-
     do.call("lm", list(as.formula(t_formula),
                        data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]))
 
   # ---------
   # different intercept / common slope
   t_formula <- paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " + "))
-  l_models[[length(l_models) + 1]] <-
+  l_models[["dics"]] <-
     do.call("lm", list(as.formula(t_formula),
                        data = exp1[exp1$Batch %in% c("b3", "b4", "b5"), ]))
 
   # ---------
-  # different intercept / different slope
+  # different intercept / different slope (pooled mean square error)
   t_formula <- paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " * "))
-  l_models[[length(l_models) + 1]] <-
+  l_models[["dids.pmse"]] <-
     do.call("lm", list(as.formula(t_formula),
                        data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]))
 
-  names(l_models) <- c("cics", "dics", "dids")
+  # ---------
+  # Different Intercept / Different Slope (individual models)
+  t_formula <- paste(response_vbl, "~", time_vbl)
+  t_dat <- droplevels(exp1[exp1$Batch %in% c("b4", "b5", "b8"), ])
+
+  tmp <- lapply(levels(t_dat[, batch_vbl]),
+                function(batch) {
+                  t_sub <- t_dat[t_dat$Batch == batch, ]
+                  do.call("lm", list(as.formula(t_formula),
+                                     data = as.name("t_sub")))
+                })
+  names(tmp) <- levels(t_dat[, batch_vbl])
+  l_models[["dids"]] <- tmp
 
   # <-><-><-><->
 
@@ -38,9 +51,15 @@ test_that("get_icpt_succeeds", {
   tmp2 <- get_icpt(model = l_models[["dics"]], response_vbl = "Potency",
                    time_vbl = "Month",  batch_vbl = "Batch",
                    xform = c("no", "no"), shift = c(0, 0))$icpt
-  tmp3 <- get_icpt(model = l_models[["dids"]], response_vbl = "Potency",
+  tmp3 <- get_icpt(model = l_models[["dids.pmse"]], response_vbl = "Potency",
                    time_vbl = "Month",  batch_vbl = "Batch",
                    xform = c("no", "no"), shift = c(0, 0))$icpt
+  tmp4 <- vapply(seq_along(l_models[["dids"]]), function(i) {
+    get_icpt(model = l_models[["dids"]][[i]], response_vbl = "Potency",
+             time_vbl = "Month",  batch_vbl = "Batch",
+             xform = c("no", "no"), shift = c(0, 0))$icpt
+  },
+  numeric(1))
 
   # <-><-><-><->
 
@@ -49,31 +68,33 @@ test_that("get_icpt_succeeds", {
                     c(102.175653110, 104.255189423, 100.820021871))
   expect_equivalent(signif(tmp3, 12),
                     c(104.070645793, 100.781872268, 101.259375000))
+  expect_equivalent(signif(tmp3, 12),
+                    c(104.070645793, 100.781872268, 101.259375000))
 })
 
 test_that("get_icpt_succeeds_with_transformations", {
-  l_models <- list()
+  l_models <- vector(mode = "list", length = 4)
 
   # ---------
   # Log transformation of y
   t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dat$Potency <- log(t_dat$Potency + 1)
 
-  l_models[[length(l_models) + 1]] <- lm(Potency ~ Month, data = t_dat)
+  l_models[[1]] <- lm(Potency ~ Month, data = t_dat)
 
   # ---------
   # Sqrt transformation of y
   t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dat$Potency <- sqrt(t_dat$Potency + 1)
 
-  l_models[[length(l_models) + 1]] <- lm(Potency ~ Month, data = t_dat)
+  l_models[[2]] <- lm(Potency ~ Month, data = t_dat)
 
   # ---------
   # Sq transformation of y
   t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dat$Potency <- (t_dat$Potency + 1)^2
 
-  l_models[[length(l_models) + 1]] <- lm(Potency ~ Month, data = t_dat)
+  l_models[[3]] <- lm(Potency ~ Month, data = t_dat)
 
   # ---------
   # Log transformation of x and sq transformation of y
@@ -81,7 +102,7 @@ test_that("get_icpt_succeeds_with_transformations", {
   t_dat$Month <- log(t_dat$Month + 1)
   t_dat$Related <- (t_dat$Related)^2
 
-  l_models[[length(l_models) + 1]] <- lm(Related ~ Month, data = t_dat)
+  l_models[[4]] <- lm(Related ~ Month, data = t_dat)
 
   # <-><-><-><->
 

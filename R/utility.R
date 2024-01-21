@@ -287,6 +287,7 @@ get_distance <- function(x_new, model, sl, mode = "minimal", alpha = 0.05,
 #' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @importFrom stats uniroot
+#' @importFrom stats setNames
 #'
 #' @keywords internal
 
@@ -355,6 +356,250 @@ find_poi <- function(srch_range, model, sl, mode = "minimal", alpha = 0.05,
   }
 
   return(res)
+}
+
+#' List of points of intersection
+#'
+#' The function \code{get_poi_list()} prepares a list of points of intersection
+#' (POI) for multiple regression models using the \code{find_poi()} function.
+#'
+#' @param data The data frame that was used for fitting the models of parameter
+#'   \code{model_list}.
+#' @param batch_vbl A character string specifying the column in \code{data}
+#'   with the grouping information (i.e. a factorial variable) for the
+#'   differentiation of the observations of the different batches.
+#' @param model_list A list of regression models of different type. Usually,
+#'   it is a list of four elements named \code{cics}, \code{dics},
+#'   \code{dids.pmse} and \code{dids}, where the first three elements contain
+#'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
+#'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
+#'   and \dQuote{different intercept / different slope} (\code{dids}) type.
+#'   The fourth element with the label \code{dids.pmse} is usually a list of
+#'   the \sQuote{\code{lm}} objects that is obtained from fitting a regression
+#'   model to the data of each level of the categorical variable separately.
+#'   The \code{cics}, \code{dics} and \code{dids.pmse} elements are \code{NA}
+#'   if data of only a single batch is available.
+#' @param sl A numeric variable specifying the \dQuote{specification limit}
+#'   (SL). Another kind of acceptance criterion may be regarded as SL.
+#' @inheritParams find_poi
+#'
+#' @details The function \code{get_poi_list()} applies the \code{find_poi()}
+#' function (find the \dQuote{point of intersection}) on all the models that
+#' are provided.
+#'
+#' @return A list with the following elements is returned:
+#'
+#' @seealso \code{\link{get_distance}}, \code{\link[stats]{uniroot}},
+#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#'
+#' @keywords internal
+
+get_poi_list <- function(data, batch_vbl, model_list, sl, srch_range,
+                         mode = "minimal", alpha = 0.05, ivl = "confidence",
+                         ivl_type = "one.sided", ivl_side = "lower", ...) {
+  if (!is.data.frame(data)) {
+    stop("The data must be provided as data frame.")
+  }
+  if (!is.character(batch_vbl)) {
+    stop("The parameter batch_vbl must be a string.")
+  }
+  if (!(batch_vbl %in% colnames(data))) {
+    stop("The batch_vbl was not found in the provided data frame.")
+  }
+  if (!is.factor(data[, batch_vbl])) {
+    stop("The column in data specified by batch_vbl must be a factor.")
+  }
+  if (!is.list(model_list)) {
+    stop("The parameter model_list must be a list.")
+  }
+  if (sum(names(model_list) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The parameter model_list must have four elements named \"cics\", ",
+         "\"dics\", \"dids\" and \"dids.pmse\".")
+  }
+  if (!is.numeric(sl) || length(sl) > 1) {
+    stop("The parameter sl must be a numeric value of length 1.")
+  }
+  if (!is.numeric(srch_range) || length(srch_range) != 2) {
+    stop("The parameter srch_range must be a vector of length 2.")
+  }
+  if (!(mode %in% c("minimal", "all"))) {
+    stop("Please specify mode either as \"minimal\" or \"all\".")
+  }
+  if (alpha <= 0 || alpha > 1) {
+    stop("Please specify alpha as (0, 1].")
+  }
+  if (!(ivl %in% c("confidence", "prediction"))) {
+    stop("Please specify ivl either as \"confidence\" or \"prediction\".")
+  }
+  if (!(ivl_type %in% c("one.sided", "two.sided"))) {
+    stop("Please specify ivl_type either as \"one.sided\" or \"two.sided\".")
+  }
+  if (!(ivl_side %in% c("lower", "upper", "both"))) {
+    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
+  }
+  if (ivl_side == "both" && length(sl) == 1) {
+    stop("Since ivl_side = \"both\", a specification with two sides is ",
+         "expected. Only one side has been specified, though, i.e. ",
+         "sl = ", sl, ".\nPlease provide a specification with two sides.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Preparation of data
+
+  d_dat <- data
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Determination of points of intersection (POIs)
+  l_poi <- lapply(model_list, function(x) NA)
+
+  l_poi[["dids"]] <-
+    vapply(model_list[["dids"]],
+           function(x) {
+             tmp <- try_get_model(
+               find_poi(srch_range = srch_range, model = x, sl = sl,
+                        mode = "minimal", alpha = alpha, ivl_type = ivl_type,
+                        ivl_side = ivl_side, ivl = ivl)
+             )
+
+             ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
+           },
+           numeric(1))
+
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    for (variety in names(l_poi)[names(l_poi) != "dids"]) {
+      if (variety == "cics") {
+        tmp <- try_get_model(
+          find_poi(srch_range = srch_range, model = model_list[[variety]],
+                   sl = sl, mode = "minimal", alpha = alpha,
+                   ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
+      }
+      if (variety %in% c("dics", "dids.pmse")) {
+        tmp <- try_get_model(
+          find_poi(srch_range = srch_range, model = model_list[[variety]],
+                   sl = sl, mode = "all", alpha = alpha,
+                   ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
+      }
+      if (is.null(tmp[["Error"]])) {
+        l_poi[[variety]] <- tmp[["Model"]]
+      }
+    }
+  }
+
+  return(l_poi)
+}
+
+#' List of intercepts of worst case batches
+#'
+#' The function \code{get_wc_icpt()} prepares a list of worst case intercepts
+#' of the worst case batches of the regression models fitted to the data.
+#'
+#' @param icpt_list A list of the intercepts of each model type, i.e. a list
+#'   of four elements named \code{cics}, \code{dics}, \code{dids.pmse} and
+#'   \code{dids}.
+#' @param poi_list A list of the points of intersection (POI) of each model
+#'   type, i.e. a list of four elements named \code{cics}, \code{dics},
+#'   \code{dids.pmse} and \code{dids}.
+#' @param wc_batch A numeric vector of the indices of the worst case batches
+#'   of each model type, i.e. a vector of four elements named \code{cics},
+#'   \code{dics}, \code{dids.pmse} and \code{dids}.
+#' @inheritParams expirest_osle
+#'
+#' @details The function \code{get_wc_icpt()} applies the \code{find_poi()}
+#' function (find the \dQuote{point of intersection}) on all the models that
+#' are provided.
+#'
+#' @return A named vector of the intercepts of the worst case batches is
+#' returned.
+#'
+#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#'
+#' @importFrom stats setNames
+#'
+#' @keywords internal
+
+get_wc_icpt <- function(data, batch_vbl, icpt_list, poi_list, wc_batch, xform) {
+  if (!is.data.frame(data)) {
+    stop("The data must be provided as data frame.")
+  }
+  if (!is.character(batch_vbl)) {
+    stop("The parameter batch_vbl must be a string.")
+  }
+  if (!(batch_vbl %in% colnames(data))) {
+    stop("The batch_vbl was not found in the provided data frame.")
+  }
+  if (!is.factor(data[, batch_vbl])) {
+    stop("The column in data specified by batch_vbl must be a factor.")
+  }
+  if (!is.list(icpt_list)) {
+    stop("The parameter icpt_list must be a list.")
+  }
+  if (sum(names(icpt_list) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The parameter icpt_list must have four elements named \"cics\", ",
+         "\"dics\", \"dids\" and \"dids.pmse\".")
+  }
+  if (!is.list(poi_list)) {
+    stop("The parameter poi_list must be a list.")
+  }
+  if (sum(names(poi_list) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The parameter poi_list must have four elements named \"cics\", ",
+         "\"dics\", \"dids\" and \"dids.pmse\".")
+  }
+  if (!is.numeric(wc_batch)) {
+    stop("The parameter wc_batch must be a numeric vector.")
+  }
+  if (sum(names(wc_batch) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The parameter wc_batch must have four elements named \"cics\", ",
+         "\"dics\", \"dids\" and \"dids.pmse\".")
+  }
+  if (length(xform) != 2) {
+    stop("Please specify xform appropriately.")
+  }
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
+      !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
+    stop("Please specify xform appropriately.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Preparation of data
+
+  d_dat <- droplevels(data)
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    wc_icpt <-
+      vapply(names(icpt_list), function(nn) {
+        if (nn == "cics") {
+          if (xform[2] != "no") {
+            unname(icpt_list[[nn]][["icpt.orig"]])
+          } else {
+            unname(icpt_list[[nn]][["icpt"]])
+          }
+        } else {
+          if (xform[2] != "no") {
+            icpt_list[[nn]][["icpt.orig"]][wc_batch[nn]]
+          } else {
+            icpt_list[[nn]][["icpt"]][wc_batch[nn]]
+          }
+        }
+      },
+      numeric(1))
+  } else {
+    wc_icpt <-
+      setNames(rep(NA, length(wc_batch)), names(wc_batch))
+
+    if (!any(is.na(poi_list[["dids"]]))) {
+      if (xform[2] != "no") {
+        wc_icpt["dids"] <-
+          icpt_list[["dids"]][["icpt.orig"]][wc_batch["dids"]]
+      } else {
+        wc_icpt["dids"] <-
+          icpt_list[["dids"]][["icpt"]][wc_batch["dids"]]
+      }
+    }
+  }
+
+  return(wc_icpt)
 }
 
 #' Transformation of variables
@@ -646,8 +891,13 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
   if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
-  if (!(ivl_side %in% c("lower", "upper"))) {
-    stop("Please specify ivl_side either as \"lower\" or \"upper\".")
+  if (!(ivl_side %in% c("lower", "upper", "both"))) {
+    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
+  }
+  if (ivl_side == "both" && length(sl) == 1) {
+    stop("Since ivl_side = \"both\", a specification with two sides is ",
+         "expected. Only one side has been specified, though, i.e. ",
+         "sl = ", sl, ".\nPlease provide a specification with two sides.")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -682,13 +932,15 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
     rl_factor <- 10^(get_n_whole_part(rl) - 1)
     rl_std <- signif(rl / rl_factor, rl_sf)
 
-    switch(ivl_side,
-           "lower" = {
-             rl <- (rl_std - 5 / 10^rl_sf) * rl_factor
-           },
-           "upper" = {
-             rl <- (rl_std + 4 / 10^rl_sf) * rl_factor
-           })
+    if (ivl_side != "both") {
+      switch(ivl_side,
+             "lower" = {
+               rl <- (rl_std - 5 / 10^rl_sf) * rl_factor
+             },
+             "upper" = {
+               rl <- (rl_std + 4 / 10^rl_sf) * rl_factor
+             })
+    }
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -943,6 +1195,7 @@ get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
 #' @seealso \code{\link[stats]{aov}}.
 #'
 #' @importFrom stats summary.aov
+#' @importFrom stats setNames
 #'
 #' @keywords internal
 
@@ -991,9 +1244,6 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
     p_batch <-
       slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
                    !grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
-    p_time <-
-      slm_ancova[!grepl(batch_vbl, rownames(slm_ancova)) &
-                   grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
     p_interaction <-
       slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
                    grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
@@ -1057,7 +1307,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 #'   obtained from fitting a regression model to the data of each level of the
 #'   categorical variable separately. The \code{cics}, \code{dics} and
 #'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
-#'   are available.}
+#'   is available.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
 #'   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
@@ -1071,6 +1321,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 #' @importFrom stats coef
 #' @importFrom stats AIC
 #' @importFrom stats BIC
+#' @importFrom stats setNames
 #'
 #' @keywords internal
 
@@ -1104,9 +1355,8 @@ get_linear_models <- function(data, response_vbl, time_vbl, batch_vbl) {
 
   # Remove unused factor levels
   d_dat <- droplevels(data)
-
-  l_models <- vector(mode = "list", length = 4)
-  names(l_models) <- c("cics", "dics", "dids.pmse", "dids")
+  l_models <- setNames(vector(mode = "list", length = 4),
+                       c("cics", "dics", "dids.pmse", "dids"))
 
   if (nlevels(d_dat[, batch_vbl]) > 1) {
     # ---------
@@ -1132,10 +1382,14 @@ get_linear_models <- function(data, response_vbl, time_vbl, batch_vbl) {
     # ---------
     # Different Intercept / Different Slope (individual models)
     t_formula <- paste(response_vbl, "~", time_vbl)
-    l_models[["dids"]] <-
-      by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat) {
-        do.call("lm", list(as.formula(t_formula), data = as.name("dat")))
-      })
+    tmp <- lapply(levels(d_dat[, batch_vbl]),
+                  function(batch) {
+                    t_dat <- d_dat[d_dat[, batch_vbl] == batch, ]
+                    do.call("lm", list(as.formula(t_formula),
+                                       data = as.name("t_dat")))
+                  })
+    names(tmp) <- levels(d_dat[, batch_vbl])
+    l_models[["dids"]] <- tmp
 
     # ---------
     # Determination of the Akaike Information Criterion (AIC) and Bayesian
@@ -1147,12 +1401,14 @@ get_linear_models <- function(data, response_vbl, time_vbl, batch_vbl) {
     t_formula <- paste(response_vbl, "~", time_vbl)
 
     l_models[names(l_models) != "dids"] <- NA
-    l_models[["dids"]] <-
-      by(data = d_dat, INDICES = d_dat[, batch_vbl],
-         FUN = function(dat) {
-           do.call("lm",
-                   list(as.formula(t_formula), data = as.name("dat")))
-         })
+    tmp <- lapply(levels(d_dat[, batch_vbl]),
+                  function(batch) {
+                    t_dat <- d_dat[d_dat[, batch_vbl] == batch, ]
+                    do.call("lm", list(as.formula(t_formula),
+                                       data = as.name("t_dat")))
+                  })
+    names(tmp) <- levels(d_dat[, batch_vbl])
+    l_models[["dids"]] <- tmp
 
     t_AIC <- t_BIC <- setNames(rep(NA, 3), c("cics", "dics", "dids.pmse"))
   }
@@ -1293,11 +1549,11 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
 #' a list of lists returned by the \code{\link{get_wcs_limit}()} function.
 #'
 #' @param ll A list of lists returned by the \code{\link{get_wcs_limit}()}
-#'   function. The list must have three elements named \code{"cics"},
-#'   \code{"dics"} and \code{"dids"}. Each of these elements have a sub-list
-#'   of the same length as the number of intercepts. Each of these sub-lists
-#'   has a sub-sub-list of the same length as the number of release limits
-#'   (\code{rl}).
+#'   function. The list must have four elements named \code{"cics"},
+#'   \code{"dics"}, \code{dids.pmse} and \code{"dids"}. Each of these elements
+#'   has a sub-list of the same length as the number of intercepts. And each
+#'   of these elements has a sub-sub-list of the same length as the number of
+#'   release limits (\code{rl}).
 #' @param element A character string specifying the element to be extracted,
 #'   i.e. either one of  \code{"delta.lim"}, \code{"delta.lim.orig"},
 #'   \code{"wcs.lim"} or \code{"wcs.lim.orig"}.
@@ -1315,9 +1571,9 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
 #' @keywords internal
 
 extract_from_ll_wcsl <- function(ll, element) {
-  if (sum(names(ll) %in% c("cics", "dics", "dids")) != 3) {
-    stop("The list ll must have three elements named \"cics\", \"dics\" ",
-         "and \"dids\".")
+  if (sum(names(ll) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The list ll must have four elements named \"cics\", \"dics\" ",
+         "\"dids.pmse\" and \"dids\".")
   }
   if (!(element %in%
         c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig"))) {
@@ -1328,41 +1584,61 @@ extract_from_ll_wcsl <- function(ll, element) {
     stop("The parameter ll must be a list of lists returned by ",
          "get_wcs_limit() at level three.")
   }
-  if (sum(vapply(ll, function(x) {
-    sum(c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig") %in%
-        names(x[[1]][[1]])) != 4
-  },
-  logical(1)))) {
-    stop("The element was not found in the element names of the list ",
-         "at level three that must be a list returned by get_wcs_limit().")
-  }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of worst case scenario (wcs) limit(s)
 
+  t_expected_names <-
+    c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig")
+  t_model_names <- names(ll)
+
   l_res <- lapply(seq_along(ll), function(i) {
     if (i == 1) {
-      matrix(vapply(seq_along(ll[[i]][[1]]), function(j) {
-        ll[[i]][[1]][[j]][[element]]
-      },
-      numeric(1)),
-      nrow = length(ll[[i]][[1]]), ncol = length(ll[[i]]),
-      dimnames = list(NULL, names(ll[[i]])))
-    } else {
-      matrix(vapply(seq_along(ll[[i]]), function(bb) {
-        vapply(seq_along(ll[[i]][[1]]), function(j) {
-          ll[[i]][[bb]][[j]][[element]]
+      if (get_n_list_levels(ll[[i]]) == 0) {
+        NA
+      } else {
+        if (any(vapply(ll[[i]], function(x) {
+          sum(t_expected_names %in% names(x[[1]])) != 4
         },
-        numeric(1))
-      }, numeric(length(ll[[i]][[1]]))),
-      nrow = length(ll[[i]][[1]]), ncol = length(ll[[i]]),
-      dimnames = list(NULL, names(ll[[i]])))
+        logical(1)))) {
+          stop("The element was not found in one of the sub-elements of ",
+               "model ", t_model_names[i], ". Please provide a list returned ",
+               "from get_wcs_limit().")
+        } else {
+          matrix(vapply(seq_along(ll[[i]][[1]]), function(j) {
+            ll[[i]][[1]][[j]][[element]]
+          },
+          numeric(1)),
+          nrow = length(ll[[i]][[1]]), ncol = length(ll[[i]]),
+          dimnames = list(NULL, names(ll[[i]])))
+        }
+      }
+    } else {
+      if (get_n_list_levels(ll[[i]]) == 0) {
+        NA
+      } else {
+        if (any(vapply(ll[[i]], function(x) {
+          sum(t_expected_names %in% names(x[[1]])) != 4
+        },
+        logical(1)))) {
+          stop("The element was not found in one of the sub-elements of ",
+               "model ", t_model_names[i], ". Please provide a list returned ",
+               "from get_wcs_limit().")
+        } else {
+          matrix(vapply(seq_along(ll[[i]]), function(bb) {
+            vapply(seq_along(ll[[i]][[1]]), function(j) {
+              ll[[i]][[bb]][[j]][[element]]
+            },
+            numeric(1))
+          }, numeric(length(ll[[i]][[1]]))),
+          nrow = length(ll[[i]][[1]]), ncol = length(ll[[i]]),
+          dimnames = list(NULL, names(ll[[i]])))
+        }
+      }
     }
   })
 
-  if (!is.null(names(ll))) {
-    names(l_res) <- names(ll)
-  }
+  names(l_res) <- t_model_names
 
   return(l_res)
 }
@@ -1374,13 +1650,13 @@ extract_from_ll_wcsl <- function(ll, element) {
 #' vectors of indices which specify the worst case elements.
 #'
 #' @param l1 A list of matrices of \eqn{x} values or a list of lists of one
-#'   element being a numeric vector. The list must have three elements named
-#'   \code{"cics"}, \code{"dics"} and \code{"dids"}.
+#'   element being a numeric vector. The list must have four elements named
+#'   \code{"cics"}, \code{"dics"}, \code{"dids.pmse"} and \code{"dids"}.
 #' @param l2 A list of vectors of indices which specify the worst case elements.
-#'   The list must have three elements named \code{"cics"}, \code{"dics"} and
-#'   \code{"dids"}. The length of \code{l2} must be equal to the length of
-#'   \code{l1} and the length of the vectors of \code{l2} must be equal to the
-#'   number of rows of the matrices in \code{l1}.
+#'   As \code{l1}, the list must have four elements named \code{"cics"},
+#'   \code{"dics"}, \code{"dids.pmse"} and \code{"dids"}. The length of the
+#'   vectors of \code{l2} must be equal to the number of rows of the matrices
+#'   in \code{l1} or the length of the vectors of the list elements.
 #'
 #' @details Information from a list of matrices of values or list of list of
 #' one vector by aid of a list of vectors of indices which specify which
@@ -1400,13 +1676,13 @@ extract_wc_x <- function(l1, l2) {
   if (!is.list(l2)) {
     stop("Parameter l2 must be a list.")
   }
-  if (sum(names(l1) %in% c("cics", "dics", "dids")) != 3) {
-    stop("The list l1 must have three elements named \"cics\", \"dics\" ",
-         "and \"dids\".")
+  if (sum(names(l1) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The list l1 must have four elements named \"cics\", \"dics\" ",
+         "\"dids.pmse\" and \"dids\".")
   }
-  if (sum(names(l2) %in% c("cics", "dics", "dids")) != 3) {
-    stop("The list l2 must have three elements named \"cics\", \"dics\" ",
-         "and \"dids\".")
+  if (sum(names(l2) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The list l2 must have four elements named \"cics\", \"dics\" ",
+         "\"dids.pmse\" and \"dids\".")
   }
   if (get_n_list_levels(l1) == 1) {
     if (sum(vapply(l1, function(x) {
@@ -1429,7 +1705,7 @@ extract_wc_x <- function(l1, l2) {
   logical(1))) > 0) {
     stop("The elements of l2 must be numeric vectors or vectors of NA.")
   }
-  if (sum(vapply(l1, function(x) is.matrix(x), logical(1))) == 3) {
+  if (sum(vapply(l1, function(x) is.matrix(x), logical(1))) == 4) {
     if (!isTRUE(all.equal(vapply(l1, function(x) nrow(x), numeric(1)),
                           vapply(l2, function(x) length(x), numeric(1))))) {
       stop("The number of rows of the matrices in l1 must be equal ",
@@ -1648,10 +1924,10 @@ get_n_list_levels <- function(x) {
 #'   confidence or prediction interval of the linear regression model
 #'   representing the worst case scenario (woca) model. The default is
 #'   \code{NULL}.
-#' @param t_exp A data frame of the intercepts, the differences between release
-#'   and shelf life limits, the worst case scenario limits (WCSLs), the expiry
-#'   and release specification limits, the shelf lives and POI values. The
-#'   default is \code{NULL}.
+#' @param wisle_est A data frame of the intercepts, the differences between
+#'   release and shelf life limits, the worst case scenario limits (WCSLs),
+#'   the expiry and release specification limits, the shelf lives and POI
+#'   values. The default is \code{NULL}.
 #' @param wc_icpt A data frame of the worst case intercepts of each of the
 #'   four fitted models. The default is \code{NULL}.
 #' @param rl_sf A positive integer or a vector of positive integers specifying
@@ -1684,12 +1960,112 @@ get_n_list_levels <- function(x) {
 #'
 #' @keywords internal
 
-get_text_annotation <-
-  function(rvu, x_range, y_range, sl, sl_sf, poi_model, ivl_side,
-           poi_woca = NULL, t_exp = NULL, wc_icpt = NULL, rl_sf = NULL,
-           rl_index = NULL, wcsl_model_name = NULL, plot_option = "full") {
+get_text_annotation <- function(rvu, x_range, y_range, sl, sl_sf, poi_model,
+                                ivl_side, poi_woca = NULL, wisle_est = NULL,
+                                wc_icpt = NULL, rl_sf = NULL, rl_index = NULL,
+                                wcsl_model_name = NULL, plot_option = "full") {
+  if (!is.character(rvu)) {
+    stop("The parameter rvu must be a string.")
+  }
+  if (!is.null(x_range)) {
+    if (!is.numeric(x_range) || length(x_range) != 2) {
+      stop("The parameter x_range must be a vector of length 2.")
+    }
+  }
+  if (!is.null(y_range)) {
+    if (!is.numeric(y_range) || length(y_range) != 2) {
+      stop("The parameter y_range must be a vector of length 2.")
+    }
+  }
+  if (!is.numeric(sl) || length(sl) > 2) {
+    stop("The parameter sl must be a numeric or vector of length 1 or 2.")
+  }
+  if (length(sl) == 2) {
+    if (sl[2] < sl[1]) {
+      stop("The parameter sl must be of the form c(lower, upper).")
+    }
+  }
+  if (!is.numeric(sl_sf) && all(!is.na(sl_sf))) {
+    stop("The parameter sl_sf must be a positive integer of length sl.")
+  }
+  if (sum(sl_sf < 0) > 0) {
+    stop("The parameter sl_sf must be a positive integer of length sl.")
+  }
+  if (length(sl_sf) != length(sl)) {
+    stop("The parameter sl_sf must be a positive integer of length sl.")
+  }
+  if (!isTRUE(all.equal(sl_sf, as.integer(sl_sf)))) {
+    stop("The parameter sl_sf must be a positive integer of length sl.")
+  }
+  if (!is.numeric(poi_model) && !is.na(poi_model) || length(poi_model) > 1) {
+    stop("The parameter poi_model must be a numeric of length 1.")
+  }
+  if (!(ivl_side %in% c("lower", "upper", "both"))) {
+    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
+  }
+
+  if (!is.null(poi_woca)) {
+    if (!is.numeric(poi_woca) && !is.na(poi_woca) || length(poi_woca) > 1) {
+      stop("The parameter poi_woca must be a numeric of length 1.")
+    }
+  }
+  if (!is.null(wisle_est)) {
+    if (!is.data.frame(wisle_est) || ncol(wisle_est) != 24) {
+      stop("The parameter wisle_est must be a data frame with 24 columns.")
+    }
+  }
+  if (!is.null(wc_icpt)) {
+    if (!is.numeric(wc_icpt) || length(wc_icpt) > 1) {
+      stop("The parameter wc_icpt must be a numeric of length 1.")
+    }
+  }
+  if (!is.null(rl_sf) && !is.null(wisle_est)) {
+    if (!is.numeric(rl_sf) && all(!is.na(rl_sf))) {
+      stop("The parameter rl_sf must be a positive integer of the same length ",
+           "as the parameter wisle_est has rows.")
+    }
+    if (sum(rl_sf < 0) > 0) {
+      stop("The parameter rl_sf must be a positive integer of the same length ",
+           "as the parameter wisle_est has rows.")
+    }
+    if (length(rl_sf) != nrow(wisle_est)) {
+      stop("The parameter rl_sf must be a positive integer of the same length ",
+           "as the parameter wisle_est has rows.")
+    }
+    if (!isTRUE(all.equal(rl_sf, as.integer(rl_sf)))) {
+      stop("The parameter rl_sf must be a positive integer of the same length ",
+           "as the parameter wisle_est has rows.")
+    }
+  }
+  if (!is.null(rl_index) && !is.null(wisle_est)) {
+    if (!is.numeric(rl_index) || length(rl_index) > 1) {
+      stop("The parameter rl_index must be a positive integer of length 1.")
+    }
+    if (rl_index != as.integer(rl_index)) {
+      stop("The parameter rl_index must be a positive integer of length 1.")
+    }
+    if (rl_index < 1 || rl_index > nrow(wisle_est)) {
+      stop("The parameter rl_index must be between 1 and the number of rows ",
+           "of the parameter wisle_est.")
+    }
+  }
+  if (!is.null(wcsl_model_name)) {
+    if (!is.character(wcsl_model_name) || length(wcsl_model_name) != 1) {
+      stop("The parameter wcsl_model_name must be a single string.")
+    }
+  }
+  if (!(plot_option %in% c("full", "lean1", "lean2", "basic1", "basic2"))) {
+    stop("Please specify plot_option either as \"full\", \"lean1\", ",
+         "\"lean2\", \"basic1\" or \"basic2\".")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Preparation of data
 
   y_breaks <- pretty(y_range, 5)
+  t_exp <- wisle_est
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   if (is.null(poi_woca)) {
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1704,7 +2080,8 @@ get_text_annotation <-
         Response = c(sl, sl[1]),
         Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
                   print_val("USL: ", sl[2], rvu, sl_sf[2]),
-                  print_val("", poi_model, "", get_n_whole_part(poi_model) + 1)),
+                  print_val("", poi_model, "",
+                            get_n_whole_part(poi_model) + 1)),
         Colour = c("black", "black", "forestgreen"),
         stringsAsFactors = FALSE)
 
@@ -1908,6 +2285,20 @@ get_text_annotation <-
 #' @keywords internal
 
 get_hlines <- function(sl, ivl_side) {
+  if (!is.numeric(sl) || length(sl) > 2) {
+    stop("The parameter sl must be a numeric or vector of length 1 or 2.")
+  }
+  if (length(sl) == 2) {
+    if (sl[2] < sl[1]) {
+      stop("The parameter sl must be of the form c(lower, upper).")
+    }
+  }
+  if (!(ivl_side %in% c("lower", "upper", "both"))) {
+    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   if (length(sl) == 2) {
     d_hlines <- data.frame(Response = sl,
                            Item = c("LSL", "USL"),
@@ -1964,8 +2355,64 @@ get_hlines <- function(sl, ivl_side) {
 #'
 #' @keywords internal
 
-get_segments <- function(sl, ivl_side, t_exp, rl, rl_index, poi_woca,
+get_segments <- function(sl, ivl_side, wisle_est, rl, rl_index, poi_woca,
                          wc_icpt, x_range, sl_model_name, wcsl_model_name) {
+  if (!is.numeric(sl) || length(sl) > 2) {
+    stop("The parameter sl must be a numeric or vector of length 1 or 2.")
+  }
+  if (length(sl) == 2) {
+    if (sl[2] < sl[1]) {
+      stop("The parameter sl must be of the form c(lower, upper).")
+    }
+  }
+  if (!(ivl_side %in% c("lower", "upper", "both"))) {
+    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
+  }
+  if (!is.data.frame(wisle_est) || ncol(wisle_est) != 24) {
+    stop("The parameter wisle_est must be a data frame with 24 columns.")
+  }
+  if (!is.numeric(rl)) {
+    stop("The parameter rl must be a numeric.")
+  }
+  if (length(rl) != nrow(wisle_est)) {
+    stop("The parameter rl must be a positive integer of the same length ",
+         "as the parameter wisle_est has rows.")
+  }
+  if (!is.numeric(rl_index) || length(rl_index) > 1) {
+    stop("The parameter rl_index must be a positive integer of length 1.")
+  }
+  if (rl_index != as.integer(rl_index)) {
+    stop("The parameter rl_index must be a positive integer of length 1.")
+  }
+  if (rl_index < 1 || rl_index > nrow(wisle_est)) {
+    stop("The parameter rl_index must be between 1 and the number of rows ",
+         "of the parameter wisle_est.")
+  }
+  if (!is.numeric(poi_woca) && !is.na(poi_woca) || length(poi_woca) > 1) {
+    stop("The parameter poi_woca must be a numeric of length 1.")
+  }
+  if (!is.numeric(wc_icpt) || length(wc_icpt) > 1) {
+    stop("The parameter wc_icpt must be a numeric of length 1.")
+  }
+  if (!is.null(x_range)) {
+    if (!is.numeric(x_range) || length(x_range) != 2) {
+      stop("The parameter x_range must be a vector of length 2.")
+    }
+  }
+  if (!is.character(sl_model_name) || length(sl_model_name) != 1) {
+    stop("The parameter sl_model_name must be a single string.")
+  }
+  if (!is.character(wcsl_model_name) || length(wcsl_model_name) != 1) {
+    stop("The parameter wcsl_model_name must be a single string.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Preparation of data
+
+  t_exp <- wisle_est
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   if (length(sl) == 2) {
     switch(ivl_side,
            "lower" = {
@@ -2062,8 +2509,61 @@ get_segments <- function(sl, ivl_side, t_exp, rl, rl_index, poi_woca,
 #'
 #' @keywords internal
 
-get_arrow <- function(sl, ivl_side, t_exp, rl, rl_index, poi_woca,
-                         wc_icpt, x_range, sl_model_name, wcsl_model_name) {
+get_arrow <- function(sl, ivl_side, wisle_est, rl, rl_index,
+                      wc_icpt, x_range, sl_model_name, wcsl_model_name) {
+  if (!is.numeric(sl) || length(sl) > 2) {
+    stop("The parameter sl must be a numeric or vector of length 1 or 2.")
+  }
+  if (length(sl) == 2) {
+    if (sl[2] < sl[1]) {
+      stop("The parameter sl must be of the form c(lower, upper).")
+    }
+  }
+  if (!(ivl_side %in% c("lower", "upper", "both"))) {
+    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
+  }
+  if (!is.data.frame(wisle_est) || ncol(wisle_est) != 24) {
+    stop("The parameter wisle_est must be a data frame with 24 columns.")
+  }
+  if (!is.numeric(rl)) {
+    stop("The parameter rl must be a numeric.")
+  }
+  if (length(rl) != nrow(wisle_est)) {
+    stop("The parameter rl must be a positive integer of the same length ",
+         "as the parameter wisle_est has rows.")
+  }
+  if (!is.numeric(rl_index) || length(rl_index) > 1) {
+    stop("The parameter rl_index must be a positive integer of length 1.")
+  }
+  if (rl_index != as.integer(rl_index)) {
+    stop("The parameter rl_index must be a positive integer of length 1.")
+  }
+  if (rl_index < 1 || rl_index > nrow(wisle_est)) {
+    stop("The parameter rl_index must be between 1 and the number of rows ",
+         "of the parameter wisle_est.")
+  }
+  if (!is.numeric(wc_icpt) || length(wc_icpt) > 1) {
+    stop("The parameter wc_icpt must be a numeric of length 1.")
+  }
+  if (!is.null(x_range)) {
+    if (!is.numeric(x_range) || length(x_range) != 2) {
+      stop("The parameter x_range must be a vector of length 2.")
+    }
+  }
+  if (!is.character(sl_model_name) || length(sl_model_name) != 1) {
+    stop("The parameter sl_model_name must be a single string.")
+  }
+  if (!is.character(wcsl_model_name) || length(wcsl_model_name) != 1) {
+    stop("The parameter wcsl_model_name must be a single string.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Preparation of data
+
+  t_exp <- wisle_est
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   if (length(sl) == 2) {
     switch(ivl_side,
            "lower" = {

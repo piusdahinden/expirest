@@ -31,6 +31,23 @@ test_that("get_linear_models_succeeds", {
                c(-0.180125195618, -0.208608547839, -0.188390951771))
 })
 
+test_that("get_linear_models_succeeds_with_a_single_batch", {
+  l_res <-
+    get_linear_models(data = exp1[exp1$Batch == "b2", ],
+                      response_vbl = "Potency", time_vbl = "Month",
+                      batch_vbl = "Batch")
+
+  t_icpt <- vapply(l_res$Models[["dids"]], function(x) coef(x)["(Intercept)"],
+                   numeric(1))
+  t_slp <- vapply(l_res$Models[["dids"]], function(x) coef(x)["Month"],
+                  numeric(1))
+
+  # <-><-><-><->
+
+  expect_equivalent(signif(t_icpt, 12), 100.249139280)
+  expect_equivalent(signif(t_slp, 12), -0.180125195618)
+})
+
 test_that("get_linear_models_fails", {
   tmp <- exp1
   tmp$Batch <- as.character(tmp$Batch)
