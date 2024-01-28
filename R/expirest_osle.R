@@ -13,7 +13,7 @@
 #'   must be a column of \code{data}.
 #' @param batch_vbl A character string specifying the column in \code{data}
 #'   with the grouping information (i.e. a factorial variable) for the
-#'   differentiation of the observations of the different batches.
+#'   differentiation of the observations of the various batches.
 #' @param sl A numeric value or a numeric vector of length \code{2} specifying
 #'   the specification limit or limits. If a vector is provided it must be of
 #'   the form \code{c(lower limit, upper limit)}.
@@ -330,7 +330,19 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
          "expirest_osle() was called with ivl_side = \"both\".")
   }
 
-  t_sides <- c("lower", "upper")
+  # Although release limits are not relevant for the osle approach. However,
+  # since expirest_wisle() calls expirest_osle(), this function must be able
+  # to hand down the information and return the results appropriately.
+  if (mrl == 0) {
+    rl <- NA
+  } else {
+    rl <- mf[[mrl]]
+  }
+  if (mrlsf == 0) {
+    rl_sf <- NA
+  } else {
+    rl_sf <- mf[[mrlsf]]
+  }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Linearisation of data by variable transformation
@@ -383,222 +395,33 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination and selection of limits
 
-  if (mrl > 0 && mrlsf > 0) {
-    l_lim <-
-      set_limits(rl = mf[[mrl]], rl_sf = mf[[mrlsf]], sl = sl, sl_sf = sl_sf,
-                 sf_option = sf_option, xform = xform, shift = shift,
-                 ivl_side = ivl_side)
-  } else {
-    l_lim <-
-      set_limits(rl = NA, rl_sf = NA, sl = sl, sl_sf = sl_sf,
-                 sf_option = sf_option, xform = xform, shift = shift,
-                 ivl_side = ivl_side)
-  }
+  l_lim <- set_limits(rl = rl, rl_sf = rl_sf, sl = sl, sl_sf = sl_sf,
+                      sf_option = sf_option, xform = xform, shift = shift,
+                      ivl_side = ivl_side)
 
-  # For the following assessments only the relevant specification limit is used.
-  if (length(sl) == 2 && ivl_side != "both") {
-    switch(ivl_side,
-           "lower" = {
-              if (xform[2] == "no") {
-               sl <- l_lim[["sl"]][1]
-             } else {
-               sl <- l_lim[["sl.trfmd"]][1]
-             }
-           },
-           "upper" = {
-             if (xform[2] == "no") {
-               sl <- l_lim[["sl"]][2]
-             } else {
-               sl <- l_lim[["sl.trfmd"]][2]
-             }
-           })
-  } else {
-    if (xform[2] == "no") {
-      sl <- l_lim[["sl"]]
-    } else {
-      sl <- l_lim[["sl.trfmd"]]
-    }
-  }
+  sl <- get_relevant_limits(limits_list = l_lim,
+                            xform = xform, ivl_side = ivl_side)$sl
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of intercepts of all models
 
-  if (nlevels(d_dat[, batch_vbl]) > 1) {
-    l_icpt <- vapply(l_models[c("cics", "dics", "dids.pmse")], function(x) {
-      list(get_icpt(model = x, response_vbl = response_vbl,
-                    time_vbl = time_vbl, batch_vbl = batch_vbl,
-                    xform = xform, shift = shift))
-    },
-    list(1))
-  } else {
-    l_icpt <- list(cics = NA, dics = NA, dids.pmse = NA)
-  }
-
-  tmp <- vapply(l_models[["dids"]], function(x) {
-    list(get_icpt(model = x, response_vbl = response_vbl,
-                  time_vbl = time_vbl, batch_vbl = batch_vbl,
-                  xform = xform, shift = shift))
-  },
-  list(1))
-  tmp <- unlist(tmp)
-  names(tmp) <- sub("\\.\\(Intercept\\)", "", names(tmp))
-
-  if (xform[2] == "no") {
-    names(tmp) <- sub("\\.icpt", "", names(tmp))
-    l_icpt <- c(l_icpt, list(dids = list(icpt = tmp)))
-  } else {
-    t_i_orig <- grep("orig", names(tmp))
-    names(tmp) <- sub("\\.icpt", "", names(tmp))
-    names(tmp) <- sub("\\.orig", "", names(tmp))
-
-    l_icpt <- c(l_icpt, list(dids = list(icpt = tmp[-t_i_orig],
-                                         icpt.orig = tmp[t_i_orig])))
-  }
+  l_icpt <- get_icpt_list(data = d_dat, response_vbl = response_vbl,
+                          time_vbl = time_vbl, batch_vbl = batch_vbl,
+                          model_list = l_models, xform = xform, shift = shift)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of POI values of all models
 
-  if (ivl_side == "both" && length(sl) == 2) {
-    l_poi <-
-      lapply(seq_along(t_sides), function(i) {
-        get_poi_list(data = d_dat, batch_vbl = batch_vbl, model_list = l_models,
-                     srch_range = srch_range, sl = sl[i], mode = "minimal",
-                     alpha = alpha, ivl = ivl, ivl_type = ivl_type,
-                     ivl_side = t_sides[i])
-      })
-    names(l_poi) <- t_sides
-
-    # Extraction of all worst case POI values
-    d_poi <-
-      rbind(lower = vapply(l_poi$lower, function(x) {
-        ifelse(all(is.na(x)), NA, min(x, na.rm = TRUE))
-      },
-      numeric(1)),
-      upper = vapply(l_poi$upper, function(x) {
-        ifelse(all(is.na(x)), NA, min(x, na.rm = TRUE))
-      },
-      numeric(1)))
-    d_poi[is.infinite(d_poi)] <- NA
-
-    # Determination of the side of the worst case POI value
-    t_poi_side <- t_sides[(d_poi["upper", ] < d_poi["lower", ]) + 1L]
-    names(t_poi_side) <- names(l_models)
-
-    # Summary vector of the worst case POI values
-    t_poi <- vapply(seq_along(colnames(d_poi)), function(i) {
-      ifelse(is.na(t_poi_side[i]), NA, d_poi[t_poi_side[i], i])
-    },
-    numeric(1))
-    names(t_poi) <- colnames(d_poi)
-    attr(t_poi, "side") <- t_poi_side
-  } else {
-    l_poi <- setNames(list(NA), ivl_side)
-    l_poi[[ivl_side]] <-
-      get_poi_list(data = d_dat, batch_vbl = batch_vbl, model_list = l_models,
-                   srch_range = srch_range, sl = sl, mode = "minimal",
-                   alpha = alpha, ivl = ivl, ivl_type = ivl_type,
-                   ivl_side = ivl_side)
-
-    # "Determination" of the side of the worst case POI value
-    t_poi_side <- rep(ivl_side, length(l_models))
-    names(t_poi_side) <- names(l_models)
-
-    # Summary vector of the worst case POI values
-    t_poi <- vapply(l_poi[[ivl_side]], function(x) {
-      ifelse(all(is.na(x)), NA, min(x, na.rm = TRUE))
-    },
-    numeric(1))
-    t_poi[is.infinite(t_poi)] <- NA
-    attr(t_poi, "side") <- t_poi_side
-  }
-
-  if (nlevels(d_dat[, batch_vbl]) > 1) {
-    if (sum(is.na(t_poi)) != 0) {
-      if (min(srch_range) == 0) {
-        warning("Not for all model types POI values obtained. ",
-                "Possibly, changing srch_range could solve the issue ",
-                "(a lower limit > 0 might be a solution).")
-      } else {
-        warning("Not for all model types POI values obtained. ",
-                "Possibly, changing srch_range could solve the issue. ")
-      }
-    }
-  } else {
-    if (is.na(t_poi["dids"])) {
-      if (min(srch_range) == 0) {
-        warning("No POI value was obtained. ",
-                "Possibly, changing srch_range could solve the issue ",
-                "(a lower limit > 0 might be a solution).")
-      } else {
-        warning("No POI value was obtained. ",
-                "Possibly, changing srch_range could solve the issue. ")
-      }
-    }
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of worst case batch (wc_batch)
-  #   and its intercept (wc_icpt)
-
-  # In case of cics model: wc_icpt is the common intercept of all batches
-  #   and none of the batches is the worst case batch and thus NA.
-  # In case of dids model: wc_batch needs to be determined using the
-  #   models fitted to the data of each individual batch.
-
-  # Worst case batch (of each model)
-  if (ivl_side == "both" && length(sl) == 2) {
-    l_wc_batch <-
-      lapply(l_poi, function(ll) {
-        vapply(ll, function(x) {
-          ifelse(!length(which.min(x)), NA, which.min(x))
-        },
-        numeric(1))
-      })
-
-    l_wc_batch$lower["cics"] <- NA
-    l_wc_batch$upper["cics"] <- NA
-
-    # Summary vector of the worst case batches
-    wc_batch <- vapply(seq_along(names(l_models)), function(i) {
-      ifelse(is.na(t_poi_side[i]), NA, l_wc_batch[[t_poi_side[i]]][i])
-    },
-    numeric(1))
-    attr(wc_batch, "side") <- t_poi_side
-  } else {
-    wc_batch <- vapply(l_poi[[ivl_side]], function(x) {
-      ifelse(!length(which.min(x)), NA, which.min(x))
-    },
-    numeric(1))
-
-    wc_batch["cics"] <- NA
-    attr(wc_batch, "side") <- t_poi_side
-  }
-
-  # Intercept of the worst case batch (of each model)
-  if (ivl_side == "both" && length(sl) == 2) {
-    l_wc_icpt <-
-      lapply(t_sides, function(side) {
-        get_wc_icpt(data = d_dat, batch_vbl = batch_vbl,
-                    icpt_list = l_icpt, poi_list = l_poi[[side]],
-                    wc_batch = l_wc_batch[[side]], xform = xform)
-      })
-    names(l_wc_icpt) <- t_sides
-
-    # Summary vector of the intercepts of the worst case batches
-    wc_icpt <- vapply(seq_along(names(l_models)), function(i) {
-      ifelse(is.na(t_poi_side[i]), NA, l_wc_icpt[[t_poi_side[i]]][i])
-    },
-    numeric(1))
-    attr(wc_icpt, "side") <- t_poi_side
-  } else {
-    wc_icpt <- get_wc_icpt(data = d_dat, batch_vbl = batch_vbl,
-                           icpt_list = l_icpt, poi_list = l_poi[[ivl_side]],
-                           wc_batch = wc_batch, xform = xform)
-    attr(wc_icpt, "side") <- t_poi_side
-  }
+  l_osle <-
+    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl, icpt_list = l_icpt,
+                      model_list = l_models, sl = sl, srch_range = srch_range,
+                      alpha = alpha,  xform = xform, shift = shift, ivl = ivl,
+                      ivl_type = ivl_type, ivl_side = ivl_side, ...)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Back-transformation of POI values, if necessary
+
+  t_poi <- l_osle[["poi"]]
 
   if (xform[1] != "no") {
     switch(xform[1],
@@ -632,11 +455,11 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
                  Models = l_models,
                  AIC = t_AIC,
                  BIC = t_BIC,
-                 wc.icpt = wc_icpt,
-                 wc.batch = wc_batch,
+                 wc.icpt = l_osle[["wc.icpt"]],
+                 wc.batch = l_osle[["which.wc.batch"]],
                  Limits = l_lim,
                  Intercepts = l_icpt,
-                 All.POI = l_poi,
+                 All.POI = l_osle[["all.poi"]],
                  POI = t_poi),
             class = "expirest_osle")
 }

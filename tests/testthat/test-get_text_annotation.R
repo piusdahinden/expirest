@@ -10,8 +10,8 @@ test_that("get_text_annotation_succeeds", {
       sf_option = "loose", ivl = "confidence", ivl_type = "one.sided",
       ivl_side = "lower")
 
-  x_range = c(-1, 29)
-  y_range = c(92, 107)
+  x_range <- c(-1, 29)
+  y_range <- c(92, 107)
 
   sl <- re[["Limits"]][["sl"]]
   sl_sf <- re[["Limits"]][["sl.sf"]] + 1
@@ -65,8 +65,8 @@ test_that("get_text_annotation_fails", {
       sf_option = "loose", ivl = "confidence", ivl_type = "one.sided",
       ivl_side = "lower")
 
-  x_range = c(-1, 29)
-  y_range = c(92, 107)
+  x_range <- c(-1, 29)
+  y_range <- c(92, 107)
 
   sl <- re[["Limits"]][["sl"]]
   sl_sf <- re[["Limits"]][["sl.sf"]] + 1

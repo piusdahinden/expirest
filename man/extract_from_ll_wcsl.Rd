@@ -33,6 +33,6 @@ aid of the function \code{\link{get_wcs_limit}()} for a set of release
 limit values (\code{rl}) and intercepts.
 }
 \seealso{
-\code{\link{get_wcs_limit}()}.
+\code{\link{get_wcs_limit}}.
 }
 \keyword{internal}

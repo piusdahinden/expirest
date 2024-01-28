@@ -45,9 +45,10 @@ if data of only a single batch is available.}
 the (time) range within which the minimal distance is expected to be found.}
 
 \item{mode}{A character string of either \code{"minimal"} or \code{"all"},
-specifying if only the minimal distance of a factorial regression model
-is returned or if the distances of all lines belonging to the different
-factor levels is returned. The default is \code{"minimal"}.}
+specifying if only the POI that is associated with the minimal distance
+of a factorial regression model is returned or if the POIs of all lines
+belonging to the different factor levels is returned. The default is
+\code{"minimal"}.}
 
 \item{alpha}{A numeric value between 0 and 1 specifying the significance
 level for the calculation of confidence or prediction intervals. The
@@ -74,7 +75,10 @@ be used.}
 \code{\link[stats]{uniroot}()}.}
 }
 \value{
-A list with the following elements is returned:
+a list of four elements named \code{cics}, \code{dics},
+\code{dids.pmse} and \code{dids} is returned. Each of them contains a named
+vector of the estimated POI values estimated for each batch named
+correspondingly.
 }
 \description{
 The function \code{get_poi_list()} prepares a list of points of intersection

@@ -18,7 +18,7 @@ must be a column of \code{data}.}
 
 \item{batch_vbl}{A character string specifying the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
-differentiation of the observations of the different batches.}
+differentiation of the observations of the various batches.}
 
 \item{alpha}{A numeric value specifying the significance level for the
 decision which model is appropriate, i.e. if the assumption of

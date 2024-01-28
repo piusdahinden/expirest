@@ -12,7 +12,7 @@ get_wc_icpt(data, batch_vbl, icpt_list, poi_list, wc_batch, xform)
 
 \item{batch_vbl}{A character string specifying the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
-differentiation of the observations of the different batches.}
+differentiation of the observations of the various batches.}
 
 \item{icpt_list}{A list of the intercepts of each model type, i.e. a list
 of four elements named \code{cics}, \code{dics}, \code{dids.pmse} and

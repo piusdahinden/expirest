@@ -10,7 +10,7 @@ test_that("get_arrow_succeeds", {
       sf_option = "loose", ivl = "confidence", ivl_type = "one.sided",
       ivl_side = "lower")
 
-  x_range = c(-1, 29)
+  x_range <- c(-1, 29)
 
   sl <- re[["Limits"]][["sl"]]
   rl <- re[["Limits"]][["rl"]]
@@ -60,7 +60,7 @@ test_that("get_arrow_fails", {
       sf_option = "loose", ivl = "confidence", ivl_type = "one.sided",
       ivl_side = "lower")
 
-  x_range = c(-1, 29)
+  x_range <- c(-1, 29)
 
   sl <- re[["Limits"]][["sl"]]
   rl <- re[["Limits"]][["rl"]]

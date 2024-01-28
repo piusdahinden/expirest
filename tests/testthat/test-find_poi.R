@@ -123,12 +123,12 @@ test_that("find_poi_fails_with_warning_tight_uniroot_interval", {
              ivl_side = "upper"),
     "Error in uniroot")
   expect_error(
-    find_poi(srch_range = c(0, 10), model = r_moist, sl = lsl,mode = "minimal",
+    find_poi(srch_range = c(0, 10), model = r_moist, sl = lsl, mode = "minimal",
              alpha = 0.05, ivl = "prediction", ivl_type = "one.sided",
              ivl_side = "lower"),
     "Error in uniroot")
   expect_error(
-    find_poi(srch_range = c(0, 10), model = r_moist, sl = usl,mode = "minimal",
+    find_poi(srch_range = c(0, 10), model = r_moist, sl = usl, mode = "minimal",
              alpha = 0.05, ivl = "prediction", ivl_type = "one.sided",
              ivl_side = "upper"),
     "Error in uniroot")

@@ -4,8 +4,8 @@ test_that("get_wc_icpt_succeeds", {
   response_vbl <- "Potency"
   time_vbl <- "Month"
   batch_vbl <- "Batch"
-  xform = c("no", "no")
-  shift = c(0, 0)
+  xform <- c("no", "no")
+  shift <- c(0, 0)
 
   # Models
   l_mod <-

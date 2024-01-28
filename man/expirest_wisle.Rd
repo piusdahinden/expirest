@@ -37,7 +37,7 @@ must be a column of \code{data}.}
 
 \item{batch_vbl}{A character string specifying the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
-differentiation of the observations of the different batches.}
+differentiation of the observations of the various batches.}
 
 \item{rl}{A numeric value or a numeric vector specifying the release
 specification limit(s) for which the corresponding expiry should be
@@ -160,7 +160,7 @@ containing the following elements:
   and shelf life limits, the WCSLs, the expiry and release specification
   limits, the shelf lives and POI values.}
 
-The \code{POI} data frame has the following columns:
+Structure of the \code{POI} data frame:
 \item{Intercept.cics}{The intercept of the worst case batch of the cics
   model.}
 \item{Intercept.dics}{The intercept of the worst case batch of the dics

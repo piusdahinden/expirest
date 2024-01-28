@@ -15,7 +15,7 @@ must be a column of \code{data}.}
 
 \item{batch_vbl}{A character string specifying the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
-differentiation of the observations of the different batches.}
+differentiation of the observations of the various batches.}
 
 \item{xform}{A vector of two character strings specifying the transformation
 of the response and the time variable. The default is \dQuote{no}

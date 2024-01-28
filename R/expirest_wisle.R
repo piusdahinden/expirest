@@ -120,7 +120,7 @@
 #'   and shelf life limits, the WCSLs, the expiry and release specification
 #'   limits, the shelf lives and POI values.}
 #'
-#' The \code{POI} data frame has the following columns:
+#' Structure of the \code{POI} data frame:
 #' \item{Intercept.cics}{The intercept of the worst case batch of the cics
 #'   model.}
 #' \item{Intercept.dics}{The intercept of the worst case batch of the dics
@@ -188,7 +188,6 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
                            shift = c(0, 0), sf_option = "loose",
                            ivl = "confidence", ivl_type = "one.sided",
                            ivl_side = "lower", ...) {
-
   if (!is.data.frame(data)) {
     stop("The data must be provided as data frame.")
   }
@@ -283,8 +282,8 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   if (!(ivl_type %in% c("one.sided", "two.sided"))) {
     stop("Please specify ivl_type either as \"one.sided\" or \"two.sided\".")
   }
-  if (!(ivl_side %in% c("lower", "upper", "both"))) {
-    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
+  if (!(ivl_side %in% c("lower", "upper"))) {
+    stop("Please specify ivl_side either as \"lower\" or \"upper\".")
   }
 
   if (length(sl) == 1) {
@@ -340,371 +339,42 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Fit of all possible models that are relevant and their intercepts
-
-  l_models <- r_ret[["Models"]]
-  l_icpt <- r_ret[["Intercepts"]]
-
-  # Preliminary definition of the lists that will be required below
-  l_poi <- l_prl <- l_wc_batch <-
-    setNames(rep(list(NA), 4), names(l_models))
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
 
-  l_lim <- r_ret$Limits
+  rel_lim <- get_relevant_limits(limits_list = r_ret[["Limits"]],
+                                 xform = xform, ivl_side = ivl_side)
 
-  # For the assessments to follow only the relevant limits are used.
-  # ---------
-  # Specification limits
-  if (length(sl) == 2) {
-    switch(ivl_side,
-           "lower" = {
-             sl_orig <- l_lim[["sl.orig"]][1]
-
-             if (xform[2] == "no") {
-               sl <- l_lim[["sl"]][1]
-             } else {
-               sl <- l_lim[["sl.trfmd"]][1]
-               sl_bt <- l_lim[["sl"]][1]
-             }
-           },
-           "upper" = {
-             sl_orig <- l_lim[["sl.orig"]][2]
-
-             if (xform[2] == "no") {
-               sl <- l_lim[["sl"]][2]
-             } else {
-               sl <- l_lim[["sl.trfmd"]][2]
-               sl_bt <- l_lim[["sl"]][2]
-             }
-           })
-  } else {
-    sl_orig <- l_lim[["sl.orig"]]
-
-    if (xform[2] == "no") {
-      sl <- l_lim[["sl"]]
-    } else {
-      sl <- l_lim[["sl.trfmd"]]
-      sl_bt <- l_lim[["sl"]]
-    }
-  }
-
-  # ---------
-  # Release limits
-  rl_orig <- l_lim[["rl.orig"]]
+  sl_orig <- rel_lim[["sl.orig"]]
+  sl <- rel_lim[["sl"]]
+  rl_orig <- rel_lim[["rl.orig"]]
+  rl <- rel_lim[["rl"]]
 
   if (xform[2] == "no") {
-    rl <- l_lim[["rl"]]
-  } else {
-    rl <- l_lim[["rl.trfmd"]]
-    rl_bt <- l_lim[["rl"]]
+    sl_bt <- rel_lim[["sl.bt"]]
+    rl_bt <- rel_lim[["rl.bt"]]
   }
 
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Calculation of POI values for all models (according to ARGPM)
 
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of worst case scenario (wcs) limits for all intercepts of
-  # all models (on the transformed scale, if data have been transformed)
-
-  # List of all wcs_limit lists
-  ll_wcsl <- lapply(seq_along(l_icpt),
-                    function(i) {
-                      if (get_n_list_levels(l_icpt[[i]]) != 0) {
-                        lapply(l_icpt[[i]]$icpt, function(xx) {
-                          lapply(rl, function(j) {
-                            get_wcs_limit(rl = j, sl = sl, intercept = xx,
-                                          xform = xform, shift = shift,
-                                          ivl_side = ivl_side)
-                          })
-                        })
-                      } else {
-                        NA
-                      }
-                    })
-  names(ll_wcsl) <- names(l_icpt)
-
-  l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
+  l_wisle <-
+    get_wisle_poi_list(icpt_list = r_ret[["Intercepts"]],
+                       model_list = r_ret[["Models"]], rl = rl, sl = sl,
+                       srch_range = srch_range, alpha = alpha,  xform = xform,
+                       shift = shift, ivl = ivl, ivl_type = ivl_type,
+                       ivl_side = ivl_side, ...)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Calculation of POI values for all wcs limits
-  # Determination of worst case POI values
+  # Compilation of summary data frame
 
-  # The worst case POI value is the POI value obtained with the batch whose
-  # lower or upper confidence or prediction interval limit is closest to the
-  # corresponding specification limit, i.e. the worst case batch.
-
-  # Example: the response is the assay, and the lower specification limit is
-  # the relevant limit. A batch may have a shorter POI than the other batches,
-  # but because it has a higher intercept or/and smaller variability than one
-  # or more of the other batches, the lower confidence or prediction interval
-  # limit of one of the other batches still may be closer to the lower
-  # specification limit so that their POI values are the POI values of
-  # relevance.
-
-  for (variety in names(l_wcsl)) {
-    if (get_n_list_levels(l_icpt[[variety]]) != 0) {
-      # Initialise empty arrays
-      m_poi <- matrix(NA,
-                      nrow = length(rl),
-                      ncol = length(l_icpt[[variety]][["icpt"]]))
-      colnames(m_poi) <- names(l_icpt[[variety]][["icpt"]])
-
-      a_prl <- array(NA,
-                     dim = c(length(rl), length(l_icpt[[variety]][["icpt"]]),
-                             length(l_icpt[[variety]][["icpt"]])),
-                     dimnames = list(as.character(seq_along(rl)),
-                                     names(l_icpt[[variety]][["icpt"]]),
-                                     names(l_icpt[[variety]][["icpt"]])))
-
-      # Fill arrays
-      for (j in seq_along(rl)) {
-        for (k in seq_len(ncol(l_wcsl[[variety]]))) {
-          if (variety != "dids") {
-            tmp_poi <- try_get_model(
-              find_poi(srch_range = srch_range,
-                       model = l_models[[variety]],
-                       sl = l_wcsl[[variety]][j, k], alpha = alpha,
-                       ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
-          } else {
-            tmp_poi <- try_get_model(
-              find_poi(srch_range = srch_range,
-                       model = l_models[["dids"]][[k]],
-                       sl = l_wcsl[[variety]][j, k], alpha = alpha,
-                       ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
-          }
-
-          if (is.null(tmp_poi[["Error"]])) {
-            m_poi[j, k] <- tmp_poi[["Model"]]
-
-            if (variety != "dids") {
-              tmp_prl <- try_get_model(
-                get_intvl_limit(
-                  x_new = tmp_poi[["Model"]],
-                  model = l_models[[variety]], alpha = alpha,
-                  ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-              )
-
-              if (is.null(tmp_prl[["Error"]])) {
-                a_prl[j, k, ] <- tmp_prl[["Model"]]
-              }
-            } else {
-              t_prl <- rep(NA, ncol(l_wcsl[[variety]]))
-
-              for (kk in seq_len(ncol(l_wcsl[["dids"]]))) {
-                tmp_prl <- try_get_model(
-                  get_intvl_limit(
-                    x_new = tmp_poi[["Model"]],
-                    model = l_models[["dids"]][[kk]], alpha = alpha,
-                    ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-                )
-
-                if (is.null(tmp_prl[["Error"]])) {
-                  t_prl[kk] <- tmp_prl[["Model"]]
-                }
-              }
-
-              a_prl[j, k, ] <- t_prl
-            }
-          }
-        }
-      }
-
-      # Put the resulting arrays into the corresponding list entries
-      l_poi[[variety]] <- m_poi
-      l_prl[[variety]] <- a_prl
-    }
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of the batches with the confidence or prediction interval
-  # limits that are closest to the respective specification limit for each
-  # model and each POI
-
-  switch(ivl_side,
-         "lower" = {
-           l_min_dist <- lapply(l_prl, FUN = function(x) {
-             if (is.logical(x)) {
-               NA
-             } else {
-               apply(x, c(1, 2), FUN = function(y) {
-                 ifelse(length(which.min(y)) != 0, which.min(abs(y)), NA)
-               })
-             }
-           })
-         },
-         "upper" = {
-           l_min_dist <- lapply(l_prl, FUN = function(x) {
-             if (is.logical(x)) {
-               NA
-             } else {
-               apply(x, c(1, 2), FUN = function(y) {
-                 ifelse(length(which.max(y)) != 0, which.max(abs(y)), NA)
-               })
-             }
-           })
-         })
-
-  # Determination of the smallest POI value for each model and each rl value
-  l_min_poi <- lapply(l_poi, FUN = function(x) {
-    if (is.logical(x)) {
-      NA
-    } else {
-      apply(x, 1, function(y) {
-        ifelse(length(which.min(y)) != 0, which.min(y), NA)
-      })
-    }
-  })
-
-  # Determination of the worst case batches for each model and each rl value:
-  #   The worst case batches are the ones with the confidence or prediction
-  #   interval limits that are closest to the respective specification limit
-  #   where the POI values are smallest.
-  # In case of cics model: wc_icpt is the common intercept of all batches
-  #   and none of the batches is the worst case batch.
-
-  for (i in seq_along(l_min_dist)) {
-    if (!is.logical(l_min_dist[[i]])) {
-      if (names(l_min_dist)[i] == "cics") {
-        l_wc_batch[[i]] <- rep(NA, length(rl))
-      } else {
-        l_wc_batch[[i]] <-
-          vapply(seq_along(rl), function(j) {
-            ifelse(!is.na(l_min_poi[[i]][j]),
-                   l_min_dist[[i]][j, l_min_poi[[i]][j]],
-                   NA)
-          },
-          numeric(1))
-      }
-    }
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Matrix of the worst case POI values for each model and each rl value
-
-  if (nlevels(d_dat[, batch_vbl]) > 1) {
-    m_poi <- extract_wc_x(l1 = l_poi, l2 = l_wc_batch)
-  } else {
-    m_poi <- matrix(NA, nrow = length(rl), ncol = length(l_wc_batch))
-    colnames(m_poi) <- names(l_wc_batch)
-
-    m_poi[, "dids"] <- as.numeric(l_poi[["dids"]])
-  }
-
-  # Depending on the transformation of the time variable the POI values have to
-  # be back-transformed.
-
-  if (xform[1] != "no") {
-    switch(xform[1],
-           "log" = {
-             m_poi <- exp(m_poi) - shift[1]
-           },
-           "sqrt" = {
-             m_poi <- m_poi^2 - shift[1]
-           },
-           "sq" = {
-             m_poi <- sqrt(m_poi) - shift[1]
-           })
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Collection of data and compilation of summary data frame
-
-  # ---------
-  # Worst case intercepts (wc_icpt_argpm) (on the original scale)
-
-  if (nlevels(d_dat[, batch_vbl]) > 1) {
-    if (xform[2] == "no") {
-      wc_icpt_argpm <- extract_wc_x(l1 = l_icpt, l2 = l_wc_batch)
-    } else {
-      l_icpt_sub <- lapply(l_icpt, function(x) list(x$icpt.orig))
-
-      wc_icpt_argpm <- extract_wc_x(l1 = l_icpt_sub, l2 = l_wc_batch)
-    }
-  } else {
-    wc_icpt_argpm <- matrix(NA, nrow = length(rl), ncol = length(l_wc_batch))
-    colnames(wc_icpt_argpm) <- names(l_wc_batch)
-
-    if (xform[2] == "no") {
-      wc_icpt_argpm[, "dids"] <- as.numeric(l_icpt[["dids"]][["icpt"]])
-    } else {
-      wc_icpt_argpm[, "dids"] <- as.numeric(l_icpt[["dids"]][["icpt.orig"]])
-    }
-  }
-
-  # ---------
-  # Delta and WCSL
-
-  if (xform[2] == "no") {
-    l_delta <- extract_from_ll_wcsl(ll_wcsl, "delta.lim")
-    l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
-
-    if (nlevels(d_dat[, batch_vbl]) > 1) {
-      m_delta <- extract_wc_x(l1 = l_delta, l2 = l_wc_batch)
-      m_wcsl <- extract_wc_x(l1 = l_wcsl, l2 = l_wc_batch)
-    } else {
-      m_delta <- matrix(NA, nrow = length(rl), ncol = length(l_wc_batch))
-      colnames(m_delta) <- names(l_wc_batch)
-      m_wcsl <- m_delta
-
-      m_delta[, "dids"] <- as.numeric(l_delta[["dids"]])
-      m_wcsl[, "dids"] <- as.numeric(l_wcsl[["dids"]])
-    }
-  } else {
-    l_delta_orig <- extract_from_ll_wcsl(ll_wcsl, "delta.lim.orig")
-    l_wcsl_orig <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim.orig")
-
-    if (nlevels(d_dat[, batch_vbl]) > 1) {
-      m_delta <- extract_wc_x(l1 = l_delta_orig, l2 = l_wc_batch)
-      m_wcsl <- extract_wc_x(l1 = l_wcsl_orig, l2 = l_wc_batch)
-    } else {
-      m_delta <- matrix(NA, nrow = length(rl), ncol = length(l_wc_batch))
-      colnames(m_delta) <- names(l_wc_batch)
-      m_wcsl <- m_delta
-
-      m_delta[, "dids"] <- as.numeric(l_delta_orig[["dids"]])
-      m_wcsl[, "dids"] <- as.numeric(l_wcsl_orig[["dids"]])
-    }
-  }
-
-  # ---------
-  # Summary data frame compilation
-
-  d_poi <- data.frame(
-    Intercept.cics = wc_icpt_argpm[, "cics"],
-    Intercept.dics = wc_icpt_argpm[, "dics"],
-    Intercept.dids = wc_icpt_argpm[, "dids"],
-    Intercept.dids.pmse = wc_icpt_argpm[, "dids.pmse"],
-    Delta.cics = m_delta[, "cics"],
-    Delta.dics = m_delta[, "dics"],
-    Delta.dids = m_delta[, "dids"],
-    Delta.dids.pmse = m_delta[, "dids.pmse"],
-    WCSL.cics = m_wcsl[, "cics"],
-    WCSL.dics = m_wcsl[, "dics"],
-    WCSL.dids = m_wcsl[, "dids"],
-    WCSL.dids.pmse = m_wcsl[, "dids.pmse"],
-    Exp.Spec.Report = rep(sl_orig, nrow(m_poi)),
-    Exp.Spec = rep(sl, nrow(m_poi)),
-    Rel.Spec.Report = rl_orig,
-    Rel.Spec = rl,
-    Shelf.Life.cics = m_poi[, "cics"],
-    Shelf.Life.dics = m_poi[, "dics"],
-    Shelf.Life.dids = m_poi[, "dids"],
-    Shelf.Life.dids.pmse = m_poi[, "dids.pmse"],
-    POI.Model.cics = rep(r_ret[["POI"]]["cics"], nrow(m_poi)),
-    POI.Model.dics = rep(r_ret[["POI"]]["dics"], nrow(m_poi)),
-    POI.Model.dids = rep(r_ret[["POI"]]["dids"], nrow(m_poi)),
-    POI.Model.dids.pmse = rep(r_ret[["POI"]]["dids.pmse"], nrow(m_poi)))
-
-  if (xform[2] != "no") {
-    d_poi[, "Exp.Spec"] <- rep(sl_bt, nrow(m_poi))
-    d_poi[, "Rel.Spec"] <- rl_bt
-  }
-
-  rownames(d_poi) <- NULL
+  l_ws <-
+    compile_wisle_summary(data = d_dat, batch_vbl = batch_vbl, rl = rl,
+                          poi_list = l_wisle[["all.poi"]],
+                          icpt_list = r_ret[["Intercepts"]],
+                          wcsl_list = l_wisle[["all.wcsl"]],
+                          wcb_list = l_wisle[["which.wc.batch"]],
+                          limits_list = rel_lim, poi_ich = r_ret[["POI"]],
+                          xform = xform, shift = shift)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Putting results into a list
@@ -716,10 +386,10 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
                  Models = r_ret[["Models"]],
                  AIC = r_ret[["AIC"]],
                  BIC = r_ret[["BIC"]],
-                 wc.icpt = wc_icpt_argpm,
-                 wc.batch = l_wc_batch,
-                 Limits = l_lim,
-                 POI = d_poi),
+                 wc.icpt = l_ws[["wc.icpt"]],
+                 wc.batch = l_wisle[["which.wc.batch"]],
+                 Limits = r_ret[["Limits"]],
+                 POI = l_ws[["POI"]]),
             class = "expirest_wisle")
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility.R
 \name{find_poi}
 \alias{find_poi}
-\title{Point of intersection}
+\title{Fint the point of intersection (POI)}
 \usage{
 find_poi(
   srch_range,
@@ -26,9 +26,10 @@ the (time) range within which the minimal distance is expected to be found.}
 (SL). Another kind of acceptance criterion may be regarded as SL.}
 
 \item{mode}{A character string of either \code{"minimal"} or \code{"all"},
-specifying if only the minimal distance of a factorial regression model
-is returned or if the distances of all lines belonging to the different
-factor levels is returned. The default is \code{"minimal"}.}
+specifying if only the POI that is associated with the minimal distance
+of a factorial regression model is returned or if the POIs of all lines
+belonging to the different factor levels is returned. The default is
+\code{"minimal"}.}
 
 \item{alpha}{A numeric value between 0 and 1 specifying the significance
 level for the calculation of confidence or prediction intervals. The
@@ -60,17 +61,18 @@ between the two lines of interest is minimal is returned.
 }
 \description{
 The function \code{find_poi()} determines the point where the distance
-between two lines is minimal, e.g., the distance between a specification or
-expiry limit and a confidence or prediction interval. The estimation is done
-by aid of \code{\link[stats]{uniroot}()} from the \sQuote{\code{stats}}
-package.
+between two lines is minimal, e.g. the distance between a specification or
+expiry limit and a confidence or prediction interval, or in other words
+the point of intersection (POI). The estimation is done by aid of
+\code{\link[stats]{uniroot}()} from the \sQuote{\code{stats}} package.
 }
 \details{
 The function \code{find_poi()} (find the \dQuote{point of
-intersection}) estimates the value of \eqn{x} (e.g., the time) where the
+intersection}) estimates the value of \eqn{x} (e.g. the time) where the
 difference between the upper or lower confidence or prediction interval and
-the upper or lower acceptance criterion (e.g., the specification or the
-expiry limit) is minimal. Confidence or prediction intervals are calculated
+the upper or lower acceptance criterion (e.g. the specification or the
+expiry limit) is minimal, or in other words where the corresponding lines
+intersect each other. Confidence or prediction intervals are calculated
 for the \code{model} provided. The POI is determined by aid of the
 \code{\link[stats]{uniroot}()} function from the \sQuote{\code{stats}}
 package. The distance between the two lines of interest is calculated using

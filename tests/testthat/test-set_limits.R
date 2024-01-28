@@ -44,7 +44,6 @@ test_that("set_limits_succeeds", {
   expect_equal(tmp1[["sl"]], c(94.95, 105.04))
   expect_equal(tmp2[["rl.orig"]], 97)
   expect_equal(tmp2[["rl"]], 96.995)
-  expect_true("rl" %in% names(tmp3) == 0)
   expect_equal(tmp4$rl.trfmd, log(96.995 + 1))
   expect_equal(tmp4$sl.trfmd, c(log(94.95 + 1), log(105.04 + 1)))
   expect_equal(tmp5$rl.trfmd, sqrt(96.995))

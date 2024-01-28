@@ -679,15 +679,7 @@ test_that("expirest_wisle_fails_with_error", {
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "middle"),
-    "specify ivl_side either as \"lower\", \"upper\" or \"both\"")
-  expect_error(
-    expirest_wisle(
-      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95, sl_sf = 3,
-      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
-      xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
-      ivl = "confidence", ivl_type = "one.sided", ivl_side = "both"),
-    "Please provide a specification with two sides.")
+    "specify ivl_side either as \"lower\" or \"upper\"")
   expect_error(
     expirest_wisle(
       data = t_dat, response_vbl = "Potency", time_vbl = "Month",
