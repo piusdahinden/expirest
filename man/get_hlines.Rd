@@ -7,12 +7,12 @@
 get_hlines(sl, ivl_side)
 }
 \arguments{
-\item{sl}{A numeric value or a numeric vector of length \code{2} specifying
-the specification limit or limits.}
+\item{sl}{A numeric value or a numeric vector of length \code{2} that
+specifies the specification limit or limits.}
 
-\item{ivl_side}{A character string specifying if the \dQuote{upper} or the
-\dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-\code{"lower"}, respectively.}
+\item{ivl_side}{A character string that specifies if the \dQuote{upper} or
+the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
+or \code{"lower"}, respectively.}
 }
 \value{
 A data frame with the columns Response, Item, Colour and Type
@@ -32,6 +32,6 @@ the function prepares a data frame that can be handed over to the
 }
 \seealso{
 \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
-  \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+\code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 }
 \keyword{internal}

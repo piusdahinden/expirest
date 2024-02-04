@@ -31,8 +31,8 @@ test_that("get_relevant_limits_succeeds", {
 test_that("get_relevant_limits_succeeds_with_transformations", {
   sl <- 0.3
   sl_sf <- 2
-  rl = 0.15
-  rl_sf = 3
+  rl <- 0.15
+  rl_sf <- 3
   xform <- c("log", "log")
   ivl_side <- "upper"
 

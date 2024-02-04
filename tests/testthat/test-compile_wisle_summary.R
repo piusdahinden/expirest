@@ -247,8 +247,8 @@ test_that("compile_wisle_summary_fails", {
   # <-><-><-><->
   # Generation of flawed objects
 
-  t_dal <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
-  t_dal$Batch <- as.character(t_dal$Batch)
+  t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
+  t_dat$Batch <- as.character(t_dat$Batch)
   l_poi_err <- l_poi[1:3]
   l_icpt_err <- re[["Intercepts"]][1:3]
   ll_wcsl_err <- l_wisle[["all.wcsl"]][1:3]
@@ -275,12 +275,19 @@ test_that("compile_wisle_summary_fails", {
                           xform = xform, shift = shift),
     "batch_vbl must be a string")
   expect_error(
-    compile_wisle_summary(data = t_dal, batch_vbl = "Lot", rl = rl,
+    compile_wisle_summary(data = d_dat, batch_vbl = "Lot", rl = rl,
                           poi_list = l_poi, icpt_list = l_icpt,
                           wcsl_list = ll_wcsl, wcb_list = l_wc_batch,
                           limits_list = rel_lim, poi_ich = re[["POI"]],
                           xform = xform, shift = shift),
     "batch_vbl was not found in the provided data frame")
+  expect_error(
+    compile_wisle_summary(data = t_dat, batch_vbl = batch_vbl, rl = rl,
+                          poi_list = l_poi, icpt_list = l_icpt,
+                          wcsl_list = ll_wcsl, wcb_list = l_wc_batch,
+                          limits_list = rel_lim, poi_ich = re[["POI"]],
+                          xform = xform, shift = shift),
+    "column in data specified by batch_vbl")
   expect_error(
     compile_wisle_summary(data = d_dat, batch_vbl = batch_vbl, rl = "rl",
                           poi_list = l_poi, icpt_list = l_icpt,

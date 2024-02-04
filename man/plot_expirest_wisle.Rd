@@ -21,7 +21,7 @@ plot_expirest_wisle(
 \item{model}{An \sQuote{\code{expirest_wisle}} object, i.e. a list returned
 by the \code{\link{expirest_wisle}()} function.}
 
-\item{rl_index}{A positive integer specifying which of the release limit
+\item{rl_index}{A positive integer that specifies which of the release limit
 values that have been handed over to \code{\link{expirest_wisle}()} should
 be displayed. The default value is \code{1}.}
 
@@ -31,25 +31,25 @@ be displayed. The default value is \code{1}.}
 i.e. also the \emph{common intercept / common slope case} model which
 was the default model when \code{show_grouping} was \code{"no"}.}
 
-\item{response_vbl_unit}{A character string specifying the unit associated
-with the response variable. The default is \code{NULL}.}
+\item{response_vbl_unit}{A character string that specifies the unit
+associated with the response variable. The default is \code{NULL}.}
 
-\item{x_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the time variable to be plotted. The default is \code{NULL}
-and the \eqn{x} range is calculated automatically on the basis of the
-estimated shelf life.}
+\item{x_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the time variable to be plotted. The default is
+\code{NULL} and the \eqn{x} range is calculated automatically on the basis
+of the estimated shelf life.}
 
-\item{y_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the response variable to be plotted. The default is
-\code{NULL} and the \eqn{y} range is calculated automatically on the
+\item{y_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the response variable to be plotted. The default
+is \code{NULL} and the \eqn{y} range is calculated automatically on the
 basis of the time course of the response.}
 
-\item{scenario}{A character string specifying if the plot should be extended
-(with respect to the \eqn{x} axis) up to the \dQuote{standard scenario}
-(\code{"standard"}) or up to the \dQuote{worst case scenario}
+\item{scenario}{A character string that specifies if the plot should be
+extended (with respect to the \eqn{x} axis) up to the \dQuote{standard
+scenario} (\code{"standard"}) or up to the \dQuote{worst case scenario}
 (\code{"worst"}). The default is \code{"standard"}.}
 
-\item{mtbs}{A characters string specifying the \dQuote{model to be shown},
+\item{mtbs}{A character string that specifies the \dQuote{model to be shown},
 i.e. either \code{verified}, which is the default, or one of \code{cics},
 \code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
 is the model that was identified through the poolability check. It is
@@ -61,17 +61,17 @@ interaction term with the \eqn{time} variable (\eqn{batch \times time}),
 i.e. a model where the mean square error is pooled across batches.}
 
 \item{plot_option}{A character string of either \code{"full"},
-\code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
-specifying if additional information should be shown in the plot (option
-\code{"full"}) or only basic information (options \code{"lean"} and
-\code{"basic"}). Full means the data points, the fitted regression line
-with the confidence or prediction interval, the specification limit(s)
-and the estimated shelf life. The default is \code{"full"}.}
+\code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"}
+that specifies if additional information should be shown in the plot
+(option \code{"full"}) or only basic information (options \code{"lean"}
+and \code{"basic"}). Full means the data points, the fitted regression
+line with the confidence or prediction interval, the specification
+limit(s) and the estimated shelf life. The default is \code{"full"}.}
 
 \item{ci_app}{A character string of either \code{"line"} or \code{"ribbon"},
-specifying the appearance of the confidence interval, i.e. if the limits
-should be plotted as lines (option \code{"line"}) or as a shaded ribbon
-(option \code{"ribbon"}). The default is \code{"line"}.}
+that specifies the appearance of the confidence interval, i.e. if the
+limits should be plotted as lines (option \code{"line"}) or as a shaded
+ribbon (option \code{"ribbon"}). The default is \code{"line"}.}
 }
 \value{
 An object of class \sQuote{\code{plot_expirest_wisle}} is returned
@@ -165,5 +165,6 @@ gg3 <- plot_expirest_wisle(
 gg3
 }
 \seealso{
-\code{\link{expirest_wisle}}, \code{\link{expirest_osle}}.
+\code{\link{expirest_wisle}}, \code{\link{expirest_osle}},
+\code{\link{plot_expirest_osle}}.
 }

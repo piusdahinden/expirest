@@ -26,10 +26,10 @@ test_that("extract_from_ll_wcsl_succeeds", {
 
   # <-><-><-><->
 
-  l_dlim <- extract_from_ll_wcsl(ll_wcsl, "delta.lim")
-  l_dlimo <- extract_from_ll_wcsl(ll_wcsl, "delta.lim.orig")
-  l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
-  l_wcslo <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim.orig")
+  l_dlim <- extract_from_ll_wcsl(ll = ll_wcsl, element = "delta.lim")
+  l_dlimo <- extract_from_ll_wcsl(ll = ll_wcsl, element = "delta.lim.orig")
+  l_wcsl <- extract_from_ll_wcsl(ll = ll_wcsl, element = "wcs.lim")
+  l_wcslo <- extract_from_ll_wcsl(ll = ll_wcsl, element = "wcs.lim.orig")
 
   # <-><-><-><->
 
@@ -70,7 +70,12 @@ test_that("extract_from_ll_wcsl_fails", {
               dids = ll2[[4]][[1]])
 
   ll4 <- ll2
-  names(ll4[[1]][[1]][[1]]) <-
+  names(ll4[["cics"]][[1]][[1]]) <-
+    c("xform", "shift", "delta.limit", "delta.limit.original",
+      "wcs.limit", "wcs.limit.original")
+
+  ll5 <- ll2
+  names(ll5[["dics"]][["b2"]][[1]]) <-
     c("xform", "shift", "delta.limit", "delta.limit.original",
       "wcs.limit", "wcs.limit.original")
 
@@ -87,5 +92,8 @@ test_that("extract_from_ll_wcsl_fails", {
     "parameter ll must be a list of lists")
   expect_error(
     extract_from_ll_wcsl(ll = ll4, element = "wcs.lim"),
+    "element was not found in one of the sub-elements")
+  expect_error(
+    extract_from_ll_wcsl(ll = ll5, element = "wcs.lim"),
     "element was not found in one of the sub-elements")
 })

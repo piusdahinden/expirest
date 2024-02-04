@@ -22,4 +22,8 @@ whole number portion of a decimal number.
 The function \code{get_n_whole_part()} counts the number of digits
 of the whole number portion of a decimal number.
 }
+\seealso{
+\code{\link{print_val}}, \code{\link{set_limits}},
+\code{\link{get_text_annotation}}.
+}
 \keyword{internal}

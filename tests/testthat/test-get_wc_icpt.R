@@ -8,10 +8,9 @@ test_that("get_wc_icpt_succeeds", {
   shift <- c(0, 0)
 
   # Models
-  l_mod <-
-    get_linear_models(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
-                      response_vbl = response_vbl, time_vbl = time_vbl,
-                      batch_vbl = batch_vbl)$Models
+  l_mod <- get_model_list(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
+                          response_vbl = response_vbl, time_vbl = time_vbl,
+                          batch_vbl = batch_vbl)$Models
 
   # Intercepts
   l_icpt <- vapply(l_mod[c("cics", "dics", "dids.pmse")], function(x) {
@@ -64,10 +63,9 @@ test_that("get_wc_icpt_succeeds_with_a_single_batch", {
   shift <- c(0, 0)
 
   # Models
-  l_mod <-
-    get_linear_models(data = exp1[exp1$Batch == "b2", ],
-                      response_vbl = response_vbl, time_vbl = time_vbl,
-                      batch_vbl = batch_vbl)$Models
+  l_mod <- get_model_list(data = exp1[exp1$Batch == "b2", ],
+                          response_vbl = response_vbl, time_vbl = time_vbl,
+                          batch_vbl = batch_vbl)$Models
 
   # Intercepts
   l_icpt <- list(cics = NA, dics = NA, dids.pmse = NA)
@@ -126,9 +124,8 @@ test_that("get_wc_icpt_succeeds_with_transformations", {
   response_vbl <- l_variables[["response"]]
 
   # Models
-  l_mod <-
-    get_linear_models(data = t_dat, response_vbl = response_vbl,
-                      time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
+  l_mod <- get_model_list(data = t_dat, response_vbl = response_vbl,
+                          time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
 
   # Limits
   l_lim <-
@@ -203,9 +200,8 @@ test_that("get_wc_icpt_succeeds_with_transformations_with_a_single_batch", {
   response_vbl <- l_variables[["response"]]
 
   # Models
-  l_mod <-
-    get_linear_models(data = t_dat, response_vbl = response_vbl,
-                      time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
+  l_mod <- get_model_list(data = t_dat, response_vbl = response_vbl,
+                          time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
 
   # Limits
   l_lim <-
@@ -264,9 +260,8 @@ test_that("get_wc_icpt_fails", {
   shift <- c(0, 0)
 
   # Models
-  l_mod <-
-    get_linear_models(data = t_dat, response_vbl = response_vbl,
-                      time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
+  l_mod <- get_model_list(data = t_dat, response_vbl = response_vbl,
+                          time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
 
   # POIs
   l_poi <- get_poi_list(data = t_dat, batch_vbl = batch_vbl, model_list = l_mod,

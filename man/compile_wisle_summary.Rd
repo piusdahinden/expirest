@@ -22,7 +22,7 @@ compile_wisle_summary(
 \item{data}{A data frame with the columns specified by \code{response_vbl},
 \code{time_vbl} and \code{batch_vbl}.}
 
-\item{batch_vbl}{A character string specifying the column in \code{data}
+\item{batch_vbl}{A character string that specifies the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
 differentiation of the observations of the various batches.}
 
@@ -54,13 +54,14 @@ batches. The \code{cics}, \code{dics} and \code{dids.pmse} elements are
 \item{poi_ich}{A numeric named vector of the POI values of the worst case
 batches of each model.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 
 \item{shift}{A vector of two values which will be added to the variables
 \eqn{x} and/or \eqn{y} before they are transformed as specified by the
@@ -131,6 +132,7 @@ Information stored in multiple lists that are generated during the
 data frame.
 }
 \seealso{
-\code{\link{expirest_wisle}()}.
+\code{\link{extract_wc_x}}, \code{\link{extract_from_ll_wcsl}},
+\code{\link{expirest_wisle}}.
 }
 \keyword{internal}

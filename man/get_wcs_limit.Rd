@@ -14,23 +14,24 @@ get_wcs_limit(
 )
 }
 \arguments{
-\item{rl}{A numeric value specifying the release specification limit(s),
+\item{rl}{A numeric value that specifies the release specification limit(s),
 on the same scale as \code{sl} and \code{intercept}.}
 
-\item{sl}{A numeric value specifying the specification limit, on the same
+\item{sl}{A numeric value that specifies the specification limit, on the same
 scale as \code{rl} and \code{intercept}.}
 
 \item{intercept}{A numeric value representing the intercept of a linear
 regression model fitted to sample data, on the same scale as \code{rl}
 and \code{sl}.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 
 \item{shift}{A vector of two values which will be added to the variables
 \eqn{x} and/or \eqn{y} before they are transformed as specified by the
@@ -40,8 +41,8 @@ purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
 default is \code{c(0, 0)}.}
 
-\item{ivl_side}{A character string specifying if the specification limit,
-given that the limit has only one side, is an \dQuote{upper} or a
+\item{ivl_side}{A character string that specifies if the specification
+limit, given that the limit has only one side, is an \dQuote{upper} or a
 \dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
 \code{"lower"}, respectively. The default is \code{"lower"}. If the
 specification has two boundaries, then this parameter specifies the
@@ -50,8 +51,8 @@ be used.}
 }
 \value{
 A list with the following elements is returned:
-\item{xform}{A vector of two character strings specifying the transformation
-  of the response and the time variable.}
+\item{xform}{A vector of two character strings that specifies the
+  transformation of the response and the time variable.}
 \item{shift}{A vector of two values which has been added to the values of
   the transformed \eqn{x} and/or \eqn{y} variables (specified via the
   \code{xform} parameter).}
@@ -94,6 +95,7 @@ Medicines (ARGPM), Stability testing for prescription medicines,
 Version 1.1, March 2017
 }
 \seealso{
-\code{\link{expirest_wisle}}, \code{\link[stats]{lm}}.
+\code{\link{extract_from_ll_wcsl}},
+\code{\link{get_wisle_poi_list}}, \code{\link{expirest_wisle}}.
 }
 \keyword{internal}

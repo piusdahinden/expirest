@@ -29,52 +29,53 @@ expirest_wisle(
 \item{data}{A data frame with the columns specified by \code{response_vbl},
 \code{time_vbl} and \code{batch_vbl}.}
 
-\item{response_vbl}{A character string specifying the response variable name
+\item{response_vbl}{A character string that specifies the response variable
+name that must be a column of \code{data}.}
+
+\item{time_vbl}{A character string that specifies the time variable name
 that must be a column of \code{data}.}
 
-\item{time_vbl}{A character string specifying the time variable name that
-must be a column of \code{data}.}
-
-\item{batch_vbl}{A character string specifying the column in \code{data}
+\item{batch_vbl}{A character string that specifies the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
 differentiation of the observations of the various batches.}
 
-\item{rl}{A numeric value or a numeric vector specifying the release
+\item{rl}{A numeric value or a numeric vector that specifies the release
 specification limit(s) for which the corresponding expiry should be
 estimated.}
 
-\item{rl_sf}{A positive integer or a vector of positive integers specifying
-the number of \dQuote{significant figures} (sf) of \code{rl}. It must have
-the same length as \code{rl}.}
+\item{rl_sf}{A positive integer or a vector of positive integers that
+specifies the number of \dQuote{significant figures} (sf) of \code{rl}.
+It must have the same length as \code{rl}.}
 
-\item{sl}{A numeric value or a numeric vector of length \code{2} specifying
-the specification limit or limits. If a vector is provided it must be of
-the form \code{c(lower limit, upper limit)}.}
+\item{sl}{A numeric value or a numeric vector of length \code{2} that
+specifies the specification limit or limits. If a vector is provided it
+must be of the form \code{c(lower limit, upper limit)}.}
 
-\item{sl_sf}{A positive integer or a vector of positive integers specifying
-the number of \dQuote{significant figures} (sf) of \code{sl}. It must have
-the same length as \code{sl}.}
+\item{sl_sf}{A positive integer or a vector of positive integers that
+specifies the number of \dQuote{significant figures} (sf) of \code{sl}.
+It must have the same length as \code{sl}.}
 
-\item{srch_range}{A vector of length \code{2} specifying the end-points of
-the (time) range that is supposed to contain the shelf life or retest
+\item{srch_range}{A vector of length \code{2} that specifies the end-points
+of the (time) range that is supposed to contain the shelf life or retest
 period.}
 
-\item{alpha}{A numeric value between 0 and 1 specifying the significance
+\item{alpha}{A numeric value between 0 and 1 that specifies the significance
 level for the calculation of confidence or prediction intervals. The
 default is \code{0.05}.}
 
-\item{alpha_pool}{A numeric value between 0 and 1 specifying the type I
+\item{alpha_pool}{A numeric value between 0 and 1 that specifies the type I
 error rate for the test of the poolability of the batches. The default
 is \code{0.25}, following ICH Q1E guideline. The value should not be
 changed unless supported by well-founded reasons.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 
 \item{shift}{A vector of two values which will be added to the variables
 \eqn{x} and/or \eqn{y} before they are transformed as specified by the
@@ -84,7 +85,7 @@ purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
 default is \code{c(0, 0)}.}
 
-\item{sf_option}{A character string specifying if the limits (\code{rl}
+\item{sf_option}{A character string that specifies if the limits (\code{rl}
 or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
 either \code{"tight"} or \code{"loose"}, respectively. The option
 \code{"tight"} means that the limits are rounded to the specified number
@@ -97,17 +98,17 @@ subtraction of \eqn{1} from the \eqn{n^{th}} digit and addition of
 \eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
-\code{"prediction"}, i.e. specifying the type of interval of interest.
+\code{"prediction"} that specifies the type of interval of interest.
 The default is \code{"confidence"}.}
 
-\item{ivl_type}{A character string specifying if a \dQuote{one sided} or
-a \dQuote{two sided} interval should be calculated, i.e. either
+\item{ivl_type}{A character string that specifies if a \dQuote{one sided}
+or a \dQuote{two sided} interval should be calculated, i.e. either
 \code{"one.sided"} or \code{"two.sided"}, respectively. The default is
 \code{"one.sided"}.}
 
-\item{ivl_side}{A character string specifying if the \dQuote{upper} or the
-\dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-\code{"lower"}, respectively. The default is \code{"lower"}. Since this
+\item{ivl_side}{A character string that specifies if the \dQuote{upper} or
+the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
+or \code{"lower"}, respectively. The default is \code{"lower"}. Since this
 parameter additionally specifies the relationship of \code{rl} with
 \code{sl}, i.e. which of the two sides of \code{sl} the \code{rl} is
 compared to, only either either \code{"upper"} or \code{"lower"} is
@@ -128,10 +129,10 @@ containing the following elements:
 \item{Variables}{A list of the variable names, i.e. the original names of
   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
   applicable, of the transformed variables.}
-\item{Model.Type}{A list of two elements specifying which model, based on
-  the ANCOVA analysis, suits best. The first element (\code{type.spec})
-  is a numeric vector of length 2 specifying the best model accepted at the
-  significance level specified by \code{alpha.pool}. The first number
+\item{Model.Type}{A list of two elements that specifies which model, based
+  on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+  is a numeric vector of length 2 that specifies the best model accepted at
+  the significance level specified by \code{alpha.pool}. The first number
   represents the decision on the intercept and the second on the slope,
   where \code{1} stands for \dQuote{common} and \code{2} stands for
   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
@@ -331,14 +332,16 @@ res1$POI
 # [1] "cics"
 
 # (Expected) results in res1$POI
-#  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
-#        100.5669       100.3638       100.2491          3          3
-#  Delta.dids WCSL.cics WCSL.dics WCSL.dids Exp.Spec.Report Exp.Spec
-#           3  97.56688  97.36375  97.24914              95    94.95
-#  Rel.Spec.Report Rel.Spec Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids
-#               98    97.95        14.07398        13.23176        13.34561
-#  POI.Model.cics POI.Model.dics POI.Model.dids
-#         26.2241        24.8003       23.34184
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1       100.5669       100.3638       100.2491            100.2491          3
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1          3          3               3  97.56688  97.36375  97.24914
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1       97.24914              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1        14.07398        13.23176        13.34561             13.80695
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1        26.2241        24.8003       23.34184            23.66724
 
 res2 <-
   expirest_wisle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
@@ -357,14 +360,16 @@ res2$POI
 # [1] "dids"
 
 # (Expected) results in res2$POI
-#  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
-#        101.5498       100.4882       101.2594          3          3
-#  Delta.dids WCSL.cics WCSL.dics WCSL.dids Exp.Spec.Report Exp.Spec
-#           3  98.54976  97.48822  98.25938              95    94.95
-#  Rel.Spec.Report Rel.Spec Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids
-#               98    97.95        13.03332        11.42141        7.619661
-#  POI.Model.cics POI.Model.dics POI.Model.dids
-#        28.12518       22.47939       15.96453
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1       101.5498       100.4882       101.2594            101.2594          3
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1          3          3               3  98.54976  97.48822  98.25938
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1       98.25938              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1        13.03332        11.42141        7.619661             7.483223
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1       28.12518       22.47939       15.96453            15.72348
 
 # Unsuccessful estimation
 res3 <-
@@ -375,14 +380,16 @@ res3 <-
 res3$POI
 
 # (Expected) results in res3$POI
-#  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
-#        100.5669             NA             NA          3         NA
-#  Delta.dids WCSL.cics WCSL.dics WCSL.dids Exp.Spec.Report Exp.Spec
-#          NA  97.56688        NA        NA              95    94.95
-#  Rel.Spec.Report Rel.Spec Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids
-#               98    97.95              NA              NA              NA
-#  POI.Model.cics POI.Model.dics POI.Model.dids
-#        14.42089       2.480635             NA
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1       100.5669             NA             NA                  NA          3
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1         NA         NA              NA  97.56688        NA        NA
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1             NA              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1              NA              NA              NA                   NA
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1       14.42089       2.480635             NA                  NA
 
 # Estimation may also fail because of an inappropriate 'srch-range' setting.
 res4 <-
@@ -393,14 +400,16 @@ res4 <-
 res4$POI
 
 # (Expected) results in res4$POI
-#  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
-#        100.5669             NA             NA          3         NA
-#  Delta.dids WCSL.cics WCSL.dics WCSL.dids Exp.Spec.Report Exp.Spec
-#          NA  97.56688        NA        NA              95    94.95
-#  Rel.Spec.Report Rel.Spec Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids
-#               98    97.95              NA              NA              NA
-#  POI.Model.cics POI.Model.dics POI.Model.dids
-#              NA             NA             NA
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1       100.5669             NA             NA                  NA          3
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1         NA         NA              NA  97.56688        NA        NA
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1             NA              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1              NA              NA              NA                   NA
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1             NA             NA             NA                  NA
 }
 \references{
 Therapeutic Goods Administration (TGA) of the Department of Health of the
@@ -414,7 +423,6 @@ Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 (CPMP/ICH/420/02).
 }
 \seealso{
-\code{\link{expirest_osle}}, \code{\link{find_poi}},
-\code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-\code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+\code{\link{expirest_osle}}, \code{\link[stats]{uniroot}},
+\code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 }

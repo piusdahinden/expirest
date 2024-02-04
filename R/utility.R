@@ -12,7 +12,7 @@
 #' confidence or prediction interval limit(s) for the linear regression model
 #' provided by \code{model}.
 #'
-#' @return A numeric value or, if the model contained a categorical variable,
+#' @return A numeric value or, if \code{model} contains a categorical variable,
 #' a numeric vector of the predicted upper or lower confidence or prediction
 #' interval limit(s) at a given value of \eqn{x}.
 #'
@@ -87,23 +87,23 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
     grouping_variables <-
       variable_names[attr(model$terms, which = "dataClasses") %in% "factor"]
 
-    x_length <- vapply(grouping_variables,
+    n_levels <- vapply(grouping_variables,
                        function(x) {
                          nlevels(model$model[, grouping_variables])
                        },
                        numeric(1))
-    x_length <- prod(x_length)
+    n_levels <- prod(n_levels)
 
     l_newdata <-
       vapply(grouping_variables,
              function(x) {
                list(rep(levels(model$model[, grouping_variables]),
-                        each = x_length /
+                        each = n_levels /
                           nlevels(model$model[, grouping_variables]) *
                           length(x_new)))
              },
              list(1))
-    l_newdata[[length(l_newdata) + 1]] <- rep(x_new, x_length)
+    l_newdata[[length(l_newdata) + 1]] <- rep(x_new, n_levels)
     names(l_newdata) <- c(grouping_variables,
                           variable_names[!(variable_names %in%
                                              grouping_variables)][-1])
@@ -142,8 +142,7 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
 #'   lines is sought, e.g. the distance of upper or lower confidence/prediction
 #'   interval limits from the upper or lower specification or expiry limits,
 #'   respectively.
-#' @param model A linear model object of type \sQuote{\code{lm}}.
-#' @param sl A numeric variable specifying the \dQuote{specification limit}
+#' @param sl A numeric variable that specifies the \dQuote{specification limit}
 #'   (SL) or, for determinations according to ARGPM guidance \dQuote{Stability
 #'   testing for prescription medicines}, the \dQuote{expiry limit} (EL). The
 #'   EL is defined as the intercept \eqn{\pm} the difference between the
@@ -151,9 +150,10 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
 #'   which is the relevant limit, it is added (\code{+}) to the intercept,
 #'   otherwise it is subtracted (\code{-}) from the intercept.
 #' @param mode A character string of either \code{"minimal"} or \code{"all"},
-#'   specifying if only the minimal distance of a factorial regression model
+#'   that specifies if only the minimal distance of a factor regression model
 #'   is returned or if the distances of all lines belonging to the different
 #'   factor levels is returned. The default is \code{"minimal"}.
+#' @inheritParams get_intvl_limit
 #' @inheritParams expirest_osle
 #'
 #' @details The function \code{find_get_distance()} estimates the distance
@@ -188,8 +188,9 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
 #'
 #' @inherit expirest_wisle references
 #'
-#' @seealso \code{\link{find_poi}}, \code{\link{expirest_osle}},
-#' \code{\link{expirest_wisle}}.
+#' @seealso \code{\link{get_intvl_limit}}, \code{\link{find_poi}},
+#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+#' \code{\link[stats]{lm}}.
 #'
 #' @keywords internal
 
@@ -243,7 +244,7 @@ get_distance <- function(x_new, model, sl, mode = "minimal", alpha = 0.05,
   return(res)
 }
 
-#' Fint the point of intersection (POI)
+#' Find the point of intersection (POI)
 #'
 #' The function \code{find_poi()} determines the point where the distance
 #' between two lines is minimal, e.g. the distance between a specification or
@@ -251,19 +252,14 @@ get_distance <- function(x_new, model, sl, mode = "minimal", alpha = 0.05,
 #' the point of intersection (POI). The estimation is done by aid of
 #' \code{\link[stats]{uniroot}()} from the \sQuote{\code{stats}} package.
 #'
-#' @param srch_range A vector of length \code{2} specifying the end-points of
-#'   the (time) range within which the minimal distance is expected to be found.
-#' @param model A linear model object of type \sQuote{\code{lm}}.
-#' @param sl A numeric variable specifying the \dQuote{specification limit}
+#' @param srch_range A vector of length \code{2} that specifies the endpoints
+#'   of the (time) range within which the minimum distance is expected.
+#' @param sl A numeric variable that specifies the \dQuote{specification limit}
 #'   (SL). Another kind of acceptance criterion may be regarded as SL.
-#' @param mode A character string of either \code{"minimal"} or \code{"all"},
-#'   specifying if only the POI that is associated with the minimal distance
-#'   of a factorial regression model is returned or if the POIs of all lines
-#'   belonging to the different factor levels is returned. The default is
-#'   \code{"minimal"}.
 #' @param ... Additional named or unnamed arguments passed on to
 #'   \code{\link[stats]{uniroot}()}.
 #' @inheritParams expirest_osle
+#' @inheritParams get_distance
 #'
 #' @details The function \code{find_poi()} (find the \dQuote{point of
 #' intersection}) estimates the value of \eqn{x} (e.g. the time) where the
@@ -285,8 +281,9 @@ get_distance <- function(x_new, model, sl, mode = "minimal", alpha = 0.05,
 #'
 #' @inherit expirest_wisle references
 #'
-#' @seealso \code{\link{get_distance}}, \code{\link[stats]{uniroot}},
-#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#' @seealso \code{\link{get_distance}}, \code{\link{get_poi_list}},
+#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+#' \code{\link[stats]{uniroot}}.
 #'
 #' @importFrom stats uniroot
 #' @importFrom stats setNames
@@ -367,21 +364,26 @@ find_poi <- function(srch_range, model, sl, mode = "minimal", alpha = 0.05,
 #'
 #' @param data The data frame that was used for fitting the models of parameter
 #'   \code{model_list}.
-#' @param batch_vbl A character string specifying the column in \code{data}
-#'   with the grouping information (i.e. a factorial variable) for the
+#' @param batch_vbl A character string that specifies the column in \code{data}
+#'   with the grouping information (i.e. a categorical variable) for the
 #'   differentiation of the observations of the different batches.
 #' @param model_list A list of regression models of different type. Usually,
 #'   it is a list of four elements named \code{cics}, \code{dics},
 #'   \code{dids.pmse} and \code{dids}, where the first three elements contain
 #'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
 #'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
-#'   and \dQuote{different intercept / different slope} (\code{dids}) type.
-#'   The fourth element with the label \code{dids.pmse} is usually a list of
-#'   the \sQuote{\code{lm}} objects that is obtained from fitting a regression
+#'   and \dQuote{different intercept / different slope} (\code{dids.pmse}) type.
+#'   The fourth element with the label \code{dids} is usually a list of the
+#'   \sQuote{\code{lm}} objects that is obtained from fitting a regression
 #'   model to the data of each level of the categorical variable separately.
-#'   The \code{cics}, \code{dics} and \code{dids.pmse} elements are \code{NA}
-#'   if data of only a single batch is available.
-#' @param sl A numeric variable specifying the \dQuote{specification limit}
+#'   The \code{dids.pmse} model differs from the \code{dids} model in that it
+#'   is a model with the categorical variable as a fixed main effect and with
+#'   an interaction term of the categorical variable with the time variable,
+#'   i.e. a model where the mean square error is pooled across batches (thus
+#'   the \dQuote{pmse} suffix meaning \dQuote{pooled mean square error}). The
+#'   \code{cics}, \code{dics} and \code{dids.pmse} elements are \code{NA} if
+#'   data of only a single batch is available.
+#' @param sl A numeric variable that specifies the \dQuote{specification limit}
 #'   (SL). Another kind of acceptance criterion may be regarded as SL.
 #' @inheritParams find_poi
 #'
@@ -389,13 +391,14 @@ find_poi <- function(srch_range, model, sl, mode = "minimal", alpha = 0.05,
 #' function (find the \dQuote{point of intersection}) on all the models that
 #' are provided.
 #'
-#' @return a list of four elements named \code{cics}, \code{dics},
+#' @return A list of four elements named \code{cics}, \code{dics},
 #' \code{dids.pmse} and \code{dids} is returned. Each of them contains a named
-#' vector of the estimated POI values estimated for each batch named
-#' correspondingly.
+#' vector of the POI values estimated for each batch and named accordingly.
 #'
-#' @seealso \code{\link{get_distance}}, \code{\link[stats]{uniroot}},
-#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#' @seealso \code{\link{get_model_list}}, \code{\link{find_poi}},
+#' \code{\link{get_distance}}, \code{\link{get_osle_poi_list}},
+#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+#' \code{\link[stats]{uniroot}}.
 #'
 #' @keywords internal
 
@@ -493,30 +496,433 @@ get_poi_list <- function(data, batch_vbl, model_list, sl, srch_range,
   return(l_poi)
 }
 
-#' List of intercepts of worst case batches
+#' Getting the intercept(s) of a linear model
 #'
-#' The function \code{get_wc_icpt()} prepares a list of worst case intercepts
-#' of the worst case batches of the regression models fitted to the data.
+#' The function \code{get_icpt()} determines the intercept(s) of the provided
+#' model.
 #'
-#' @param icpt_list A list of the intercepts of each model type, i.e. a list
-#'   of four elements named \code{cics}, \code{dics}, \code{dids.pmse} and
-#'   \code{dids}.
-#' @param poi_list A list of the points of intersection (POI) of each model
-#'   type, i.e. a list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids}.
-#' @param wc_batch A numeric vector of the indices of the worst case batches
-#'   of each model type, i.e. a vector of four elements named \code{cics},
-#'   \code{dics}, \code{dids.pmse} and \code{dids}.
+#' @param response_vbl A character string that specifies the response variable
+#'   name that must be a column of the data frame that was used for model
+#'   fitting.
+#' @param time_vbl A character string that specifies the time variable name
+#'   that must be a column of data frame that was used for model fitting.
+#' @param batch_vbl A character string that specifies the column of the data
+#'   frame that was used for model fitting with the grouping information (i.e.
+#'   a categorical variable) for the differentiation of the observations from
+#'   the different batches.
+#' @inheritParams get_intvl_limit
 #' @inheritParams expirest_osle
 #'
-#' @details The function \code{get_wc_icpt()} applies the \code{find_poi()}
-#' function (find the \dQuote{point of intersection}) on all the models that
-#' are provided.
+#' @details The function \code{get_icpt()} determines the intercept(s) of the
+#' model that has been handed over via the \code{model} parameter.
+#'
+#' @return A list with a single element containing the numeric value or a
+#' numeric vector of the intercept(s) or, if the data have been transformed,
+#' a list with an additional element that contains the numeric value or
+#' numeric vector on the original scale is returned.
+#'
+#' @seealso \code{\link{get_icpt_list}}, \code{\link{expirest_osle}},
+#' \code{\link{expirest_wisle}}, \code{\link[stats]{lm}}.
+#'
+#' @importFrom stats coef
+#' @importFrom stats formula
+#'
+#' @keywords internal
+
+get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
+                     xform = c("no", "no"), shift = c(0, 0)) {
+  if (!inherits(model, "lm")) {
+    stop("Please provide a model of type \"lm\".")
+  }
+  if (!is.character(response_vbl)) {
+    stop("The parameter response_vbl must be a string.")
+  }
+  if (length(grep(response_vbl, as.character(formula(model$terms)))) == 0) {
+    stop("The parameter response_vbl was not found in the provided model.")
+  }
+  if (!is.character(time_vbl)) {
+    stop("The parameter time_vbl must be a string.")
+  }
+  if (length(grep(time_vbl, as.character(formula(model$terms)))) == 0) {
+    stop("The parameter time_vbl was not found in the provided model.")
+  }
+  if (!is.character(batch_vbl)) {
+    stop("The parameter batch_vbl must be a string.")
+  }
+  if (length(attr(model$terms, "order")) > 1) {
+    if (length(grep(batch_vbl, as.character(formula(model$terms)))) == 0) {
+      stop("The parameter batch_vbl was not found in the provided model.")
+    }
+  }
+  if (length(xform) != 2) {
+    stop("Please specify xform appropriately.")
+  }
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
+      !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
+    stop("Please specify xform appropriately.")
+  }
+  if (!is.numeric(shift) || length(shift) != 2) {
+    stop("The parameter shift must be a numeric vector of length 2.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Determination of intercept(s)
+
+  if (length(coef(model)) == 2) {
+    intercept <- coef(model)["(Intercept)"]
+  } else {
+    t_coef <- coef(model)
+    t_batch_levels <- levels(model[["model"]][, batch_vbl])
+
+    t_batch_id <- grep(batch_vbl, names(t_coef))
+    t_time_id <- grep(time_vbl, names(t_coef))
+
+    # Calculate the intercepts
+    intercept <- c(t_coef["(Intercept)"], t_coef["(Intercept)"] +
+                     t_coef[t_batch_id[t_batch_id < t_time_id[1]]])
+
+    # Rename the vector
+    t_names <- names(intercept)
+    t_names <- sub(batch_vbl, "", t_names)
+    t_names[which(!(t_names %in% t_batch_levels))] <-
+      t_batch_levels[which(!(t_names %in% t_batch_levels))]
+    names(intercept) <- t_names
+  }
+
+  # ---------
+  # Depending on the transformation of the response variable the intercept(s)
+  # has (have) to be back-transformed to the original scale.
+
+  if (xform[2] != "no") {
+    switch(xform[2],
+           "log" = {
+             icpt_orig <- exp(intercept) - shift[2]
+           },
+           "sqrt" = {
+             icpt_orig <- intercept^2 - shift[2]
+           },
+           "sq" = {
+             icpt_orig <- rep(NA, length(intercept))
+             names(icpt_orig) <- names(intercept)
+
+             ok <- unname(which(intercept >= 0))
+             if (length(ok) > 0) {
+               icpt_orig[ok] <- sqrt(intercept[ok]) - shift[2]
+             }
+           })
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Return of the intercept(s)
+
+  if (xform[2] == "no") {
+    l_res <- list(icpt = intercept)
+  } else {
+    l_res <- list(icpt = intercept,
+                  icpt.orig = icpt_orig)
+  }
+
+  return(l_res)
+}
+
+#' List of intercepts
+#'
+#' The function \code{get_icpt_list()} prepares a list of the intercepts
+#' of the regression models fitted to the data.
+#'
+#' @param data The data frame that was used for fitting the models of parameter
+#'   \code{model_list}.
+#' @inheritParams expirest_osle
+#' @inheritParams get_poi_list
+#'
+#' @details The function \code{get_icpt_list()} extracts the intercepts of
+#' the various regression models (fitted by aid of the \code{lm()} function)
+#' that are passed in via the \code{model_list} parameter.
+#'
+#' @return A list of four elements named \code{cics}, \code{dics},
+#' \code{dids.pmse} and \code{dids} is returned. Each of them contains a list
+#' element named \code{icpt} with a vector of the intercepts. If the data
+#' have been transformed, each of the primary list elements contains a further
+#' list element called \code{icpt.orig} with a numeric vector of the intercepts
+#' on the original scale.
+#'
+#' @seealso \code{\link{get_model_list}}, \code{\link{get_icpt}},
+#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#'
+#' @keywords internal
+
+get_icpt_list <- function(data, response_vbl, time_vbl, batch_vbl, model_list,
+                          xform = c("no", "no"), shift = c(0, 0)) {
+  if (!is.data.frame(data)) {
+    stop("The data must be provided as data frame.")
+  }
+  if (!is.character(response_vbl)) {
+    stop("The parameter response_vbl must be a string.")
+  }
+  if (!(response_vbl %in% colnames(data))) {
+    stop("The response_vbl was not found in the provided data frame.")
+  }
+  if (!is.character(time_vbl)) {
+    stop("The parameter time_vbl must be a string.")
+  }
+  if (!(time_vbl %in% colnames(data))) {
+    stop("The time_vbl was not found in the provided data frame.")
+  }
+  if (!is.character(batch_vbl)) {
+    stop("The parameter batch_vbl must be a string.")
+  }
+  if (!(batch_vbl %in% colnames(data))) {
+    stop("The batch_vbl was not found in the provided data frame.")
+  }
+  if (!is.factor(data[, batch_vbl])) {
+    stop("The column in data specified by batch_vbl must be a factor.")
+  }
+  if (!is.list(model_list)) {
+    stop("The parameter model_list must be a list.")
+  }
+  if (sum(names(model_list) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The parameter model_list must have four elements named \"cics\", ",
+         "\"dics\", \"dids\" and \"dids.pmse\".")
+  }
+  if (length(xform) != 2) {
+    stop("Please specify xform appropriately.")
+  }
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
+      !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
+    stop("Please specify xform appropriately.")
+  }
+  if (length(shift) != 2) {
+    stop("The parameter shift must be a numeric vector of length 2.")
+  }
+  if (!is.numeric(shift)) {
+    stop("The parameter shift must be a numeric vector of length 2.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Preparation of data
+
+  d_dat <- droplevels(data)
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Determination of the intercepts
+
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    l_icpt <- vapply(model_list[c("cics", "dics", "dids.pmse")], function(x) {
+      list(get_icpt(model = x, response_vbl = response_vbl,
+                    time_vbl = time_vbl, batch_vbl = batch_vbl,
+                    xform = xform, shift = shift))
+    },
+    list(1))
+  } else {
+    l_icpt <- list(cics = NA, dics = NA, dids.pmse = NA)
+  }
+
+  tmp <- vapply(model_list[["dids"]], function(x) {
+    list(get_icpt(model = x, response_vbl = response_vbl,
+                  time_vbl = time_vbl, batch_vbl = batch_vbl,
+                  xform = xform, shift = shift))
+  },
+  list(1))
+  tmp <- unlist(tmp)
+  names(tmp) <- sub("\\.\\(Intercept\\)", "", names(tmp))
+
+  if (xform[2] == "no") {
+    names(tmp) <- sub("\\.icpt", "", names(tmp))
+    l_icpt <- c(l_icpt, list(dids = list(icpt = tmp)))
+  } else {
+    t_i_orig <- grep("orig", names(tmp))
+    names(tmp) <- sub("\\.icpt", "", names(tmp))
+    names(tmp) <- sub("\\.orig", "", names(tmp))
+
+    l_icpt <- c(l_icpt, list(dids = list(icpt = tmp[-t_i_orig],
+                                         icpt.orig = tmp[t_i_orig])))
+  }
+
+  return(l_icpt)
+}
+
+#' Determination of the \dQuote{worst case scenario} (wcs) limit
+#'
+#' The function \code{get_wcs_limit()} calculates \dQuote{worst case scenario}
+#' (wcs) limit following the ARGPM Guidance \dQuote{Stability testing for
+#' prescription medicines}.
+#'
+#' @param rl A numeric value that specifies the release specification limit(s),
+#'   on the same scale as \code{sl} and \code{intercept}.
+#' @param sl A numeric value that specifies the specification limit, on the same
+#'   scale as \code{rl} and \code{intercept}.
+#' @param intercept A numeric value representing the intercept of a linear
+#'   regression model fitted to sample data, on the same scale as \code{rl}
+#'   and \code{sl}.
+#' @inheritParams expirest_osle
+#'
+#' @details The function \code{get_wcs_limit()} determines the \dQuote{worst
+#' case scenario} (wcs) limit as is proposed by the Australian Regulatory
+#' Guidelines for Prescription Medicines (ARGPM) guidance \dQuote{Stability
+#' testing for prescription medicines}. According to this guideline, the shelf
+#' life or expiry limit is estimated as the point where the upper or lower
+#' limit of the 95\% confidence interval of the linear model fitted to the
+#' data intersects the wcs limit. The wcs limit is obtained by
+#' adding/subtracting the absolute difference of specification limit and
+#' release limit to/from the common intercept of the test batches or the
+#' intercept of the worst performing batch.
+#'
+#' If data have been linearised by transformation, all elements, i.e. \code{rl},
+#' \code{sl} and \code{intercept} must be on the same, i.e. transformed, scale.
+#' The results are returned on the transformed scale and on the original scale.
+#'
+#' @return A list with the following elements is returned:
+#' \item{xform}{A vector of two character strings that specifies the
+#'   transformation of the response and the time variable.}
+#' \item{shift}{A vector of two values which has been added to the values of
+#'   the transformed \eqn{x} and/or \eqn{y} variables (specified via the
+#'   \code{xform} parameter).}
+#' \item{delta.lim}{A numeric value or a numeric vector of the absolute
+#'   difference(s) between \code{rl} and {sl}, if \code{xform[2] != "no"} on
+#'   the transformed scale.}
+#' \item{delta.lim.orig}{A numeric value or a numeric vector of the absolute
+#'   difference(s) between \code{rl} and {sl} on the original scale.}
+#' \item{wcs.lim}{A numeric value or a numeric vector of the worst case
+#'   scenario (wcs) limit(s), if \code{xform[2] != "no"} on the transformed
+#'   scale.}
+#' \item{wcs.lim.orig}{A numeric value or a numeric vector of the worst case
+#'   scenario (wcs) limit(s) on the original scale.}
+#'
+#' @references
+#' Therapeutic Goods Administration (TGA) of the Department of Health of the
+#' Australian Government, Australian Regulatory Guidelines for Prescription
+#' Medicines (ARGPM), Stability testing for prescription medicines,
+#' Version 1.1, March 2017
+#'
+#' @seealso \code{\link{extract_from_ll_wcsl}},
+#' \code{\link{get_wisle_poi_list}}, \code{\link{expirest_wisle}}.
+#'
+#' @keywords internal
+
+get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
+                          shift = c(0, 0), ivl_side = "lower") {
+  if (!is.numeric(rl) || length(rl) > 1) {
+    stop("The parameter rl must be a numeric value of length 1.")
+  }
+  if (!is.numeric(sl) || length(sl) > 1) {
+    stop("The parameter sl must be a numeric value of length 1.")
+  }
+  if (!is.numeric(intercept)) {
+    stop("The parameter intercept must be a numeric value of length 1.")
+  }
+  if (length(xform) != 2) {
+    stop("Please specify xform appropriately.")
+  }
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
+      !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
+    stop("Please specify xform appropriately.")
+  }
+  if (!is.numeric(shift) || length(shift) != 2) {
+    stop("The parameter shift must be a numeric vector of length 2.")
+  }
+  if (!(ivl_side %in% c("lower", "upper"))) {
+    stop("Please specify ivl_side either as \"lower\" or \"upper\".")
+  }
+
+  if (ivl_side == "lower" && any(rl < sl)) {
+    stop("If ivl_side is \"lower\" rl must be > sl.")
+  }
+  if (ivl_side == "upper" && any(rl > sl)) {
+    stop("If ivl_side is \"upper\" rl must be < sl.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Determination of worst case scenario (wcs) limit(s)
+
+  switch(ivl_side,
+         "lower" = {
+           delta_lim <- rl - sl
+           wcs_lim <- intercept - delta_lim
+         },
+         "upper" = {
+           delta_lim <- sl - rl
+           wcs_lim <- intercept + delta_lim
+         })
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Based on the transformation of the response variable delta_lim and
+  # wcs_lim have to be back-transformed to the original scale.
+
+  if (xform[2] != "no") {
+    switch(xform[2],
+           "log" = {
+             delta_lim_orig <- exp(delta_lim) - shift[2]
+             wcs_lim_orig <- exp(wcs_lim) - shift[2]
+           },
+           "sqrt" = {
+             delta_lim_orig <- delta_lim^2 - shift[2]
+             wcs_lim_orig <- wcs_lim^2 - shift[2]
+           },
+           "sq" = {
+             delta_lim_orig <- sqrt(delta_lim) - shift[2]
+
+             if (wcs_lim < 0) {
+               wcs_lim_orig <- NA
+             } else {
+               wcs_lim_orig <- sqrt(wcs_lim) - shift[2]
+             }
+           })
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Collect and return the data
+
+  if (xform[2] == "no") {
+    l_res <- list(xform = xform,
+                  shift = shift,
+                  delta.lim = delta_lim,
+                  delta.lim.orig = delta_lim,
+                  wcs.lim = wcs_lim,
+                  wcs.lim.orig = wcs_lim)
+  } else {
+    l_res <- list(xform = xform,
+                  shift = shift,
+                  delta.lim = delta_lim,
+                  delta.lim.orig = delta_lim_orig,
+                  wcs.lim = wcs_lim,
+                  wcs.lim.orig = wcs_lim_orig)
+  }
+
+  return(l_res)
+}
+
+#' Get intercepts of the worst case batches
+#'
+#' The function \code{get_wc_icpt()} prepares a vector of the intercepts
+#' of the worst case batches of all the regression models fitted to the data.
+#'
+#' @param icpt_list A list of four elements named \code{cics}, \code{dics},
+#'   \code{dids.pmse} and \code{dids} with the intercepts of each linear
+#'   regression model and batch. The \code{cics}, \code{dics} and
+#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
+#'   is available.
+#' @param poi_list A list of four elements named \code{cics}, \code{dics},
+#'   \code{dids.pmse} and \code{dids} with the points of intersection (POI)
+#'   of each linear regression model and batch. The \code{cics}, \code{dics}
+#'   and \code{dids.pmse} elements are \code{NA} if data of only a single
+#'   batch is available.
+#' @param wc_batch A numeric vector of the indices of the worst case batches
+#'   of each model type, i.e. a vector of four elements named \code{cics},
+#'   \code{dics}, \code{dids.pmse} and \code{dids}. The \code{cics} element
+#'   is \code{NA} because in the \dQuote{common intercept / common slope} model
+#'   the data from different batches is pooled.
+#' @inheritParams expirest_osle
+#'
+#' @details The function \code{get_wc_icpt()} extracts the worst case batches
+#' from the list of intercepts (\code{icpt_list}), given that the estimation
+#' of the corresponding POIs (\code{poi_list}) was successful.
 #'
 #' @return A named vector of the intercepts of the worst case batches is
 #' returned.
 #'
-#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#' @seealso \code{\link{get_icpt_list}}, \code{\link{get_poi_list}},
+#' \code{\link{get_osle_poi_list}}, \code{\link{get_wisle_poi_list}},
+#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @importFrom stats setNames
 #'
@@ -621,6 +1027,8 @@ get_wc_icpt <- function(data, batch_vbl, icpt_list, poi_list, wc_batch, xform) {
 #' @return The provided data frame with (a) new column(s) of the transformed
 #' variable(s).
 #'
+#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#'
 #' @keywords internal
 
 get_xformed_variables <- function(data, response_vbl, time_vbl,
@@ -720,6 +1128,8 @@ get_xformed_variables <- function(data, response_vbl, time_vbl,
 #' the list element names of the original variables have the suffix
 #' \code{".orig"}.
 #'
+#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#'
 #' @keywords internal
 
 get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
@@ -811,29 +1221,29 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 #' \code{shift}.
 #'
 #' @return A list with the following elements is returned:
-#' \item{sf.option}{A character string specifying the option concerning the
+#' \item{sf.option}{A character string that specifies the option concerning the
 #'   significant figures.}
-#' \item{xform}{A vector of two character strings specifying the transformation
-#'   of the response and the time variable.}
+#' \item{xform}{A vector of two character strings that specifies the
+#'   transformation of the response and the time variable.}
 #' \item{shift}{A vector of two values to be added to the values of the
 #'   transformed \eqn{x} and/or \eqn{y} variables (specified via the
 #'   \code{xform} parameter).}
-#' \item{rl.orig}{An optional element containing a numeric value or a numeric
-#'   vector specifying the release limit(s) on the original scale.}
-#' \item{rl.sf}{An optional element containing a numeric value or a numeric
-#'   vector specifying the significant figures of the release limit(s).}
-#' \item{rl}{An optional element containing a numeric value or a numeric vector
-#'   of the adjusted (as specified by the \code{sf.option} parameter) release
-#'   limit(s).}
-#' \item{rl.trfmd}{An optional element containing a numeric value or a numeric
-#'   vector of the adjusted and transformed, if applicable (as specified by the
-#'   the \code{sf.option} parameter and the second element of the \code{xform}
-#'   parameter, respectively), release limit(s), otherwise the same as
-#'   \code{rl}.}
-#' \item{sl.orig}{A numeric value or a numeric vector of length \code{2}
-#'   specifying the specification limit(s) on the original scale.}
+#' \item{rl.orig}{A numeric value or a numeric vector of the release limit(s)
+#'   on the original scale. If \code{NA} was passed in, \code{NA} is returned.}
+#' \item{rl.sf}{A numeric value or a numeric vector that specifies the
+#'   significant figures of the release limit(s). If \code{NA} was  passed in,
+#'   \code{NA} is returned.}
+#' \item{rl}{A numeric value or a numeric vector of the adjusted (as specified
+#'   by the \code{sf.option} parameter) release limit(s). If \code{NA} was
+#'   passed in, \code{NA} is returned.}
+#' \item{rl.trfmd}{A numeric value or a numeric vector of the adjusted and
+#'   transformed, if applicable (as specified by the the \code{sf.option}
+#'   parameter and the second element of the \code{xform} parameter,
+#'   respectively), release limit(s), otherwise the same as \code{rl}.}
+#' \item{sl.orig}{A numeric value or a numeric vector of length \code{2} of the
+#'   specification limit(s) on the original scale.}
 #' \item{sl.sf}{A numeric value or a numeric vector of length \code{2}
-#'   specifying the significant figures of the specification limit(s).}
+#'   that specifies the significant figures of the specification limit(s).}
 #' \item{sl}{A numeric value or a numeric vector of length \code{2} of the
 #'   adjusted (as specified by the \code{sf.option} parameter) specification
 #'   limit(s).}
@@ -842,6 +1252,8 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 #'   \code{sf.option} parameter and the second element of the \code{xform}
 #'   parameter, respectively) specification limit(s), otherwise the same as
 #'   \code{sl}.}
+#'
+#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
 
@@ -1000,866 +1412,6 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
   return(l_res)
 }
 
-#' Determination of the \dQuote{worst case scenario} (wcs) limit
-#'
-#' The function \code{get_wcs_limit()} calculates \dQuote{worst case scenario}
-#' (wcs) limit following the ARGPM Guidance \dQuote{Stability testing for
-#' prescription medicines}.
-#'
-#' @param rl A numeric value specifying the release specification limit(s),
-#'   on the same scale as \code{sl} and \code{intercept}.
-#' @param sl A numeric value specifying the specification limit, on the same
-#'   scale as \code{rl} and \code{intercept}.
-#' @param intercept A numeric value representing the intercept of a linear
-#'   regression model fitted to sample data, on the same scale as \code{rl}
-#'   and \code{sl}.
-#' @inheritParams expirest_osle
-#'
-#' @details The function \code{get_wcs_limit()} determines the \dQuote{worst
-#' case scenario} (wcs) limit as is proposed by the Australian Regulatory
-#' Guidelines for Prescription Medicines (ARGPM) guidance \dQuote{Stability
-#' testing for prescription medicines}. According to this guideline, the shelf
-#' life or expiry limit is estimated as the point where the upper or lower
-#' limit of the 95\% confidence interval of the linear model fitted to the
-#' data intersects the wcs limit. The wcs limit is obtained by
-#' adding/subtracting the absolute difference of specification limit and
-#' release limit to/from the common intercept of the test batches or the
-#' intercept of the worst performing batch.
-#'
-#' If data have been linearised by transformation, all elements, i.e. \code{rl},
-#' \code{sl} and \code{intercept} must be on the same, i.e. transformed, scale.
-#' The results are returned on the transformed scale and on the original scale.
-#'
-#' @return A list with the following elements is returned:
-#' \item{xform}{A vector of two character strings specifying the transformation
-#'   of the response and the time variable.}
-#' \item{shift}{A vector of two values which has been added to the values of
-#'   the transformed \eqn{x} and/or \eqn{y} variables (specified via the
-#'   \code{xform} parameter).}
-#' \item{delta.lim}{A numeric value or a numeric vector of the absolute
-#'   difference(s) between \code{rl} and {sl}, if \code{xform[2] != "no"} on
-#'   the transformed scale.}
-#' \item{delta.lim.orig}{A numeric value or a numeric vector of the absolute
-#'   difference(s) between \code{rl} and {sl} on the original scale.}
-#' \item{wcs.lim}{A numeric value or a numeric vector of the worst case
-#'   scenario (wcs) limit(s), if \code{xform[2] != "no"} on the transformed
-#'   scale.}
-#' \item{wcs.lim.orig}{A numeric value or a numeric vector of the worst case
-#'   scenario (wcs) limit(s) on the original scale.}
-#'
-#' @references
-#' Therapeutic Goods Administration (TGA) of the Department of Health of the
-#' Australian Government, Australian Regulatory Guidelines for Prescription
-#' Medicines (ARGPM), Stability testing for prescription medicines,
-#' Version 1.1, March 2017
-#'
-#' @seealso \code{\link{expirest_wisle}}, \code{\link[stats]{lm}}.
-#'
-#' @keywords internal
-
-get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
-                          shift = c(0, 0), ivl_side = "lower") {
-  if (!is.numeric(rl) || length(rl) > 1) {
-    stop("The parameter rl must be a numeric value of length 1.")
-  }
-  if (!is.numeric(sl) || length(sl) > 1) {
-    stop("The parameter sl must be a numeric value of length 1.")
-  }
-  if (!is.numeric(intercept)) {
-    stop("The parameter intercept must be a numeric value of length 1.")
-  }
-  if (length(xform) != 2) {
-    stop("Please specify xform appropriately.")
-  }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
-      !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
-    stop("Please specify xform appropriately.")
-  }
-  if (!is.numeric(shift) || length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!(ivl_side %in% c("lower", "upper"))) {
-    stop("Please specify ivl_side either as \"lower\" or \"upper\".")
-  }
-
-  if (ivl_side == "lower" && any(rl < sl)) {
-    stop("If ivl_side is \"lower\" rl must be > sl.")
-  }
-  if (ivl_side == "upper" && any(rl > sl)) {
-    stop("If ivl_side is \"upper\" rl must be < sl.")
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of worst case scenario (wcs) limit(s)
-
-  switch(ivl_side,
-         "lower" = {
-           delta_lim <- rl - sl
-           wcs_lim <- intercept - delta_lim
-         },
-         "upper" = {
-           delta_lim <- sl - rl
-           wcs_lim <- intercept + delta_lim
-         })
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Based on the transformation of the response variable delta_lim and
-  # wcs_lim have to be back-transformed to the original scale.
-
-  if (xform[2] != "no") {
-    switch(xform[2],
-           "log" = {
-             delta_lim_orig <- exp(delta_lim) - shift[2]
-             wcs_lim_orig <- exp(wcs_lim) - shift[2]
-           },
-           "sqrt" = {
-             delta_lim_orig <- delta_lim^2 - shift[2]
-             wcs_lim_orig <- wcs_lim^2 - shift[2]
-           },
-           "sq" = {
-             delta_lim_orig <- sqrt(delta_lim) - shift[2]
-
-             if (wcs_lim < 0) {
-               wcs_lim_orig <- NA
-             } else {
-               wcs_lim_orig <- sqrt(wcs_lim) - shift[2]
-             }
-           })
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Collect and return the data
-
-  if (xform[2] == "no") {
-    l_res <- list(xform = xform,
-                  shift = shift,
-                  delta.lim = delta_lim,
-                  delta.lim.orig = delta_lim,
-                  wcs.lim = wcs_lim,
-                  wcs.lim.orig = wcs_lim)
-  } else {
-    l_res <- list(xform = xform,
-                  shift = shift,
-                  delta.lim = delta_lim,
-                  delta.lim.orig = delta_lim_orig,
-                  wcs.lim = wcs_lim,
-                  wcs.lim.orig = wcs_lim_orig)
-  }
-
-  return(l_res)
-}
-
-#' Result of ANCOVA model check
-#'
-#' The function \code{check_ancova()} fits an ANalysis of COVAriance (ANCOVA)
-#' model to figure out which kind of linear regression model suits the
-#' (historical) data best.
-#'
-#' @param alpha A numeric value specifying the significance level for the
-#'   decision which model is appropriate, i.e. if the assumption of
-#'   \emph{common slope} or \emph{common intercept} is appropriate or not.
-#'   The default is \code{0.05}.
-#' @inheritParams expirest_osle
-#'
-#' @details The function \code{check_ancova()} fits an ANCOVA (ANalyis of
-#' COVAriance) model to the data contained in the provided data frame. Based
-#' on \code{alpha}, it checks if the intercepts and/or slopes between the
-#' groups differ significantly or not.
-#'
-#' @return A list of two elements is returned specifying which model, based on
-#'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
-#'   is a numeric vector of length 2 specifying the best model accepted at the
-#'   significance level specified by \code{alpha}. It has the form
-#'   \code{c(ci, cs)}, where \code{ci} specifies if a common intercept is
-#'   appropriate (\code{ci = 1}) or not (\code{ci = 0}) and \code{cs} specifies
-#'   if a common slope is appropriate (\code{cs = 1}) or not (\code{cs = 0}).
-#'   The second element (\code{type.acronym}) is an acronym representing the
-#'   first item. In case of a linear model including only a single batch,
-#'   all elements are \code{NA}.
-#'
-#' @seealso \code{\link[stats]{aov}}.
-#'
-#' @importFrom stats summary.aov
-#' @importFrom stats setNames
-#'
-#' @keywords internal
-
-check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
-                         alpha = 0.05) {
-  if (!is.data.frame(data)) {
-    stop("The data must be provided as data frame.")
-  }
-  if (!is.character(response_vbl)) {
-    stop("The parameter response_vbl must be a string.")
-  }
-  if (!(response_vbl %in% colnames(data))) {
-    stop("The response_vbl was not found in the provided data frame.")
-  }
-  if (!is.character(time_vbl)) {
-    stop("The parameter time_vbl must be a string.")
-  }
-  if (!(time_vbl %in% colnames(data))) {
-    stop("The time_vbl was not found in the provided data frame.")
-  }
-  if (!is.character(batch_vbl)) {
-    stop("The parameter batch_vbl must be a string.")
-  }
-  if (!(batch_vbl %in% colnames(data))) {
-    stop("The batch_vbl was not found in the provided data frame.")
-  }
-  if (!is.factor(data[, batch_vbl])) {
-    stop("The column in data specified by batch_vbl must be a factor.")
-  }
-  if (alpha <= 0 || alpha > 1) {
-    stop("Please specify alpha as (0, 1].")
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  # Remove unused factor levels
-  data <- droplevels(data)
-
-  if (nlevels(data[, batch_vbl]) > 1) {
-    t_formula <-
-      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep  = " * "))
-    lm_ancova <-
-      do.call("aov", list(as.formula(t_formula), data = as.name("data")))
-    slm_ancova <- summary(lm_ancova)[[1]]
-
-    p_batch <-
-      slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
-                   !grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
-    p_interaction <-
-      slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
-                   grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
-
-    # Store the outcome of the test in two logical parameters, i.e.
-    # common_icpt: yes or no (common intercept model)
-    # common_slp:  yes or no (common slope model)
-
-    ifelse(p_batch > alpha, common_icpt <- 1L, common_icpt <- 0L)
-    ifelse(p_interaction > alpha, common_slp <- 1L, common_slp <- 0L)
-
-    l_model_type <-
-      list(type.spec = setNames(c(common_icpt, common_slp),
-                                c("common.icpt", "common.slp")),
-           type.acronym =
-             paste0(c("di", "ci")[common_icpt + 1],
-                    c("ds", "cs")[common_slp + 1]))
-  } else {
-    l_model_type <-
-      list(type.spec = setNames(c(NA, NA), c("common.icpt", "common.slp")),
-           type.acronym = "n.a.")
-  }
-
-  return(l_model_type)
-}
-
-#' Linear model fitting
-#'
-#' The function \code{get_linear_models()} fits four types of linear regression
-#' models that are often used for the assessment of stability data, e.g. for
-#' the estimation of the shelf life or retest period.
-#'
-#' @inheritParams expirest_osle
-#'
-#' @details The function \code{get_linear_models()} expects a data frame with
-#' a response variable, a time variable and a categorical variable which
-#' usually has factor levels of multiple batches of a drug product that was
-#' assessed over a certain period of time with respect to the time-dependent
-#' behavior of characteristic parameters. Using these results, the function
-#' fits
-#' \itemize{
-#'  \item a \emph{common intercept / common slope} model (cics),
-#'  \item a \emph{different intercept / common slope} model (dics) or
-#'  \item a \emph{different intercept / different slope} model with pooled
-#'    mean square error (dids.pmse) and
-#'  \item a \emph{different intercept / different slope} model (dids) in which
-#'    individual models are fitted to each level of the categorical variable.
-#' }
-#'
-#' If the categorical variable has only a single factor level, then the first
-#' three models are \code{NA} and only a single regression model is fitted.
-#'
-#' @return A list of three elements is returned,
-#' containing the following elements:
-#' \item{Models}{A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids}. The first three elements contain the
-#'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
-#'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
-#'   and \dQuote{different intercept / different slope} (\code{dids}) models.
-#'   The fourth element is a list of the \sQuote{\code{lm}} objects that is
-#'   obtained from fitting a regression model to the data of each level of the
-#'   categorical variable separately. The \code{cics}, \code{dics} and
-#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
-#'   is available.}
-#' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-#'   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
-#' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-#'   values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
-#'   models.}
-#'
-#' @seealso \code{\link{expirest_osle}}.
-#'
-#' @importFrom stats lm
-#' @importFrom stats as.formula
-#' @importFrom stats coef
-#' @importFrom stats AIC
-#' @importFrom stats BIC
-#' @importFrom stats setNames
-#'
-#' @keywords internal
-
-get_linear_models <- function(data, response_vbl, time_vbl, batch_vbl) {
-  if (!is.data.frame(data)) {
-    stop("The data must be provided as data frame.")
-  }
-  if (!is.character(response_vbl)) {
-    stop("The parameter response_vbl must be a string.")
-  }
-  if (!(response_vbl %in% colnames(data))) {
-    stop("The response_vbl was not found in the provided data frame.")
-  }
-  if (!is.character(time_vbl)) {
-    stop("The parameter time_vbl must be a string.")
-  }
-  if (!(time_vbl %in% colnames(data))) {
-    stop("The time_vbl was not found in the provided data frame.")
-  }
-  if (!is.character(batch_vbl)) {
-    stop("The parameter batch_vbl must be a string.")
-  }
-  if (!(batch_vbl %in% colnames(data))) {
-    stop("The batch_vbl was not found in the provided data frame.")
-  }
-  if (!is.factor(data[, batch_vbl])) {
-    stop("The column in data specified by batch_vbl must be a factor.")
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  # Remove unused factor levels
-  d_dat <- droplevels(data)
-  l_models <- setNames(vector(mode = "list", length = 4),
-                       c("cics", "dics", "dids.pmse", "dids"))
-
-  if (nlevels(d_dat[, batch_vbl]) > 1) {
-    # ---------
-    # Common Intercept / Common Slope
-    t_formula <- paste(response_vbl, "~", time_vbl)
-    l_models[["cics"]] <-
-      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-    # ---------
-    # Different Intercept / Common Slope
-    t_formula <-
-      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " + "))
-    l_models[["dics"]] <-
-      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-    # ---------
-    # Different Intercept / Different Slope (pooled mean square error)
-    t_formula <-
-      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " * "))
-    l_models[["dids.pmse"]] <-
-      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-    # ---------
-    # Different Intercept / Different Slope (individual models)
-    t_formula <- paste(response_vbl, "~", time_vbl)
-    tmp <- lapply(levels(d_dat[, batch_vbl]),
-                  function(batch) {
-                    t_dat <- d_dat[d_dat[, batch_vbl] == batch, ]
-                    do.call("lm", list(as.formula(t_formula),
-                                       data = as.name("t_dat")))
-                  })
-    names(tmp) <- levels(d_dat[, batch_vbl])
-    l_models[["dids"]] <- tmp
-
-    # ---------
-    # Determination of the Akaike Information Criterion (AIC) and Bayesian
-    # Information Criterion (BIC) of each of the relevant models
-
-    t_AIC <- vapply(l_models[c("cics", "dics", "dids.pmse")], AIC, numeric(1))
-    t_BIC <- vapply(l_models[c("cics", "dics", "dids.pmse")], BIC, numeric(1))
-  } else {
-    t_formula <- paste(response_vbl, "~", time_vbl)
-
-    l_models[names(l_models) != "dids"] <- NA
-    tmp <- lapply(levels(d_dat[, batch_vbl]),
-                  function(batch) {
-                    t_dat <- d_dat[d_dat[, batch_vbl] == batch, ]
-                    do.call("lm", list(as.formula(t_formula),
-                                       data = as.name("t_dat")))
-                  })
-    names(tmp) <- levels(d_dat[, batch_vbl])
-    l_models[["dids"]] <- tmp
-
-    t_AIC <- t_BIC <- setNames(rep(NA, 3), c("cics", "dics", "dids.pmse"))
-  }
-
-  return(list(Models = l_models,
-              AIC = t_AIC,
-              BIC = t_BIC))
-}
-
-#' Getting the intercept(s) of a linear model
-#'
-#' The function \code{get_icpt()} determines the intercept(s) of the provided
-#' model.
-#'
-#' @param model A linear model object of type \sQuote{\code{lm}}.
-#' @param response_vbl A character string specifying the response variable name
-#'   that must be a column of the data frame that was used for model fitting.
-#' @param time_vbl A character string specifying the time variable name that
-#'   must be a column of data frame that was used for model fitting.
-#' @param batch_vbl A character string specifying the column of the data frame
-#'   that was used for model fitting with the grouping information (i.e. a
-#'   factorial variable) for the differentiation of the observations from the
-#'   different batches.
-#' @inheritParams expirest_osle
-#'
-#' @details The function \code{get_icpt()} determines the intercept(s) of the
-#' model that has been handed over via the \code{model} parameter.
-#'
-#' @return A list with a single element containing the numeric value or a
-#' numeric vector of the intercept(s) or, if the data have been transformed,
-#' a list with an additional element that contains the numeric value or numeric
-#' vector on the original scale.
-#'
-#' @importFrom stats coef
-#' @importFrom stats formula
-#'
-#' @keywords internal
-
-get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
-                     xform = c("no", "no"), shift = c(0, 0)) {
-  if (!inherits(model, "lm")) {
-    stop("Please provide a model of type \"lm\".")
-  }
-  if (!is.character(response_vbl)) {
-    stop("The parameter response_vbl must be a string.")
-  }
-  if (length(grep(response_vbl, as.character(formula(model$terms)))) == 0) {
-    stop("The parameter response_vbl was not found in the provided model.")
-  }
-  if (!is.character(time_vbl)) {
-    stop("The parameter time_vbl must be a string.")
-  }
-  if (length(grep(time_vbl, as.character(formula(model$terms)))) == 0) {
-    stop("The parameter time_vbl was not found in the provided model.")
-  }
-  if (!is.character(batch_vbl)) {
-    stop("The parameter batch_vbl must be a string.")
-  }
-  if (length(attr(model$terms, "order")) > 1) {
-    if (length(grep(batch_vbl, as.character(formula(model$terms)))) == 0) {
-      stop("The parameter batch_vbl was not found in the provided model.")
-    }
-  }
-  if (length(xform) != 2) {
-    stop("Please specify xform appropriately.")
-  }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
-      !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
-    stop("Please specify xform appropriately.")
-  }
-  if (!is.numeric(shift) || length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of intercept(s)
-
-  if (length(coef(model)) == 2) {
-    intercept <- coef(model)["(Intercept)"]
-  } else {
-    t_coef <- coef(model)
-    t_batch_levels <- levels(model[["model"]][, batch_vbl])
-
-    t_batch_id <- grep(batch_vbl, names(t_coef))
-    t_time_id <- grep(time_vbl, names(t_coef))
-
-    # Calculate the intercepts
-    intercept <- c(t_coef["(Intercept)"], t_coef["(Intercept)"] +
-                     t_coef[t_batch_id[t_batch_id < t_time_id[1]]])
-
-    # Rename the vector
-    t_names <- names(intercept)
-    t_names <- sub(batch_vbl, "", t_names)
-    t_names[which(!(t_names %in% t_batch_levels))] <-
-      t_batch_levels[which(!(t_names %in% t_batch_levels))]
-    names(intercept) <- t_names
-  }
-
-  # ---------
-  # Depending on the transformation of the response variable the intercept(s)
-  # has (have) to be back-transformed to the original scale.
-
-  if (xform[2] != "no") {
-    switch(xform[2],
-           "log" = {
-             icpt_orig <- exp(intercept) - shift[2]
-           },
-           "sqrt" = {
-             icpt_orig <- intercept^2 - shift[2]
-           },
-           "sq" = {
-             icpt_orig <- rep(NA, length(intercept))
-             names(icpt_orig) <- names(intercept)
-
-             ok <- unname(which(intercept >= 0))
-             if (length(ok) > 0) {
-               icpt_orig[ok] <- sqrt(intercept[ok]) - shift[2]
-             }
-           })
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Return of the intercept(s)
-
-  if (xform[2] == "no") {
-    l_res <- list(icpt = intercept)
-  } else {
-    l_res <- list(icpt = intercept,
-                  icpt.orig = icpt_orig)
-  }
-
-  return(l_res)
-}
-
-#' List of intercepts
-#'
-#' The function \code{get_icpt_list()} prepares a list of the intercepts
-#' of the regression models fitted to the data.
-#'
-#' @param data The data frame that was used for fitting the models of parameter
-#'   \code{model_list}.
-#' @param model_list A list of regression models of different type. Usually,
-#'   it is a list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids}, where the first three elements contain
-#'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
-#'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
-#'   and \dQuote{different intercept / different slope} (\code{dids}) type.
-#'   The fourth element with the label \code{dids.pmse} is usually a list of
-#'   the \sQuote{\code{lm}} objects that is obtained from fitting a regression
-#'   model to the data of each level of the categorical variable separately.
-#'   The \code{cics}, \code{dics} and \code{dids.pmse} elements are \code{NA}
-#'   if data of only a single batch is available.
-#' @inheritParams expirest_osle
-#'
-#' @details The function \code{get_poi_list()} applies the \code{find_poi()}
-#' function (find the \dQuote{point of intersection}) on all the models that
-#' are provided.
-#'
-#' @return a list of four elements named \code{cics}, \code{dics},
-#' \code{dids.pmse} and \code{dids} is returned. Each of them contains a named
-#' vector of the estimated POI values estimated for each batch named
-#' correspondingly.
-#'
-#' @seealso \code{\link{get_distance}}, \code{\link[stats]{uniroot}},
-#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
-#'
-#' @keywords internal
-
-get_icpt_list <- function(data, response_vbl, time_vbl, batch_vbl, model_list,
-                          xform = c("no", "no"), shift = c(0, 0)) {
-  if (!is.data.frame(data)) {
-    stop("The data must be provided as data frame.")
-  }
-  if (!is.character(response_vbl)) {
-    stop("The parameter response_vbl must be a string.")
-  }
-  if (!(response_vbl %in% colnames(data))) {
-    stop("The response_vbl was not found in the provided data frame.")
-  }
-  if (!is.character(time_vbl)) {
-    stop("The parameter time_vbl must be a string.")
-  }
-  if (!(time_vbl %in% colnames(data))) {
-    stop("The time_vbl was not found in the provided data frame.")
-  }
-  if (!is.character(batch_vbl)) {
-    stop("The parameter batch_vbl must be a string.")
-  }
-  if (!(batch_vbl %in% colnames(data))) {
-    stop("The batch_vbl was not found in the provided data frame.")
-  }
-  if (!is.factor(data[, batch_vbl])) {
-    stop("The column in data specified by batch_vbl must be a factor.")
-  }
-  if (!is.list(model_list)) {
-    stop("The parameter model_list must be a list.")
-  }
-  if (sum(names(model_list) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
-    stop("The parameter model_list must have four elements named \"cics\", ",
-         "\"dics\", \"dids\" and \"dids.pmse\".")
-  }
-  if (length(xform) != 2) {
-    stop("Please specify xform appropriately.")
-  }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
-      !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
-    stop("Please specify xform appropriately.")
-  }
-  if (length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!is.numeric(shift)) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Preparation of data
-
-  d_dat <- droplevels(data)
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of the intercepts
-
-  if (nlevels(d_dat[, batch_vbl]) > 1) {
-    l_icpt <- vapply(model_list[c("cics", "dics", "dids.pmse")], function(x) {
-      list(get_icpt(model = x, response_vbl = response_vbl,
-                    time_vbl = time_vbl, batch_vbl = batch_vbl,
-                    xform = xform, shift = shift))
-    },
-    list(1))
-  } else {
-    l_icpt <- list(cics = NA, dics = NA, dids.pmse = NA)
-  }
-
-  tmp <- vapply(model_list[["dids"]], function(x) {
-    list(get_icpt(model = x, response_vbl = response_vbl,
-                  time_vbl = time_vbl, batch_vbl = batch_vbl,
-                  xform = xform, shift = shift))
-  },
-  list(1))
-  tmp <- unlist(tmp)
-  names(tmp) <- sub("\\.\\(Intercept\\)", "", names(tmp))
-
-  if (xform[2] == "no") {
-    names(tmp) <- sub("\\.icpt", "", names(tmp))
-    l_icpt <- c(l_icpt, list(dids = list(icpt = tmp)))
-  } else {
-    t_i_orig <- grep("orig", names(tmp))
-    names(tmp) <- sub("\\.icpt", "", names(tmp))
-    names(tmp) <- sub("\\.orig", "", names(tmp))
-
-    l_icpt <- c(l_icpt, list(dids = list(icpt = tmp[-t_i_orig],
-                                         icpt.orig = tmp[t_i_orig])))
-  }
-
-  return(l_icpt)
-}
-
-#' Extract information from \dQuote{worst case scenario} (wcs) limit lists list
-#'
-#' The function \code{extract_from_ll_wcsl()} extracts specific elements from
-#' a list of lists returned by the \code{\link{get_wcs_limit}()} function.
-#'
-#' @param ll A list of lists returned by the \code{\link{get_wcs_limit}()}
-#'   function. The list must have four elements named \code{"cics"},
-#'   \code{"dics"}, \code{dids.pmse} and \code{"dids"}. Each of these elements
-#'   has a sub-list of the same length as the number of intercepts. And each
-#'   of these elements has a sub-sub-list of the same length as the number of
-#'   release limits (\code{rl}).
-#' @param element A character string specifying the element to be extracted,
-#'   i.e. either one of  \code{"delta.lim"}, \code{"delta.lim.orig"},
-#'   \code{"wcs.lim"} or \code{"wcs.lim.orig"}.
-#'
-#' @details Information in a bulk list of lists that has been obtained by
-#' aid of the function \code{\link{get_wcs_limit}()} for a set of release
-#' limit values (\code{rl}) and intercepts.
-#'
-#' @return A list of the same length as \code{ll_wcsl} is returned. The
-#' individual elements of the list are matrices of the values specified by
-#' \code{element} that have been extracted from \code{x}.
-#'
-#' @seealso \code{\link{get_wcs_limit}}.
-#'
-#' @keywords internal
-
-extract_from_ll_wcsl <- function(ll, element) {
-  if (sum(names(ll) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
-    stop("The list ll must have four elements named \"cics\", \"dics\" ",
-         "\"dids.pmse\" and \"dids\".")
-  }
-  if (!(element %in%
-        c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig"))) {
-    stop("Please specify element either as \"delta.lim\", \"delta.lim.orig\", ",
-         "\"wcs.lim\" or \"wcs.lim.orig\".")
-  }
-  if (get_n_list_levels(ll) != 4) {
-    stop("The parameter ll must be a list of lists returned by ",
-         "get_wcs_limit() at level three.")
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of worst case scenario (wcs) limit(s)
-
-  t_expected_names <-
-    c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig")
-  t_model_names <- names(ll)
-
-  l_res <- lapply(seq_along(ll), function(i) {
-    if (i == 1) {
-      if (get_n_list_levels(ll[[i]]) == 0) {
-        NA
-      } else {
-        if (any(vapply(ll[[i]], function(x) {
-          sum(t_expected_names %in% names(x[[1]])) != 4
-        },
-        logical(1)))) {
-          stop("The element was not found in one of the sub-elements of ",
-               "model ", t_model_names[i], ". Please provide a list returned ",
-               "from get_wcs_limit().")
-        } else {
-          matrix(vapply(seq_along(ll[[i]][[1]]), function(j) {
-            ll[[i]][[1]][[j]][[element]]
-          },
-          numeric(1)),
-          nrow = length(ll[[i]][[1]]), ncol = length(ll[[i]]),
-          dimnames = list(NULL, names(ll[[i]])))
-        }
-      }
-    } else {
-      if (get_n_list_levels(ll[[i]]) == 0) {
-        NA
-      } else {
-        if (any(vapply(ll[[i]], function(x) {
-          sum(t_expected_names %in% names(x[[1]])) != 4
-        },
-        logical(1)))) {
-          stop("The element was not found in one of the sub-elements of ",
-               "model ", t_model_names[i], ". Please provide a list returned ",
-               "from get_wcs_limit().")
-        } else {
-          matrix(vapply(seq_along(ll[[i]]), function(bb) {
-            vapply(seq_along(ll[[i]][[1]]), function(j) {
-              ll[[i]][[bb]][[j]][[element]]
-            },
-            numeric(1))
-          }, numeric(length(ll[[i]][[1]]))),
-          nrow = length(ll[[i]][[1]]), ncol = length(ll[[i]]),
-          dimnames = list(NULL, names(ll[[i]])))
-        }
-      }
-    }
-  })
-
-  names(l_res) <- t_model_names
-
-  return(l_res)
-}
-
-#' Extract worst case x value
-#'
-#' The function \code{extract_wc_x()} extracts the worst case \eqn{x} value
-#' from a list of matrices of possible \eqn{x} values based on a list of
-#' vectors of indices which specify the worst case elements.
-#'
-#' @param l1 A list of matrices of \eqn{x} values or a list of lists of one
-#'   element being a numeric vector. The list must have four elements named
-#'   \code{"cics"}, \code{"dics"}, \code{"dids.pmse"} and \code{"dids"}.
-#' @param l2 A list of vectors of indices which specify the worst case elements.
-#'   As \code{l1}, the list must have four elements named \code{"cics"},
-#'   \code{"dics"}, \code{"dids.pmse"} and \code{"dids"}. The length of the
-#'   vectors of \code{l2} must be equal to the number of rows of the matrices
-#'   in \code{l1} or the length of the vectors of the list elements.
-#'
-#' @details Information from a list of matrices of values or list of list of
-#' one vector by aid of a list of vectors of indices which specify which
-#' elements in row of each matrix or which elements of the vectors are the
-#' worst case elements.
-#'
-#' @return A matrix of the worst case values with the number of rows
-#' corresponding to the length of the vectors in \code{l2} and the number of
-#' columns corresponding to the length of \code{l1} or \code{l2} is returned.
-#'
-#' @keywords internal
-
-extract_wc_x <- function(l1, l2) {
-  if (!is.list(l1)) {
-    stop("The parameter l1 must be a list.")
-  }
-  if (!is.list(l2)) {
-    stop("The parameter l2 must be a list.")
-  }
-  if (sum(names(l1) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
-    stop("The list l1 must have four elements named \"cics\", \"dics\" ",
-         "\"dids.pmse\" and \"dids\".")
-  }
-  if (sum(names(l2) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
-    stop("The list l2 must have four elements named \"cics\", \"dics\" ",
-         "\"dids.pmse\" and \"dids\".")
-  }
-  if (get_n_list_levels(l1) == 1) {
-    if (sum(vapply(l1, function(x) {
-      !is.matrix(x)
-    },
-    logical(1))) > 0) {
-      stop("The elements of l1 must be matrices or lists of vectors.")
-    }
-  } else {
-    if (sum(vapply(l1, function(x) {
-      !is.numeric(x[[1]]) & !is.logical(x[[1]])
-    },
-    logical(1))) > 0) {
-      stop("The elements of l1 must be matrices or lists of vectors.")
-    }
-  }
-  if (sum(vapply(l2, function(x) {
-    !is.numeric(x) & !is.logical(x)
-  },
-  logical(1))) > 0) {
-    stop("The elements of l2 must be numeric vectors or vectors of NA.")
-  }
-  if (sum(vapply(l1, function(x) is.matrix(x), logical(1))) == 4) {
-    if (!isTRUE(all.equal(vapply(l1, function(x) nrow(x), numeric(1)),
-                          vapply(l2, function(x) length(x), numeric(1))))) {
-      stop("The number of rows of the matrices in l1 must be equal ",
-           "to the length of the vectors in l2.")
-    }
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  m_res <- matrix(NA, nrow = length(l2[[1]]), ncol = length(l1))
-  colnames(m_res) <- names(l1)
-
-  for (i in seq_along(l1)) {
-    if (names(l1)[i] == "cics") {
-      if (is.matrix(l1[["cics"]])) {
-        m_res[, "cics"] <- l1[["cics"]]
-      }
-      if (is.list(l1[["cics"]])) {
-        if (is.vector(l1[["cics"]][[length(l1[["cics"]])]]) &&
-            length(l1[["cics"]][[length(l1[["cics"]])]]) == 1) {
-          m_res[, "cics"] <- rep(unname(l1[[i]][[1]]), length(l2[[1]]))
-        }
-      }
-    } else {
-      if (is.matrix(l1[[i]])) {
-        m_res[, i] <- vapply(seq_along(l2[[1]]), function(j) {
-          ifelse(!is.na(l2[[i]][j]),
-                 l1[[i]][j, l2[[i]][j]],
-                 NA)
-        }, numeric(1))
-      }
-      if (is.list(l1[[i]])) {
-        m_res[, i] <- vapply(seq_along(l2[[1]]), function(j) {
-          ifelse(!is.na(l2[[i]][j]),
-                 l1[[i]][[1]][l2[[i]][j]],
-                 NA)
-        },
-        numeric(1))
-      }
-    }
-  }
-
-  return(m_res)
-}
-
 #' Get relevant limits
 #'
 #' The function \code{get_relevant_limits()} expects a list returned by the
@@ -1869,42 +1421,25 @@ extract_wc_x <- function(l1, l2) {
 #' @param limits_list A list returned by the \code{set_limits()} function.
 #' @inheritParams expirest_osle
 #'
-#' @details The function \code{get_relevant_limits()} extracts the limits
-#' that are returned by the \code{set_limits()} function, based on the setting
-#' of the parameter \code{xform}.
+#' @details The function \code{get_relevant_limits()} makes a subset of the
+#' list returned by the \code{set_limits()} function.
 #'
 #' @return A list with the following elements is returned:
-#' \item{sf.option}{A character string specifying the option concerning the
-#'   significant figures.}
-#' \item{xform}{A vector of two character strings specifying the transformation
-#'   of the response and the time variable.}
-#' \item{shift}{A vector of two values to be added to the values of the
-#'   transformed \eqn{x} and/or \eqn{y} variables (specified via the
-#'   \code{xform} parameter).}
-#' \item{rl.orig}{An optional element containing a numeric value or a numeric
-#'   vector specifying the release limit(s) on the original scale.}
-#' \item{rl.sf}{An optional element containing a numeric value or a numeric
-#'   vector specifying the significant figures of the release limit(s).}
-#' \item{rl}{An optional element containing a numeric value or a numeric vector
-#'   of the adjusted (as specified by the \code{sf.option} parameter) release
-#'   limit(s).}
-#' \item{rl.trfmd}{An optional element containing a numeric value or a numeric
-#'   vector of the adjusted and transformed, if applicable (as specified by the
-#'   the \code{sf.option} parameter and the second element of the \code{xform}
-#'   parameter, respectively), release limit(s), otherwise the same as
-#'   \code{rl}.}
-#' \item{sl.orig}{A numeric value or a numeric vector of length \code{2}
-#'   specifying the specification limit(s) on the original scale.}
-#' \item{sl.sf}{A numeric value or a numeric vector of length \code{2}
-#'   specifying the significant figures of the specification limit(s).}
-#' \item{sl}{A numeric value or a numeric vector of length \code{2} of the
-#'   adjusted (as specified by the \code{sf.option} parameter) specification
-#'   limit(s).}
-#' \item{sl.trfmd}{A numeric value or a numeric vector of length \code{2} of
-#'   the adjusted and transformed, if applicable (as specified by the the
-#'   \code{sf.option} parameter and the second element of the \code{xform}
-#'   parameter, respectively) specification limit(s), otherwise the same as
-#'   \code{sl}.}
+#' \item{sl.orig}{A numeric value or a numeric vector of length \code{2} of the
+#'   specification limit(s) on the original scale.}
+#' \item{sl}{A numeric value or a numeric vector of length \code{2} of adjusted
+#'   specification limit(s).}
+#' \item{rl.orig}{A numeric value or a numeric vector that specifies the release
+#'   limit(s) on the original scale. If \code{NA} was  passed in, \code{NA} is
+#'   returned.}
+#' \item{rl}{A numeric value or a numeric vector of adjusted release limit(s).
+#'   If \code{NA} was passed in, \code{NA} is returned.}
+#' \item{sl.bt}{A numeric value or a numeric vector of length \code{2} of
+#'   adjusted specification limit(s) before transformation. If no
+#'   transformation has been performed it is \code{NA}.}
+#' \item{rl.bt}{A numeric value or a numeric vector of adjusted release
+#'   limit(s) before transformation. If no transformation has been performed
+#'   it is \code{NA}.}
 #'
 #' @seealso \code{\link{set_limits}}
 #'
@@ -2003,29 +1538,479 @@ get_relevant_limits <- function(limits_list, xform = c("no", "no"),
               rl.bt = rl_bt))
 }
 
+#' Result of ANCOVA model check
+#'
+#' The function \code{check_ancova()} fits an ANalysis of COVAriance (ANCOVA)
+#' model to figure out which kind of linear regression model suits the
+#' (historical) data best.
+#'
+#' @param alpha A numeric value that specifies the significance level for the
+#'   decision which model is appropriate, i.e. if the assumption of
+#'   \emph{common slope} or \emph{common intercept} is appropriate or not.
+#'   The default is \code{0.05}.
+#' @inheritParams expirest_osle
+#'
+#' @details The function \code{check_ancova()} fits an ANCOVA (ANalyis of
+#' COVAriance) model to the data contained in the provided data frame. Based
+#' on \code{alpha}, it checks if the intercepts and/or slopes between the
+#' groups differ significantly or not.
+#'
+#' @return A list of two elements is returned that specifies which model, based
+#'   on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+#'   is a numeric vector of length 2 that specifies the best model accepted at
+#'   the significance level specified by \code{alpha}. It has the form
+#'   \code{c(ci, cs)}, where \code{ci} specifies if a common intercept is
+#'   appropriate (\code{ci = 1}) or not (\code{ci = 0}) and \code{cs} specifies
+#'   if a common slope is appropriate (\code{cs = 1}) or not (\code{cs = 0}).
+#'   The second element (\code{type.acronym}) is an acronym representing the
+#'   first item. In case of a linear model including only a single batch,
+#'   all elements are \code{NA}.
+#'
+#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+#' \code{\link[stats]{aov}}.
+#'
+#' @importFrom stats summary.aov
+#' @importFrom stats setNames
+#'
+#' @keywords internal
+
+check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
+                         alpha = 0.05) {
+  if (!is.data.frame(data)) {
+    stop("The data must be provided as data frame.")
+  }
+  if (!is.character(response_vbl)) {
+    stop("The parameter response_vbl must be a string.")
+  }
+  if (!(response_vbl %in% colnames(data))) {
+    stop("The response_vbl was not found in the provided data frame.")
+  }
+  if (!is.character(time_vbl)) {
+    stop("The parameter time_vbl must be a string.")
+  }
+  if (!(time_vbl %in% colnames(data))) {
+    stop("The time_vbl was not found in the provided data frame.")
+  }
+  if (!is.character(batch_vbl)) {
+    stop("The parameter batch_vbl must be a string.")
+  }
+  if (!(batch_vbl %in% colnames(data))) {
+    stop("The batch_vbl was not found in the provided data frame.")
+  }
+  if (!is.factor(data[, batch_vbl])) {
+    stop("The column in data specified by batch_vbl must be a factor.")
+  }
+  if (alpha <= 0 || alpha > 1) {
+    stop("Please specify alpha as (0, 1].")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  # Remove unused factor levels
+  data <- droplevels(data)
+
+  if (nlevels(data[, batch_vbl]) > 1) {
+    t_formula <-
+      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep  = " * "))
+    lm_ancova <-
+      do.call("aov", list(as.formula(t_formula), data = as.name("data")))
+    slm_ancova <- summary(lm_ancova)[[1]]
+
+    p_batch <-
+      slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
+                   !grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
+    p_interaction <-
+      slm_ancova[grepl(batch_vbl, rownames(slm_ancova)) &
+                   grepl(time_vbl, rownames(slm_ancova)), "Pr(>F)"]
+
+    # Store the outcome of the test in two logical parameters, i.e.
+    # common_icpt: yes or no (common intercept model)
+    # common_slp:  yes or no (common slope model)
+
+    ifelse(p_batch > alpha, common_icpt <- 1L, common_icpt <- 0L)
+    ifelse(p_interaction > alpha, common_slp <- 1L, common_slp <- 0L)
+
+    l_model_type <-
+      list(type.spec = setNames(c(common_icpt, common_slp),
+                                c("common.icpt", "common.slp")),
+           type.acronym =
+             paste0(c("di", "ci")[common_icpt + 1],
+                    c("ds", "cs")[common_slp + 1]))
+  } else {
+    l_model_type <-
+      list(type.spec = setNames(c(NA, NA), c("common.icpt", "common.slp")),
+           type.acronym = "n.a.")
+  }
+
+  return(l_model_type)
+}
+
+#' Linear model fitting
+#'
+#' The function \code{get_model_list()} fits four types of linear regression
+#' models that are often used for the assessment of stability data, e.g. for
+#' the estimation of the shelf life or retest period.
+#'
+#' @inheritParams expirest_osle
+#'
+#' @details The function \code{get_model_list()} expects a data frame with
+#' a response variable, a time variable and a categorical variable which
+#' usually has factor levels of multiple batches of a drug product that was
+#' assessed over a certain period of time with respect to the time-dependent
+#' behavior of characteristic parameters. Using these results, the function
+#' fits
+#' \itemize{
+#'  \item a \emph{common intercept / common slope} model (cics),
+#'  \item a \emph{different intercept / common slope} model (dics) or
+#'  \item a \emph{different intercept / different slope} model with pooled
+#'    mean square error (dids.pmse) and
+#'  \item a \emph{different intercept / different slope} model (dids) in which
+#'    individual models are fitted to each level of the categorical variable.
+#' }
+#'
+#' If the categorical variable has only a single factor level, then the first
+#' three models are \code{NA} and only a single regression model is fitted.
+#'
+#' @return A list of three elements is returned,
+#' containing the following elements:
+#' \item{Models}{A list of four elements named \code{cics}, \code{dics},
+#'   \code{dids.pmse} and \code{dids}. The first three elements contain the
+#'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
+#'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
+#'   and \dQuote{different intercept / different slope} (\code{dids}) models.
+#'   The fourth element is a list of the \sQuote{\code{lm}} objects that is
+#'   obtained from fitting a regression model to the data of each level of the
+#'   categorical variable separately. The \code{cics}, \code{dics} and
+#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
+#'   is available.}
+#' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
+#'   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
+#' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
+#'   values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+#'   models.}
+#'
+#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+#' \code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+#'
+#' @importFrom stats lm
+#' @importFrom stats as.formula
+#' @importFrom stats coef
+#' @importFrom stats AIC
+#' @importFrom stats BIC
+#' @importFrom stats setNames
+#'
+#' @keywords internal
+
+get_model_list <- function(data, response_vbl, time_vbl, batch_vbl) {
+  if (!is.data.frame(data)) {
+    stop("The data must be provided as data frame.")
+  }
+  if (!is.character(response_vbl)) {
+    stop("The parameter response_vbl must be a string.")
+  }
+  if (!(response_vbl %in% colnames(data))) {
+    stop("The response_vbl was not found in the provided data frame.")
+  }
+  if (!is.character(time_vbl)) {
+    stop("The parameter time_vbl must be a string.")
+  }
+  if (!(time_vbl %in% colnames(data))) {
+    stop("The time_vbl was not found in the provided data frame.")
+  }
+  if (!is.character(batch_vbl)) {
+    stop("The parameter batch_vbl must be a string.")
+  }
+  if (!(batch_vbl %in% colnames(data))) {
+    stop("The batch_vbl was not found in the provided data frame.")
+  }
+  if (!is.factor(data[, batch_vbl])) {
+    stop("The column in data specified by batch_vbl must be a factor.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  # Remove unused factor levels
+  d_dat <- droplevels(data)
+  l_models <- setNames(vector(mode = "list", length = 4),
+                       c("cics", "dics", "dids.pmse", "dids"))
+
+  if (nlevels(d_dat[, batch_vbl]) > 1) {
+    # ---------
+    # Common Intercept / Common Slope
+    t_formula <- paste(response_vbl, "~", time_vbl)
+    l_models[["cics"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+
+    # ---------
+    # Different Intercept / Common Slope
+    t_formula <-
+      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " + "))
+    l_models[["dics"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+
+    # ---------
+    # Different Intercept / Different Slope (pooled mean square error)
+    t_formula <-
+      paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " * "))
+    l_models[["dids.pmse"]] <-
+      do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
+
+    # ---------
+    # Different Intercept / Different Slope (individual models)
+    t_formula <- paste(response_vbl, "~", time_vbl)
+    tmp <- lapply(levels(d_dat[, batch_vbl]),
+                  function(batch) {
+                    t_dat <- d_dat[d_dat[, batch_vbl] == batch, ]
+                    do.call("lm", list(as.formula(t_formula),
+                                       data = as.name("t_dat")))
+                  })
+    names(tmp) <- levels(d_dat[, batch_vbl])
+    l_models[["dids"]] <- tmp
+
+    # ---------
+    # Determination of the Akaike Information Criterion (AIC) and Bayesian
+    # Information Criterion (BIC) of each of the relevant models
+
+    t_AIC <- vapply(l_models[c("cics", "dics", "dids.pmse")], AIC, numeric(1))
+    t_BIC <- vapply(l_models[c("cics", "dics", "dids.pmse")], BIC, numeric(1))
+  } else {
+    t_formula <- paste(response_vbl, "~", time_vbl)
+
+    l_models[names(l_models) != "dids"] <- NA
+    tmp <- lapply(levels(d_dat[, batch_vbl]),
+                  function(batch) {
+                    t_dat <- d_dat[d_dat[, batch_vbl] == batch, ]
+                    do.call("lm", list(as.formula(t_formula),
+                                       data = as.name("t_dat")))
+                  })
+    names(tmp) <- levels(d_dat[, batch_vbl])
+    l_models[["dids"]] <- tmp
+
+    t_AIC <- t_BIC <- setNames(rep(NA, 3), c("cics", "dics", "dids.pmse"))
+  }
+
+  return(list(Models = l_models,
+              AIC = t_AIC,
+              BIC = t_BIC))
+}
+
+#' Extract information from \dQuote{worst case scenario} (wcs) limit lists list
+#'
+#' The function \code{extract_from_ll_wcsl()} extracts specific elements from
+#' a list of lists returned by the \code{\link{get_wcs_limit}()} function.
+#'
+#' @param ll A list of lists returned by the \code{\link{get_wcs_limit}()}
+#'   function. The list must have four elements named \code{"cics"},
+#'   \code{"dics"}, \code{dids.pmse} and \code{"dids"}. Each of these elements
+#'   has a sub-list of the same length as the number of intercepts. And each
+#'   of these elements has a sub-sub-list of the same length as the number of
+#'   release limits (\code{rl}).
+#' @param element A character string that specifies the element to be extracted,
+#'   i.e. either one of  \code{"delta.lim"}, \code{"delta.lim.orig"},
+#'   \code{"wcs.lim"} or \code{"wcs.lim.orig"}.
+#'
+#' @details Information in a bulk list of lists that has been obtained by
+#' aid of the function \code{\link{get_wcs_limit}()} for a set of release
+#' limit values (\code{rl}) and intercepts.
+#'
+#' @return A list of the same length as \code{ll_wcsl} is returned. The
+#' individual elements of the list are matrices of the values specified by
+#' \code{element} that have been extracted from \code{ll}.
+#'
+#' @seealso \code{\link{get_wcs_limit}}.
+#'
+#' @keywords internal
+
+extract_from_ll_wcsl <- function(ll, element) {
+  if (sum(names(ll) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The list ll must have four elements named \"cics\", \"dics\" ",
+         "\"dids.pmse\" and \"dids\".")
+  }
+  if (!(element %in%
+        c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig"))) {
+    stop("Please specify element either as \"delta.lim\", \"delta.lim.orig\", ",
+         "\"wcs.lim\" or \"wcs.lim.orig\".")
+  }
+  if (get_n_list_levels(ll) != 4) {
+    stop("The parameter ll must be a list of lists returned by ",
+         "get_wcs_limit() at level three.")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Determination of worst case scenario (wcs) limit(s)
+
+  t_expected_names <-
+    c("delta.lim", "delta.lim.orig", "wcs.lim", "wcs.lim.orig")
+  t_model_names <- names(ll)
+
+  l_res <- lapply(t_model_names, function(mm) {
+    if (mm == "cics") {
+      if (get_n_list_levels(ll[[mm]]) == 0) {
+        NA
+      } else {
+        if (any(vapply(ll[[mm]], function(x) {
+          sum(t_expected_names %in% names(x[[1]])) != 4
+        },
+        logical(1)))) {
+          stop("The element was not found in one of the sub-elements of ",
+               "model ", mm, ". Please provide a list returned ",
+               "from get_wcs_limit().")
+        } else {
+          matrix(vapply(seq_along(ll[[mm]][[1]]), function(j) {
+            ll[[mm]][[1]][[j]][[element]]
+          },
+          numeric(1)),
+          nrow = length(ll[[mm]][[1]]), ncol = length(ll[[mm]]),
+          dimnames = list(NULL, names(ll[[mm]])))
+        }
+      }
+    } else {
+      if (get_n_list_levels(ll[[mm]]) == 0) {
+        NA
+      } else {
+        if (any(vapply(ll[[mm]], function(x) {
+          sum(t_expected_names %in% names(x[[1]])) != 4
+        },
+        logical(1)))) {
+          stop("The element was not found in one of the sub-elements of ",
+               "model ", mm, ". Please provide a list returned ",
+               "from get_wcs_limit().")
+        } else {
+          matrix(vapply(seq_along(ll[[mm]]), function(bb) {
+            vapply(seq_along(ll[[mm]][[1]]), function(j) {
+              ll[[mm]][[bb]][[j]][[element]]
+            },
+            numeric(1))
+          }, numeric(length(ll[[mm]][[1]]))),
+          nrow = length(ll[[mm]][[1]]), ncol = length(ll[[mm]]),
+          dimnames = list(NULL, names(ll[[mm]])))
+        }
+      }
+    }
+  })
+
+  names(l_res) <- t_model_names
+
+  return(l_res)
+}
+
+#' Extract worst case x value
+#'
+#' The function \code{extract_wc_x()} extracts the worst case \eqn{x} value
+#' from a list of matrices of possible \eqn{x} values based on a list of
+#' vectors of indices which specify the worst case elements.
+#'
+#' @param l1 A list of matrices of \eqn{x} values or a list of lists of one
+#'   vectors of \eqn{x} values. The list must have four elements named
+#'   \code{"cics"}, \code{"dics"}, \code{"dids.pmse"} and \code{"dids"}.
+#' @param l2 A list of vectors of indices. As \code{l1}, the list must have
+#'   four elements named \code{"cics"}, \code{"dics"}, \code{"dids.pmse"} and
+#'   \code{"dids"}. The length of the vectors of \code{l2} must be equal to
+#'   the number of rows of the matrices in \code{l1} or the length of the
+#'   vectors in \code{l1}.
+#'
+#' @details Information from a list of matrices or a list of lists of vectors
+#' is extracted by aid of a list of vectors of indices which specify which
+#' elements per row of each matrix or which elements of the vectors have to
+#' be returned.
+#'
+#' @return A matrix of the worst case values with the number of rows
+#' corresponding to the length of the vectors in \code{l2} and the number of
+#' columns corresponding to the length of \code{l1} or \code{l2} is returned.
+#'
+#' @keywords internal
+
+extract_wc_x <- function(l1, l2) {
+  if (!is.list(l1)) {
+    stop("The parameter l1 must be a list.")
+  }
+  if (!is.list(l2)) {
+    stop("The parameter l2 must be a list.")
+  }
+  if (sum(names(l1) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The list l1 must have four elements named \"cics\", \"dics\" ",
+         "\"dids.pmse\" and \"dids\".")
+  }
+  if (sum(names(l2) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
+    stop("The list l2 must have four elements named \"cics\", \"dics\" ",
+         "\"dids.pmse\" and \"dids\".")
+  }
+  if (get_n_list_levels(l1) == 1) {
+    if (sum(vapply(l1, function(x) {
+      !is.matrix(x)
+    },
+    logical(1))) > 0) {
+      stop("The elements of l1 must be matrices or lists of vectors.")
+    }
+  } else {
+    if (sum(vapply(l1, function(x) {
+      !is.numeric(x[[1]]) & !is.logical(x[[1]])
+    },
+    logical(1))) > 0) {
+      stop("The elements of l1 must be matrices or lists of vectors.")
+    }
+  }
+  if (sum(vapply(l2, function(x) {
+    !is.numeric(x) & !is.logical(x)
+  },
+  logical(1))) > 0) {
+    stop("The elements of l2 must be numeric vectors or vectors of NA.")
+  }
+  if (sum(vapply(l1, function(x) is.matrix(x), logical(1))) == 4) {
+    if (!isTRUE(all.equal(vapply(l1, function(x) nrow(x), numeric(1)),
+                          vapply(l2, function(x) length(x), numeric(1))))) {
+      stop("The number of rows of the matrices in l1 must be equal ",
+           "to the length of the vectors in l2.")
+    }
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  m_res <- matrix(NA, nrow = length(l2[[1]]), ncol = length(l1))
+  colnames(m_res) <- names(l1)
+
+  for (i in seq_along(l1)) {
+    if (names(l1)[i] == "cics") {
+      if (is.matrix(l1[["cics"]])) {
+        m_res[, "cics"] <- l1[["cics"]]
+      }
+      if (is.list(l1[["cics"]])) {
+        if (is.vector(l1[["cics"]][[length(l1[["cics"]])]]) &&
+            length(l1[["cics"]][[length(l1[["cics"]])]]) == 1) {
+          m_res[, "cics"] <- rep(unname(l1[[i]][[1]]), length(l2[[1]]))
+        }
+      }
+    } else {
+      if (is.matrix(l1[[i]])) {
+        m_res[, i] <- vapply(seq_along(l2[[1]]), function(j) {
+          ifelse(!is.na(l2[[i]][j]),
+                 l1[[i]][j, l2[[i]][j]],
+                 NA)
+        }, numeric(1))
+      }
+      if (is.list(l1[[i]])) {
+        m_res[, i] <- vapply(seq_along(l2[[1]]), function(j) {
+          ifelse(!is.na(l2[[i]][j]),
+                 l1[[i]][[1]][l2[[i]][j]],
+                 NA)
+        },
+        numeric(1))
+      }
+    }
+  }
+
+  return(m_res)
+}
+
 #' Compile information on worst case batches for ordinary shelf life estimation
 #'
 #' The function \code{get_osle_poi_list()} prepares a list of points of
 #' intersection (POI) for multiple regression models using the
 #' \code{find_poi()} function.
 #'
-#' @param icpt_list A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids} with the intercepts of each linear
-#'   regression model and batch. The \code{cics}, \code{dics} and
-#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
-#'   is available.
-#' @param model_list A list of regression models of different type. Usually,
-#'   it is a list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids}, where the first three elements contain
-#'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
-#'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
-#'   and \dQuote{different intercept / different slope} (\code{dids}) type.
-#'   The fourth element with the label \code{dids.pmse} is usually a list of
-#'   the \sQuote{\code{lm}} objects that is obtained from fitting a regression
-#'   model to the data of each level of the categorical variable separately.
-#'   The \code{cics}, \code{dics} and \code{dids.pmse} elements are \code{NA}
-#'   if data of only a single batch is available.
 #' @inheritParams expirest_osle
+#' @inheritParams get_wc_icpt
+#' @inheritParams get_poi_list
 #'
 #' @details The function \code{get_osle_poi_list()} applies the
 #' \code{find_poi()} function (find the \dQuote{point of intersection}) on
@@ -2033,15 +2018,34 @@ get_relevant_limits <- function(limits_list, xform = c("no", "no"),
 #' to the latter it differs from the \code{\link{get_poi_list}()} function.
 #'
 #' @return A list with the following elements is returned:
-#' \item{all.poi}{A list of the POI values, i.e. a list with a list element
-#'   for every model, containing matrices with columns for each intercept and
-#'   rows for each release limit.}
-#' \item{which.min.poi}{}
-#' \item{which.wc.batch}{}
+#' \item{all.poi}{A list of the POI values, i.e. a list with one or two list
+#'   elements for the side (i.e. \code{lower} or \code{upper}) of the
+#'   corresponding specification limit, each containing a list returned by the
+#'   \code{\link{get_poi_list}()} function, containing of four elements named
+#'   \code{cics}, \code{dics}, \code{dids.pmse} and \code{dids}. Each of them
+#'   contains a named vector of the POI values estimated for each batch and
+#'   named accordingly.}
+#' \item{poi}{A named vector of the worst case POI values of each model, i.e.
+#'   named \code{cics}, \code{dics}, \code{dids.pmse} and \code{dids}. In
+#'   addition, the vector has an attribute called \code{side} that specifies
+#'   the side of the specification limit which is crossed by the confidence or
+#'   prediction interval at the corresponding POI value.}
+#' \item{wc.icpt}{A named vector of the intercepts of the worst case batches of
+#'   each model, i.e. named \code{cics}, \code{dics}, \code{dids.pmse} and
+#'   \code{dids}. In addition, the vector has an attribute called \code{side}
+#'   that specifies the side of the specification limit which is crossed by the
+#'   confidence or prediction interval at the POI value of the corresponding
+#'   worst case batch.}
+#' \item{which.wc.batch}{A named vector of the indices of the worst case
+#'   batches of each model, i.e. named \code{cics}, \code{dics},
+#'   \code{dids.pmse} and \code{dids}. In addition, the vector has an attribute
+#'   called \code{side} that specifies the side of the specification limit
+#'   which is crossed by the confidence or prediction interval at the POI value
+#'   of the corresponding worst case batch.}
 #'
-#' @seealso \code{\link{get_poi_list}}, \code{\link{get_distance}},
-#' \code{\link[stats]{uniroot}}, \code{\link{expirest_osle}},
-#' \code{\link{expirest_wisle}}.
+#' @seealso \code{\link{get_icpt_list}}, \code{\link{get_model_list}},
+#' \code{\link{get_poi_list}}, \code{\link{get_wc_icpt}},
+#' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
 
@@ -2267,23 +2271,9 @@ get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
 #' intersection (POI) for multiple regression models and release limits
 #' using the \code{find_poi()} function.
 #'
-#' @param icpt_list A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids} with the intercepts of each linear
-#'   regression model and batch. The \code{cics}, \code{dics} and
-#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
-#'   is available.
-#' @param model_list A list of regression models of different type. Usually,
-#'   it is a list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids}, where the first three elements contain
-#'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
-#'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
-#'   and \dQuote{different intercept / different slope} (\code{dids}) type.
-#'   The fourth element with the label \code{dids.pmse} is usually a list of
-#'   the \sQuote{\code{lm}} objects that is obtained from fitting a regression
-#'   model to the data of each level of the categorical variable separately.
-#'   The \code{cics}, \code{dics} and \code{dids.pmse} elements are \code{NA}
-#'   if data of only a single batch is available.
 #' @inheritParams expirest_wisle
+#' @inheritParams get_wc_icpt
+#' @inheritParams get_poi_list
 #'
 #' @details The function \code{get_wisle_poi_list()} applies the
 #' \code{find_poi()} function (find the \dQuote{point of intersection}) on
@@ -2292,24 +2282,41 @@ get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
 #'
 #' @return A list with the following elements is returned:
 #' \item{all.wcsl}{A list of the worst case scenario (wcs) limits with a list
-#'   element for every linear model, containing a list element for every batch
-#'   (intercept) associated with each model, containing a list element for
-#'   every release limit. The wcs limit is obtained by adding/subtracting the
+#'   of four elements for each linear model named \code{cics}, \code{dics},
+#'   \code{dids.pmse} and \code{dids}. Each of these elements contains a list
+#'   element for each batch (intercept) containing itself a list element for
+#'   each release limit. The wcs limit is obtained by adding/subtracting the
 #'   absolute difference of specification limit and release limit to/from the
 #'   common intercept of the test batches or the intercept of the worst
 #'   performing batch.}
-#' \item{all.poi}{A list of the POI values, i.e. a list with a list element
-#'   for every model, containing matrices with columns for each intercept and
-#'   rows for each release limit.}
-#' \item{which.min.dist}{A list of the indices of the batches with the minimal
-#'   intercept, i.e. a list with a list element
-#'   for every model, containing matrices with columns for each intercept and
-#'   rows for each release limit.}
-#' \item{which.min.poi}{}
-#' \item{which.wc.batch}{}
+#' \item{all.poi}{A list of the POI values, i.e. a list with a list of four
+#'   elements for each linear model named \code{cics}, \code{dics},
+#'   \code{dids.pmse} and \code{dids}. Each of these elements contains a
+#'   matrix with columns for each intercept and rows for each release limit.}
+#' \item{all.prl}{A list of the confidence or prediction interval limits that
+#'   are associated with a POI value, i.e. a list with a list of four elements
+#'   for each linear model named \code{cics}, \code{dics}, \code{dids.pmse}
+#'   and \code{dids}. Each of these elements contains an array with a level for
+#'   each batch, containing matrices with columns for each batch and rows for
+#'   each release limit, where the matrices contain the estimated interval
+#'   limits at each POI value per batch.}
+#' \item{which.min.dist}{A list of four elements for each linear model named
+#'   \code{cics}, \code{dics}, \code{dids.pmse} and \code{dids}. Each of these
+#'   list elements contains a matrix of the indices of the batches with the
+#'   minimal intercept in the \code{all.prl} list. The matrices have a column
+#'   for each batch and a row for each release limit.}
+#' \item{which.min.poi}{A list of four elements for each linear model named
+#'   \code{cics}, \code{dics}, \code{dids.pmse} and \code{dids}. Each of these
+#'   list elements contains a numeric vector with the minimal POI value of
+#'   associated with each release limit.}
+#' \item{which.wc.batch}{A list of four elements for each linear model named
+#'   \code{cics}, \code{dics}, \code{dids.pmse} and \code{dids}. Each of these
+#'   list elements contains a numeric vector with the indices of the worst
+#'   case batches associated with each release limit.}
 #'
-#' @seealso \code{\link{get_poi_list}}, \code{\link{get_distance}},
-#' \code{\link[stats]{uniroot}}, \code{\link{expirest_osle}},
+#' @seealso \code{\link{get_icpt_list}}, \code{\link{get_model_list}},
+#' \code{\link{get_wcs_limit}}, \code{\link{find_poi}},
+#' \code{\link{get_intvl_limit}}, \code{\link{expirest_osle}},
 #' \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
@@ -2360,7 +2367,7 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
   if (!(ivl_type %in% c("one.sided", "two.sided"))) {
     stop("Please specify ivl_type either as \"one.sided\" or \"two.sided\".")
   }
-  if (!(ivl_side %in% c("lower", "upper", "both"))) {
+  if (!(ivl_side %in% c("lower", "upper"))) {
     stop("Please specify ivl_side either as \"lower\" or \"upper\".")
   }
 
@@ -2565,16 +2572,6 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
 #' lists that are generated during the wisle estimation and compiles a
 #' summary data frame.
 #'
-#' @param poi_list A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids} with the points of intersection (POI)
-#'   of each linear regression model and batch. The \code{cics}, \code{dics}
-#'   and \code{dids.pmse} elements are \code{NA} if data of only a single
-#'   batch is available.
-#' @param icpt_list A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids.pmse} and \code{dids} with the intercepts of each linear
-#'   regression model and batch. The \code{cics}, \code{dics} and
-#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
-#'   is available.
 #' @param wcsl_list A list of four elements named \code{cics}, \code{dics},
 #'   \code{dids.pmse} and \code{dids} with the worst case scenario limits
 #'   of each batch and linear regression model. The \code{cics}, \code{dics}
@@ -2584,10 +2581,11 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
 #'   \code{dids.pmse} and \code{dids} with the indices of the worst case
 #'   batches. The \code{cics}, \code{dics} and \code{dids.pmse} elements are
 #'   \code{NA} if data of only a single batch is available.
-#' @param limits_list A list returned by the \code{set_limits()} function.
 #' @param poi_ich A numeric named vector of the POI values of the worst case
 #'   batches of each model.
 #' @inheritParams expirest_osle
+#' @inheritParams get_wc_icpt
+#' @inheritParams get_relevant_limits
 #'
 #' @details Information stored in multiple lists that are generated during the
 #' \dQuote{what-if shelf life estimation} is extracted and compiled in a single
@@ -2642,7 +2640,8 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
 #' \item{POI.Model.dids}{The POI of the dids model obtained by fitting
 #'   individual models to the data of each batch.}
 #'
-#' @seealso \code{\link{expirest_wisle}()}.
+#' @seealso \code{\link{extract_wc_x}}, \code{\link{extract_from_ll_wcsl}},
+#' \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
 
@@ -2857,13 +2856,13 @@ compile_wisle_summary <- function(data, batch_vbl, rl, poi_list, icpt_list,
 #' The function \code{print_val()} generates a character string for the purpose
 #' to print a value on a plot (together with associated information).
 #'
-#' @param val_name A character string specifying the text preceding the value
-#'   of the parameter to be displayed.
-#' @param val_value A numeric value specifying the value of the parameter to
-#'   be displayed.
-#' @param val_unit A character string specifying the text following the value
-#'   of the parameter to be displayed.
-#' @param val_sf A positive integer specifying the number of significant
+#' @param val_name A character string that specifies the text preceding the
+#'   value of the parameter to be displayed.
+#' @param val_value A numeric value that specifies the value of the parameter
+#'   to be displayed.
+#' @param val_unit A character string that specifies the text following the
+#'   value of the parameter to be displayed.
+#' @param val_sf A positive integer that specifies the number of significant
 #'   figures for the display of the limit.
 #' @param prefix A character string at the beginning of the whole text. The
 #'   default is an empty string, i.e. \code{""}.
@@ -2881,7 +2880,8 @@ compile_wisle_summary <- function(data, batch_vbl, rl, poi_list, icpt_list,
 #' @return A single character string of the form \dQuote{val_name: val_value
 #' (with the number of specified decimal places) val_unit}.
 #'
-#' @seealso \code{\link[base]{formatC}}, \code{\link[base]{paste}}.
+#' @seealso \code{\link{get_text_annotation}}, \code{\link{get_n_whole_part}},
+#' \code{\link[base]{formatC}}, \code{\link[base]{paste}}.
 #'
 #' @keywords internal
 
@@ -2951,6 +2951,9 @@ print_val <- function(val_name, val_value, val_unit, val_sf,
 #' @return An integer representing the number of digits of the whole number
 #' portion of the decimal number that was handed over.
 #'
+#' @seealso \code{\link{print_val}}, \code{\link{set_limits}},
+#' \code{\link{get_text_annotation}}.
+#'
 #' @keywords internal
 
 get_n_whole_part <- function(x) {
@@ -2989,6 +2992,9 @@ get_n_whole_part <- function(x) {
 #' @return An integer representing the number of levels of the list. If an
 #' object is passed on to \code{x} that is not a list \code{0} is returned.
 #'
+#' @seealso \code{\link{extract_from_ll_wcsl}}, \code{\link{extract_wc_x}},
+#' \code{\link{get_wisle_poi_list}}.
+#'
 #' @keywords internal
 
 get_n_list_levels <- function(x) {
@@ -3005,22 +3011,22 @@ get_n_list_levels <- function(x) {
 #' text on a plot prepared by the \code{ggplot()} function from
 #' the \sQuote{\code{ggplot2}} package.
 #'
-#' @param rvu A character string specifying the unit associated with the
+#' @param rvu A character string that specifies the unit associated with the
 #'   response variable.
-#' @param x_range A numeric vector of the form \code{c(min, max)} specifying
-#'   the range of the time variable to be plotted.
-#' @param y_range A numeric vector of the form \code{c(min, max)} specifying
-#'   the range of the response variable to be plotted.
-#' @param sl A numeric value or a numeric vector of length \code{2} specifying
-#'   the specification limit or limits.
-#' @param sl_sf A positive integer or a vector of positive integers specifying
-#'   the number of \dQuote{significant figures} (sf) of \code{sl}.
+#' @param x_range A numeric vector of the form \code{c(min, max)} that
+#'   specifies the range of the time variable to be plotted.
+#' @param y_range A numeric vector of the form \code{c(min, max)} that
+#'   specifies the range of the response variable to be plotted.
+#' @param sl A numeric value or a numeric vector of length \code{2} that
+#'   specifies the specification limit or limits.
+#' @param sl_sf A positive integer or a vector of positive integers that
+#'   specifies the number of \dQuote{significant figures} (sf) of \code{sl}.
 #' @param poi_model Point of intersection (POI) with the upper or lower
 #'   confidence or prediction interval of the most appropriate model according
 #'   to the ICH Q1E guideline.
-#' @param ivl_side A character string specifying if the \dQuote{upper} or the
-#'   \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-#'   \code{"lower"}, respectively.
+#' @param ivl_side A character string that specifies if the \dQuote{upper} or
+#'   the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
+#'   or \code{"lower"}, respectively.
 #' @param poi_woca Point of intersection (POI) with the upper or lower
 #'   confidence or prediction interval of the linear regression model
 #'   representing the worst case scenario (woca) model. The default is
@@ -3031,21 +3037,23 @@ get_n_list_levels <- function(x) {
 #'   values. The default is \code{NULL}.
 #' @param wc_icpt A data frame of the worst case intercepts of each of the
 #'   four fitted models. The default is \code{NULL}.
-#' @param rl_sf A positive integer or a vector of positive integers specifying
-#'   the number of \dQuote{significant figures} (sf) of \code{rl}. The default
-#'   is \code{NULL}.
-#' @param rl_index A positive integer specifying which of the release limit
+#' @param rl_sf A positive integer or a vector of positive integers that
+#'   specifies the number of \dQuote{significant figures} (sf) of \code{rl}.
+#'   The default is \code{NULL}.
+#' @param rl_index A positive integer that specifies which of the release limit
 #'   values that have been handed over to \code{\link{expirest_wisle}()} should
 #'   be displayed. The default is \code{NULL}.
-#' @param wcsl_model_name A character string specifying the name of the
+#' @param wcsl_model_name A character string that specifies the name of the
 #'   model with the worst case scenario limit. The default is \code{NULL}.
-#' @param plot_option A character string of either \code{"full"},
+#' @param plot_option A character string of either \code{"full"}, \code{"lean"},
 #'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
-#'   specifying if additional information should be shown in the plot (option
-#'   \code{"full"}) or only basic information (options \code{"lean"} and
-#'   \code{"basic"}). Full means the data points, the fitted regression line
-#'   with the confidence or prediction interval, the specification limit(s)
-#'   and the estimated shelf life. The default is \code{"full"}.
+#'   that specifies if additional information should be shown in the plot
+#'   (option \code{"full"}) or only basic information (options \code{"lean"}
+#'   and \code{"basic"}). Full means the data points, the fitted regression
+#'   line with the confidence or prediction interval, the specification
+#'   limit(s) and the estimated shelf life. For \sQuote{expirest_osle} objects,
+#'   only the options \code{"full"} and \code{"lean"} are relevant. The default
+#'   is \code{"full"}.
 #'
 #' @details The function \code{get_text_annotation()} expects various pieces
 #' of information characterising an \sQuote{\code{expirest_osle}} or an
@@ -3057,7 +3065,8 @@ get_n_list_levels <- function(x) {
 #' is returned.
 #'
 #' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
-#'   \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#' \code{\link{print_val}}, \code{\link[ggplot2]{ggplot}},
+#' \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
 
@@ -3381,7 +3390,7 @@ get_text_annotation <- function(rvu, x_range, y_range, sl, sl_sf, poi_model,
 #' is returned.
 #'
 #' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
-#'   \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
 
@@ -3433,11 +3442,11 @@ get_hlines <- function(sl, ivl_side) {
 #' segments on a plot prepared by the \code{ggplot()} function from
 #' the \sQuote{\code{ggplot2}} package
 #'
-#' @param rl A numeric value or a numeric vector specifying the release
+#' @param rl A numeric value or a numeric vector that specifies the release
 #'   specification limit(s) for which the corresponding expiry should be
 #'   estimated.
-#' @param sl_model_name A character string specifying the name of the
-#'   model with the shelf life limit.
+#' @param sl_model_name A character string that specifies the name of the
+#'   model with the shelf life limit of interest.
 #' @inheritParams get_text_annotation
 #'
 #' @details The function \code{get_segments()} expects various pieces
@@ -3452,7 +3461,7 @@ get_hlines <- function(sl, ivl_side) {
 #' Response.2 represent the release limit.
 #'
 #' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
-#'   \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
 
@@ -3595,7 +3604,7 @@ get_segments <- function(sl, ivl_side, wisle_est, rl, rl_index, poi_woca,
 #' @inheritParams get_segments
 #'
 #' @details The function \code{get_arrows()} expects various pieces
-#' of information characterising an \sQuote{\code{expirest_osle}} or an
+#' of information that characterises an \sQuote{\code{expirest_osle}} or an
 #' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
 #' the function prepares a data frame that can be handed over to the
 #' \code{geom_vline()} function from the \sQuote{\code{ggplot2}} package.
@@ -3606,7 +3615,7 @@ get_segments <- function(sl, ivl_side, wisle_est, rl, rl_index, poi_woca,
 #' intercept and Response.1 and Response.2 represent the release limit.
 #'
 #' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
-#'   \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
 

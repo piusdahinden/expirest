@@ -9,16 +9,17 @@ get_relevant_limits(limits_list, xform = c("no", "no"), ivl_side = "lower")
 \arguments{
 \item{limits_list}{A list returned by the \code{set_limits()} function.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 
-\item{ivl_side}{A character string specifying if the specification limit,
-given that the limit has only one side, is an \dQuote{upper} or a
+\item{ivl_side}{A character string that specifies if the specification
+limit, given that the limit has only one side, is an \dQuote{upper} or a
 \dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
 \code{"lower"}, respectively. The default is \code{"lower"}. If the
 specification has two boundaries, then this parameter specifies the
@@ -27,37 +28,21 @@ be used.}
 }
 \value{
 A list with the following elements is returned:
-\item{sf.option}{A character string specifying the option concerning the
-  significant figures.}
-\item{xform}{A vector of two character strings specifying the transformation
-  of the response and the time variable.}
-\item{shift}{A vector of two values to be added to the values of the
-  transformed \eqn{x} and/or \eqn{y} variables (specified via the
-  \code{xform} parameter).}
-\item{rl.orig}{An optional element containing a numeric value or a numeric
-  vector specifying the release limit(s) on the original scale.}
-\item{rl.sf}{An optional element containing a numeric value or a numeric
-  vector specifying the significant figures of the release limit(s).}
-\item{rl}{An optional element containing a numeric value or a numeric vector
-  of the adjusted (as specified by the \code{sf.option} parameter) release
-  limit(s).}
-\item{rl.trfmd}{An optional element containing a numeric value or a numeric
-  vector of the adjusted and transformed, if applicable (as specified by the
-  the \code{sf.option} parameter and the second element of the \code{xform}
-  parameter, respectively), release limit(s), otherwise the same as
-  \code{rl}.}
-\item{sl.orig}{A numeric value or a numeric vector of length \code{2}
-  specifying the specification limit(s) on the original scale.}
-\item{sl.sf}{A numeric value or a numeric vector of length \code{2}
-  specifying the significant figures of the specification limit(s).}
-\item{sl}{A numeric value or a numeric vector of length \code{2} of the
-  adjusted (as specified by the \code{sf.option} parameter) specification
-  limit(s).}
-\item{sl.trfmd}{A numeric value or a numeric vector of length \code{2} of
-  the adjusted and transformed, if applicable (as specified by the the
-  \code{sf.option} parameter and the second element of the \code{xform}
-  parameter, respectively) specification limit(s), otherwise the same as
-  \code{sl}.}
+\item{sl.orig}{A numeric value or a numeric vector of length \code{2} of the
+  specification limit(s) on the original scale.}
+\item{sl}{A numeric value or a numeric vector of length \code{2} of adjusted
+  specification limit(s).}
+\item{rl.orig}{A numeric value or a numeric vector that specifies the release
+  limit(s) on the original scale. If \code{NA} was  passed in, \code{NA} is
+  returned.}
+\item{rl}{A numeric value or a numeric vector of adjusted release limit(s).
+  If \code{NA} was passed in, \code{NA} is returned.}
+\item{sl.bt}{A numeric value or a numeric vector of length \code{2} of
+  adjusted specification limit(s) before transformation. If no
+  transformation has been performed it is \code{NA}.}
+\item{rl.bt}{A numeric value or a numeric vector of adjusted release
+  limit(s) before transformation. If no transformation has been performed
+  it is \code{NA}.}
 }
 \description{
 The function \code{get_relevant_limits()} expects a list returned by the
@@ -65,9 +50,8 @@ function \code{set_limits} and returns a list of only the relevant limits,
 i.e. those that are relevant with respect to transformation.
 }
 \details{
-The function \code{get_relevant_limits()} extracts the limits
-that are returned by the \code{set_limits()} function, based on the setting
-of the parameter \code{xform}.
+The function \code{get_relevant_limits()} makes a subset of the
+list returned by the \code{set_limits()} function.
 }
 \seealso{
 \code{\link{set_limits}}

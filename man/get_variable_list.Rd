@@ -7,23 +7,24 @@
 get_variable_list(response_vbl, time_vbl, batch_vbl, xform = c("no", "no"))
 }
 \arguments{
-\item{response_vbl}{A character string specifying the response variable name
+\item{response_vbl}{A character string that specifies the response variable
+name that must be a column of \code{data}.}
+
+\item{time_vbl}{A character string that specifies the time variable name
 that must be a column of \code{data}.}
 
-\item{time_vbl}{A character string specifying the time variable name that
-must be a column of \code{data}.}
-
-\item{batch_vbl}{A character string specifying the column in \code{data}
+\item{batch_vbl}{A character string that specifies the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
 differentiation of the observations of the various batches.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 }
 \value{
 A list with the variable names. If the data have been transformed,
@@ -39,5 +40,8 @@ The function \code{get_variable_list()} makes a list of the
 variable names. If data have been transformed, the list comprises the
 original variable name(s) (with suffix .orig in the corresponding list
 element names) and the transformed variable name(s).
+}
+\seealso{
+\code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 }
 \keyword{internal}

@@ -25,14 +25,16 @@ res1$POI
 # [1] "cics"
 
 # (Expected) results in res1$POI
-#  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
-#        100.5669       100.3638       100.2491          3          3
-#  Delta.dids WCSL.cics WCSL.dics WCSL.dids Exp.Spec.Report Exp.Spec
-#           3  97.56688  97.36375  97.24914              95    94.95
-#  Rel.Spec.Report Rel.Spec Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids
-#               98    97.95        14.07398        13.23176        13.34561
-#  POI.Model.cics POI.Model.dics POI.Model.dids
-#         26.2241        24.8003       23.34184
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1       100.5669       100.3638       100.2491            100.2491          3
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1          3          3               3  97.56688  97.36375  97.24914
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1       97.24914              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1        14.07398        13.23176        13.34561             13.80695
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1        26.2241        24.8003       23.34184            23.66724
 
 res2 <-
   expirest_wisle(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
@@ -51,14 +53,16 @@ res2$POI
 # [1] "dids"
 
 # (Expected) results in res2$POI
-#  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
-#        101.5498       100.4882       101.2594          3          3
-#  Delta.dids WCSL.cics WCSL.dics WCSL.dids Exp.Spec.Report Exp.Spec
-#           3  98.54976  97.48822  98.25938              95    94.95
-#  Rel.Spec.Report Rel.Spec Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids
-#               98    97.95        13.03332        11.42141        7.619661
-#  POI.Model.cics POI.Model.dics POI.Model.dids
-#        28.12518       22.47939       15.96453
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1       101.5498       100.4882       101.2594            101.2594          3
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1          3          3               3  98.54976  97.48822  98.25938
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1       98.25938              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1        13.03332        11.42141        7.619661             7.483223
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1       28.12518       22.47939       15.96453            15.72348
 
 # Unsuccessful estimation
 res3 <-
@@ -69,14 +73,16 @@ res3 <-
 res3$POI
 
 # (Expected) results in res3$POI
-#  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
-#        100.5669             NA             NA          3         NA
-#  Delta.dids WCSL.cics WCSL.dics WCSL.dids Exp.Spec.Report Exp.Spec
-#          NA  97.56688        NA        NA              95    94.95
-#  Rel.Spec.Report Rel.Spec Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids
-#               98    97.95              NA              NA              NA
-#  POI.Model.cics POI.Model.dics POI.Model.dids
-#        14.42089       2.480635             NA
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1       100.5669             NA             NA                  NA          3
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1         NA         NA              NA  97.56688        NA        NA
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1             NA              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1              NA              NA              NA                   NA
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1       14.42089       2.480635             NA                  NA
 
 # Estimation may also fail because of an inappropriate 'srch-range' setting.
 res4 <-
@@ -87,11 +93,13 @@ res4 <-
 res4$POI
 
 # (Expected) results in res4$POI
-#  Intercept.cics Intercept.dics Intercept.dids Delta.cics Delta.dics
-#        100.5669             NA             NA          3         NA
-#  Delta.dids WCSL.cics WCSL.dics WCSL.dids Exp.Spec.Report Exp.Spec
-#          NA  97.56688        NA        NA              95    94.95
-#  Rel.Spec.Report Rel.Spec Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids
-#               98    97.95              NA              NA              NA
-#  POI.Model.cics POI.Model.dics POI.Model.dids
-#              NA             NA             NA
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1       100.5669             NA             NA                  NA          3
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1         NA         NA              NA  97.56688        NA        NA
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1             NA              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1              NA              NA              NA                   NA
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1             NA             NA             NA                  NA

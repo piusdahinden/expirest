@@ -27,44 +27,45 @@ expirest_osle(
 \item{data}{A data frame with the columns specified by \code{response_vbl},
 \code{time_vbl} and \code{batch_vbl}.}
 
-\item{response_vbl}{A character string specifying the response variable name
+\item{response_vbl}{A character string that specifies the response variable
+name that must be a column of \code{data}.}
+
+\item{time_vbl}{A character string that specifies the time variable name
 that must be a column of \code{data}.}
 
-\item{time_vbl}{A character string specifying the time variable name that
-must be a column of \code{data}.}
-
-\item{batch_vbl}{A character string specifying the column in \code{data}
+\item{batch_vbl}{A character string that specifies the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
 differentiation of the observations of the various batches.}
 
-\item{sl}{A numeric value or a numeric vector of length \code{2} specifying
-the specification limit or limits. If a vector is provided it must be of
-the form \code{c(lower limit, upper limit)}.}
+\item{sl}{A numeric value or a numeric vector of length \code{2} that
+specifies the specification limit or limits. If a vector is provided it
+must be of the form \code{c(lower limit, upper limit)}.}
 
-\item{sl_sf}{A positive integer or a vector of positive integers specifying
-the number of \dQuote{significant figures} (sf) of \code{sl}. It must have
-the same length as \code{sl}.}
+\item{sl_sf}{A positive integer or a vector of positive integers that
+specifies the number of \dQuote{significant figures} (sf) of \code{sl}.
+It must have the same length as \code{sl}.}
 
-\item{srch_range}{A vector of length \code{2} specifying the end-points of
-the (time) range that is supposed to contain the shelf life or retest
+\item{srch_range}{A vector of length \code{2} that specifies the end-points
+of the (time) range that is supposed to contain the shelf life or retest
 period.}
 
-\item{alpha}{A numeric value between 0 and 1 specifying the significance
+\item{alpha}{A numeric value between 0 and 1 that specifies the significance
 level for the calculation of confidence or prediction intervals. The
 default is \code{0.05}.}
 
-\item{alpha_pool}{A numeric value between 0 and 1 specifying the type I
+\item{alpha_pool}{A numeric value between 0 and 1 that specifies the type I
 error rate for the test of the poolability of the batches. The default
 is \code{0.25}, following ICH Q1E guideline. The value should not be
 changed unless supported by well-founded reasons.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 
 \item{shift}{A vector of two values which will be added to the variables
 \eqn{x} and/or \eqn{y} before they are transformed as specified by the
@@ -74,7 +75,7 @@ purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
 default is \code{c(0, 0)}.}
 
-\item{sf_option}{A character string specifying if the limits (\code{rl}
+\item{sf_option}{A character string that specifies if the limits (\code{rl}
 or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
 either \code{"tight"} or \code{"loose"}, respectively. The option
 \code{"tight"} means that the limits are rounded to the specified number
@@ -87,16 +88,16 @@ subtraction of \eqn{1} from the \eqn{n^{th}} digit and addition of
 \eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
-\code{"prediction"}, i.e. specifying the type of interval of interest.
+\code{"prediction"} that specifies the type of interval of interest.
 The default is \code{"confidence"}.}
 
-\item{ivl_type}{A character string specifying if a \dQuote{one sided} or
-a \dQuote{two sided} interval should be calculated, i.e. either
+\item{ivl_type}{A character string that specifies if a \dQuote{one sided}
+or a \dQuote{two sided} interval should be calculated, i.e. either
 \code{"one.sided"} or \code{"two.sided"}, respectively. The default is
 \code{"one.sided"}.}
 
-\item{ivl_side}{A character string specifying if the specification limit,
-given that the limit has only one side, is an \dQuote{upper} or a
+\item{ivl_side}{A character string that specifies if the specification
+limit, given that the limit has only one side, is an \dQuote{upper} or a
 \dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
 \code{"lower"}, respectively. The default is \code{"lower"}. If the
 specification has two boundaries, then this parameter specifies the
@@ -116,10 +117,10 @@ containing the following elements:
 \item{Variables}{A list of the variable names, i.e. the original names of
   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
   applicable, of the transformed variables.}
-\item{Model.Type}{A list of two elements specifying which model, based on
-  the ANCOVA analysis, suits best. The first element (\code{type.spec})
-  is a numeric vector of length 2 specifying the best model accepted at the
-  significance level specified by \code{alpha.pool}. The first number
+\item{Model.Type}{A list of two elements that specifies which model, based
+  on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+  is a numeric vector of length 2 that specifies the best model accepted at
+  the significance level specified by \code{alpha.pool}. The first number
   represents the decision on the intercept and the second on the slope,
   where \code{1} stands for \dQuote{common} and \code{2} stands for
   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
@@ -251,8 +252,11 @@ res1$POI
 # [1] "cics"
 
 # Expected results in res1$POI
-#     cics     dics     dids
-# 26.22410 24.80030 23.34184
+#     cics      dics dids.pmse      dids
+# 26.22410  24.80030  23.66724  23.34184
+# attr(,"side")
+#     cics      dics dids.pmse      dids
+#  "lower"   "lower"   "lower"   "lower"
 
 res2 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
@@ -270,8 +274,11 @@ res2$POI
 # [1] "dids"
 
 # Expected results in res2$POI
-#     cics     dics     dids
-# 28.12518 22.47939 15.96453
+#     cics      dics dids.pmse      dids
+# 28.12518  22.47939  15.72348  15.96453
+# attr(,"side")
+#     cics      dics dids.pmse      dids
+#  "lower"   "lower"   "lower"   "lower"
 
 # Moisture stability data (\% (w/w)) of three batches of a drug product obtained
 # over a 24 months period:
@@ -293,8 +300,11 @@ res3 <-
 res3$POI
 
 # (Expected) results in res3$POI
-# cics dics dids
-#   NA   NA   NA
+#    cics      dics dids.pmse      dids
+#     NA        NA        NA        NA
+# attr(,"side")
+#    cics      dics dids.pmse      dids
+# "lower"   "lower"   "lower"   "lower"
 
 # Estimation may also fail because of an inappropriate 'srch-range' setting.
 res4 <-
@@ -304,8 +314,11 @@ res4 <-
 res4$POI
 
 # (Expected) results in res4$POI
-# cics dics dids
-#   NA   NA   NA
+#    cics      dics dids.pmse      dids
+#     NA        NA        NA        NA
+# attr(,"side")
+#    cics      dics dids.pmse      dids
+# "lower"   "lower"   "lower"   "lower"
 }
 \references{
 International Council for Harmonisation of Technical Requirements for
@@ -314,7 +327,6 @@ Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 (CPMP/ICH/420/02).
 }
 \seealso{
-\code{\link{expirest_wisle}}, \code{\link{find_poi}},
-\code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-\code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+\code{\link{expirest_wisle}}, \code{\link[stats]{uniroot}},
+\code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 }

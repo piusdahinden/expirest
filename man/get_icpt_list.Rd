@@ -18,13 +18,13 @@ get_icpt_list(
 \item{data}{The data frame that was used for fitting the models of parameter
 \code{model_list}.}
 
-\item{response_vbl}{A character string specifying the response variable name
+\item{response_vbl}{A character string that specifies the response variable
+name that must be a column of \code{data}.}
+
+\item{time_vbl}{A character string that specifies the time variable name
 that must be a column of \code{data}.}
 
-\item{time_vbl}{A character string specifying the time variable name that
-must be a column of \code{data}.}
-
-\item{batch_vbl}{A character string specifying the column in \code{data}
+\item{batch_vbl}{A character string that specifies the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
 differentiation of the observations of the various batches.}
 
@@ -33,20 +33,26 @@ it is a list of four elements named \code{cics}, \code{dics},
 \code{dids.pmse} and \code{dids}, where the first three elements contain
 \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
 (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
-and \dQuote{different intercept / different slope} (\code{dids}) type.
-The fourth element with the label \code{dids.pmse} is usually a list of
-the \sQuote{\code{lm}} objects that is obtained from fitting a regression
+and \dQuote{different intercept / different slope} (\code{dids.pmse}) type.
+The fourth element with the label \code{dids} is usually a list of the
+\sQuote{\code{lm}} objects that is obtained from fitting a regression
 model to the data of each level of the categorical variable separately.
-The \code{cics}, \code{dics} and \code{dids.pmse} elements are \code{NA}
-if data of only a single batch is available.}
+The \code{dids.pmse} model differs from the \code{dids} model in that it
+is a model with the categorical variable as a fixed main effect and with
+an interaction term of the categorical variable with the time variable,
+i.e. a model where the mean square error is pooled across batches (thus
+the \dQuote{pmse} suffix meaning \dQuote{pooled mean square error}). The
+\code{cics}, \code{dics} and \code{dids.pmse} elements are \code{NA} if
+data of only a single batch is available.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 
 \item{shift}{A vector of two values which will be added to the variables
 \eqn{x} and/or \eqn{y} before they are transformed as specified by the
@@ -57,22 +63,24 @@ with values of \eqn{\leq 0} are log or square root transformed. The
 default is \code{c(0, 0)}.}
 }
 \value{
-a list of four elements named \code{cics}, \code{dics},
-\code{dids.pmse} and \code{dids} is returned. Each of them contains a named
-vector of the estimated POI values estimated for each batch named
-correspondingly.
+A list of four elements named \code{cics}, \code{dics},
+\code{dids.pmse} and \code{dids} is returned. Each of them contains a list
+element named \code{icpt} with a vector of the intercepts. If the data
+have been transformed, each of the primary list elements contains a further
+list element called \code{icpt.orig} with a numeric vector of the intercepts
+on the original scale.
 }
 \description{
 The function \code{get_icpt_list()} prepares a list of the intercepts
 of the regression models fitted to the data.
 }
 \details{
-The function \code{get_poi_list()} applies the \code{find_poi()}
-function (find the \dQuote{point of intersection}) on all the models that
-are provided.
+The function \code{get_icpt_list()} extracts the intercepts of
+the various regression models (fitted by aid of the \code{lm()} function)
+that are passed in via the \code{model_list} parameter.
 }
 \seealso{
-\code{\link{get_distance}}, \code{\link[stats]{uniroot}},
+\code{\link{get_model_list}}, \code{\link{get_icpt}},
 \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 }
 \keyword{internal}

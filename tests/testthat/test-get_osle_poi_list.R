@@ -9,8 +9,8 @@ test_that("get_osle_poi_list_succeeds", {
   shift <- c(0, 0)
 
   l_models <-
-    get_linear_models(data = d_dat, response_vbl = response_vbl,
-                      time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
+    get_model_list(data = d_dat, response_vbl = response_vbl,
+                   time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
 
   l_icpt <- get_icpt_list(data = d_dat, response_vbl = response_vbl,
                           time_vbl = time_vbl, batch_vbl = batch_vbl,
@@ -44,13 +44,13 @@ test_that("get_osle_poi_list_fails", {
   alpha <- 0.05
   xform <- c("no", "no")
   shift <- c(0, 0)
-  ivl = "confidence"
-  ivl_type = "one.sided"
-  ivl_side = "lower"
+  ivl <- "confidence"
+  ivl_type <- "one.sided"
+  ivl_side <- "lower"
 
   l_models <-
-    get_linear_models(data = d_dat, response_vbl = response_vbl,
-                      time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
+    get_model_list(data = d_dat, response_vbl = response_vbl,
+                   time_vbl = time_vbl, batch_vbl = batch_vbl)$Models
 
   l_icpt <- get_icpt_list(data = d_dat, response_vbl = response_vbl,
                           time_vbl = time_vbl, batch_vbl = batch_vbl,
@@ -97,31 +97,38 @@ test_that("get_osle_poi_list_fails", {
                       ivl_side = ivl_side),
     "icpt_list must be a list with four elements")
   expect_error(
-    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl,icpt_list = l_icpt,
+    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl, icpt_list = l_icpt,
                       model_list = "l_models", sl = sl, srch_range = srch_range,
                       alpha = alpha,  xform = xform, shift = shift, ivl = ivl,
                       ivl_type = ivl_type, ivl_side = ivl_side),
     "model_list must be a list with four elements")
   expect_error(
-    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl,icpt_list = l_icpt,
+    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl, icpt_list = l_icpt,
                       model_list = l_models_err, sl = sl,
                       srch_range = srch_range, alpha = alpha,  xform = xform,
                       shift = shift, ivl = ivl, ivl_type = ivl_type,
                       ivl_side = ivl_side),
     "model_list must be a list with four elements")
   expect_error(
-    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl,icpt_list = l_icpt,
+    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl, icpt_list = l_icpt,
                       model_list = l_models, sl = "sl", srch_range = srch_range,
                       alpha = alpha,  xform = xform, shift = shift, ivl = ivl,
                       ivl_type = ivl_type, ivl_side = ivl_side),
     "sl must be a numeric or vector of length 1 or 2")
   expect_error(
-    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl,icpt_list = l_icpt,
+    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl, icpt_list = l_icpt,
                       model_list = l_models, sl = c(95, 100, 105),
                       srch_range = srch_range, alpha = alpha,  xform = xform,
                       shift = shift, ivl = ivl, ivl_type = ivl_type,
                       ivl_side = ivl_side),
     "sl must be a numeric or vector of length 1 or 2")
+  expect_error(
+    get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl, icpt_list = l_icpt,
+                      model_list = l_models, sl = c(105, 95),
+                      srch_range = srch_range, alpha = alpha,  xform = xform,
+                      shift = shift, ivl = ivl, ivl_type = ivl_type,
+                      ivl_side = ivl_side),
+    "sl must be of the form")
   expect_error(
     get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl, icpt_list = l_icpt,
                       model_list = l_models, sl = sl, srch_range = "srch_range",

@@ -26,64 +26,75 @@ res3 <-
                  sl_sf = 3, srch_range = c(0, 500))
 
 res1
+# Expected output of print(res1)
 # Summary of shelf life estimation following the ARGPM
 # guidance "Stability testing for prescription medicines"
 #
 # The best model accepted at a significance level of 0.25 has
 # Common intercepts and Common slopes (acronym: cics).
 #
-# Worst case intercept(s): 100.5669
-# Worst case batch(es): NA
+# Worst case intercept and batch:
+#   RL Batch Intercept
+# 1 98    NA  100.5669
 #
-# Estimated shelf life (lives) for cics model:
-#      SL RL    wisle    osle
-# cics 95 98 14.07398 26.2241
+# Estimated shelf lives for the cics model:
+#   SL RL    wisle    osle
+# 1 95 98 14.07398 26.2241
 #
 # Abbreviations:
 #   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
-#   ICH: International Council for Harmonisation; osle: Ordinary shelf life
-#   estimation (i.e. following the ICH guidance); RL: Release Limit; SL:
-#   Specification Limit; wisle: What-if (approach for) shelf life estimation
-#   (i.e. following ARGPM guidance).
+#   ICH: International Council for Harmonisation;
+#   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
+#   RL: Release Limit;
+#   SL: Specification Limit;
+#   wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).
 
 res2
+# Expected output of print(res2)
 # Summary of shelf life estimation following the ARGPM
 # guidance "Stability testing for prescription medicines"
 #
 # The best model accepted at a significance level of 0.25 has
 # Different intercepts and Common slopes (acronym: dics).
 #
-# Worst case intercept(s):   100.82
-# Worst case batch(es): b5
+# Worst case intercept and batch:
+#   RL Batch Intercept
+# 1 98    b5    100.82
 #
-# Estimated shelf life (lives) for dics model:
-#      SL RL    wisle     osle
-# cics 95 98 11.40993 23.60194
+# Estimated shelf lives for the dics model:
+#   SL RL    wisle     osle
+# 1 95 98 11.40993 23.60194
 #
 # Abbreviations:
 #   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
-#   ICH: International Council for Harmonisation; osle: Ordinary shelf life
-#   estimation (i.e. following the ICH guidance); RL: Release Limit; SL:
-#   Specification Limit; wisle: What-if (approach for) shelf life estimation
-#   (i.e. following ARGPM guidance).
+#   ICH: International Council for Harmonisation;
+#   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
+#   RL: Release Limit;
+#   SL: Specification Limit;
+#   wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).
 
 res3
+# Expected output of print(res3)
 # Summary of shelf life estimation following the ARGPM
-# guidance "Stability testing for prescription medicines"
+#   guidance "Stability testing for prescription medicines"
 #
 # The best model accepted at a significance level of 0.25 has
-# Different intercepts and Different slopes (acronym: dids).
+#  Different intercepts and Different slopes (acronym: dids).
 #
-# Worst case intercept(s): 101.2594
-# Worst case batch(es): b8
+# Worst case intercept and batch:
+#   RL Batch Intercept
+# 1 98    b8  101.2594
 #
-# Estimated shelf life (lives) for dids model:
-#      SL RL    wisle     osle
-# cics 95 98 7.619661 15.96453
+# Estimated shelf lives for the dids model (for information, the results of
+#   the model fitted with pooled mean square error (pmse) are also shown:
+#   SL RL    wisle wisle (pmse)     osle osle (pmse)
+# 1 95 98 7.619661     7.483223 15.96453    15.72348
 #
 # Abbreviations:
 #   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
-#   ICH: International Council for Harmonisation; osle: Ordinary shelf life
-#   estimation (i.e. following the ICH guidance); RL: Release Limit; SL:
-#   Specification Limit; wisle: What-if (approach for) shelf life estimation
-#   (i.e. following ARGPM guidance).
+#   ICH: International Council for Harmonisation;
+#   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
+#   pmse: Pooled mean square error;
+#   RL: Release Limit;
+#   SL: Specification Limit;
+#   wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).

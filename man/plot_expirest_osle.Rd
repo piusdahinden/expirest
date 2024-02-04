@@ -25,20 +25,20 @@ by the \code{\link{expirest_osle}()} function.}
 i.e. also the \emph{common intercept / common slope case} model which
 was the default model when \code{show_grouping} was \code{"no"}.}
 
-\item{response_vbl_unit}{A character string specifying the unit associated
-with the response variable. The default is \code{NULL}.}
+\item{response_vbl_unit}{A character string that specifies the unit
+associated with the response variable. The default is \code{NULL}.}
 
-\item{x_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the time variable to be plotted. The default is \code{NULL}
-and the \eqn{x} range is calculated automatically on the basis of the
-estimated shelf life.}
+\item{x_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the time variable to be plotted. The default is
+\code{NULL} and the \eqn{x} range is calculated automatically on the basis
+of the estimated shelf life.}
 
-\item{y_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the response variable to be plotted. The default is
-\code{NULL} and the \eqn{y} range is calculated automatically on the
+\item{y_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the response variable to be plotted. The default
+is \code{NULL} and the \eqn{y} range is calculated automatically on the
 basis of the time course of the response.}
 
-\item{mtbs}{A characters string specifying the \dQuote{model to be shown},
+\item{mtbs}{A character string that specifies the \dQuote{model to be shown},
 i.e. either \code{verified}, which is the default, or one of \code{cics},
 \code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
 is the model that was identified through the poolability check. It is
@@ -50,16 +50,16 @@ interaction term with the \eqn{time} variable (\eqn{batch \times time}),
 i.e. a model where the mean square error is pooled across batches.}
 
 \item{plot_option}{A character string of either \code{"full"} or
-\code{"lean"}, i.e. specifying if additional information should be put out
+\code{"lean"} that specifies if additional information should be put out
 on the plot (option \code{"full"}) or only basic information (option
 \code{"lean"}), i.e. the data points, the fitted regression line with
 the confidence interval, the specification limit(s) and the estimated
 shelf life limit(s). The default is \code{"full"}.}
 
 \item{ci_app}{A character string of either \code{"line"} or \code{"ribbon"},
-specifying the appearance of the confidence interval, i.e. if the limits
-should be plotted as lines (option \code{"line"}) or as a shaded ribbon
-(option \code{"ribbon"}). The default is \code{"line"}.}
+that specifies the appearance of the confidence interval, i.e. if the
+limits should be plotted as lines (option \code{"line"}) or as a shaded
+ribbon (option \code{"ribbon"}). The default is \code{"line"}.}
 }
 \value{
 An object of class \sQuote{\code{plot_expirest_osle}} is returned
@@ -148,5 +148,6 @@ gg3 <- plot_expirest_osle(
 gg3
 }
 \seealso{
-\code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+\code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+\code{\link{plot_expirest_wisle}}.
 }

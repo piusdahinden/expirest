@@ -21,4 +21,8 @@ a nested list.
 The function \code{get_n_list_levels()} determines the number of
 levels of a (nested) list.
 }
+\seealso{
+\code{\link{extract_from_ll_wcsl}}, \code{\link{extract_wc_x}},
+\code{\link{get_wisle_poi_list}}.
+}
 \keyword{internal}

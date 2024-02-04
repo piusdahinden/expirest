@@ -1,9 +1,16 @@
 context("Extract worst case x value")
 
 test_that("extract_wc_x_succeeds", {
+  d_dat <- exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]
+  response_vbl <- "Potency"
+  time_vbl <- "Month"
+  batch_vbl <- "Batch"
+  rl <- c(100, 99, 98)
+  rl_sf <- rep(3, 3)
+  sl <- 95
+  sl_sf <- 2
   srch_range <- c(0, 500)
   alpha <- 0.05
-  alpha_pool <- 0.25
   xform <- c("no", "no")
   shift <- c(0, 0)
   sf_option <- "tight"
@@ -11,112 +18,24 @@ test_that("extract_wc_x_succeeds", {
   ivl_type <- "one.sided"
   ivl_side <- "lower"
 
-  sl <- 95
-  sl_sf <- 2
-  rl <- c(100, 99, 98)
-  rl_sf <- rep(3, 3)
+  re <- expirest_osle(data = d_dat, response_vbl = response_vbl,
+                      time_vbl = time_vbl, batch_vbl = batch_vbl, sl = sl,
+                      sl_sf = 2, srch_range = srch_range, alpha = alpha,
+                      alpha_pool = 0.25, xform = xform, shift = shift,
+                      sf_option = sf_option, ivl = ivl, ivl_type = ivl_type,
+                      ivl_side = ivl_side, rl = rl, rl_sf = rep(3, 3))
 
-  re <-
-    expirest_osle(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
-                  response_vbl = "Potency", time_vbl = "Month",
-                  batch_vbl = "Batch", sl = sl, sl_sf = sl_sf,
-                  srch_range = srch_range, alpha = alpha,
-                  alpha_pool = alpha_pool, xform = xform, shift = shift,
-                  sf_option = sf_option, ivl = ivl, ivl_type = ivl_type,
-                  ivl_side = ivl_side)
+  # <-><-><-><->
 
-  l_models <- re[["Models"]]
-  l_icpt <- re[["Intercepts"]]
+  rel_lim <- get_relevant_limits(limits_list = re[["Limits"]],
+                                 xform = xform, ivl_side = ivl_side)
 
-  # Determination of worst case scenario (wcs) limits
-  ll_wcsl <-
-    lapply(seq_along(l_icpt),
-           function(i) {
-             lapply(l_icpt[[i]]$icpt, function(xx) {
-               lapply(rl, function(j) {
-                 get_wcs_limit(rl = j, sl = 95, intercept = xx,  xform = xform,
-                               shift = shift, ivl_side = ivl_side)
-               })
-             })
-           })
-
-  names(ll_wcsl) <- names(l_icpt)
-  l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
-
-  # Calculation of POI values for all wcs limits
-  # Determination of worst case POI values
-  l_poi <- l_prl <- vector(mode = "list", length = length(l_wcsl))
-  names(l_poi) <- names(l_wcsl)
-
-  for (variety in names(l_wcsl)) {
-    # Initialise empty arrays
-    m_poi <-
-      matrix(NA, nrow = length(rl), ncol = length(l_icpt[[variety]][["icpt"]]))
-    colnames(m_poi) <- names(l_icpt[[variety]][["icpt"]])
-
-    a_prl <- array(NA, dim = c(length(rl), length(l_icpt[[variety]][["icpt"]]),
-                               length(l_icpt[[variety]][["icpt"]])),
-                   dimnames = list(as.character(seq_along(rl)),
-                                   names(l_icpt[[variety]][["icpt"]]),
-                                   names(l_icpt[[variety]][["icpt"]])))
-
-    # Fill arrays
-    for (j in seq_along(rl)) {
-      for (k in seq_len(ncol(l_wcsl[[variety]]))) {
-        if (variety != "dids") {
-          tmp_poi <- try_get_model(
-            find_poi(srch_range = srch_range,
-                     model = l_models[[variety]],
-                     sl = l_wcsl[[variety]][j, k], alpha = alpha,
-                     ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
-        } else {
-          tmp_poi <- try_get_model(
-            find_poi(srch_range = srch_range,
-                     model = l_models[["dids"]][[k]],
-                     sl = l_wcsl[[variety]][j, k], alpha = alpha,
-                     ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
-        }
-
-        if (is.null(tmp_poi[["Error"]])) {
-          m_poi[j, k] <- tmp_poi[["Model"]]
-
-          if (variety != "dids") {
-            tmp_prl <- try_get_model(
-              get_intvl_limit(
-                x_new = tmp_poi[["Model"]],
-                model = l_models[[variety]], alpha = alpha,
-                ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-            )
-
-            if (is.null(tmp_prl[["Error"]])) {
-              a_prl[j, k, ] <- tmp_prl[["Model"]]
-            }
-          } else {
-            t_prl <- rep(NA, ncol(l_wcsl[[variety]]))
-
-            for (kk in seq_len(ncol(l_wcsl[["dids"]]))) {
-              tmp_prl <- try_get_model(
-                get_intvl_limit(
-                  x_new = tmp_poi[["Model"]],
-                  model = l_models[["dids"]][[kk]], alpha = alpha,
-                  ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-              )
-
-              if (is.null(tmp_prl[["Error"]])) {
-                t_prl[kk] <- tmp_prl[["Model"]]
-              }
-            }
-
-            a_prl[j, k, ] <- t_prl
-          }
-        }
-      }
-    }
-
-    # Put the resulting arrays into the corresponding list entries
-    l_poi[[variety]] <- m_poi
-    l_prl[[variety]] <- a_prl
-  }
+  l_wisle <-
+    get_wisle_poi_list(icpt_list = re[["Intercepts"]],
+                       model_list = re[["Models"]], rl = rl, sl = sl,
+                       srch_range = srch_range, alpha = alpha,  xform = xform,
+                       shift = shift, ivl = ivl, ivl_type = ivl_type,
+                       ivl_side = ivl_side)
 
   # Worst case batches
   l_wcb1 <- list(cics = rep(NA, 3),
@@ -134,9 +53,9 @@ test_that("extract_wc_x_succeeds", {
 
   # <-><-><-><->
 
-  m_poi1 <- extract_wc_x(l1 = l_poi, l2 = l_wcb1)
-  m_poi2 <- extract_wc_x(l1 = l_poi, l2 = l_wcb2)
-  m_poi3 <- extract_wc_x(l1 = l_poi, l2 = l_wcb3)
+  m_poi1 <- extract_wc_x(l1 = l_wisle[["all.poi"]], l2 = l_wcb1)
+  m_poi2 <- extract_wc_x(l1 = l_wisle[["all.poi"]], l2 = l_wcb2)
+  m_poi3 <- extract_wc_x(l1 = l_wisle[["all.poi"]], l2 = l_wcb3)
 
   # <-><-><-><->
 

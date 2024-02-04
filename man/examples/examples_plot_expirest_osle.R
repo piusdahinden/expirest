@@ -18,9 +18,8 @@ res1 <-
 # object that is essentially an 'expirest_osle' object augmented by a 'ggplot'
 # object.
 gg1 <- plot_expirest_osle(
-  model = res1, show_grouping = "no", response_vbl_unit = "%",
-  y_range = c(93, 107), x_range = NULL, plot_option = "full",
-  ci_app = "line")
+  model = res1, response_vbl_unit = "%", x_range = NULL, y_range = c(93, 105),
+  mtbs = "verified", plot_option = "full", ci_app = "line")
 gg1
 
 # Since the element gg1$Graph is a 'ggplot' object it can be used for further
@@ -33,21 +32,26 @@ if (requireNamespace("ggplot2")) {
     scale_x_continuous(limits = c(-1, 31), breaks = seq(0, 30, 6))
 }
 
-# Illustration of the grouping
-gg2 <- plot_expirest_osle(
-  model = res1, show_grouping = "yes", response_vbl_unit = "%",
-  y_range = c(93, 107), x_range = c(0, 35), plot_option = "full",
-  ci_app = "line")
-gg2
-
 # Repeat this for a different intercept / different slope (dids) model.
 res2 <-
   expirest_osle(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
                 response_vbl = "Potency", time_vbl = "Month",
                 batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
 
+gg2 <- plot_expirest_osle(
+  model = res2, response_vbl_unit = "%", x_range = c(0, 43),
+  y_range = c(83, 107), mtbs = "verified", plot_option = "full",
+  ci_app = "ribbon")
+gg2
+
+# In case of different intercept / different slope models, individually fit
+# linear models are shown by default, i.e. with the 'mtbs' parameter set
+# as "verified". To get the different intercept / different slope model
+# displayed where the mean square error is pooled across batches, i.e. the
+# dids.pmse model, the 'mtbs' parameter has to be set accordingly.
+
 gg3 <- plot_expirest_osle(
-  model = res2, show_grouping = "yes", response_vbl_unit = "%",
-  y_range = c(83, 107), x_range = c(0, 43), plot_option = "full",
+  model = res2, response_vbl_unit = "%", x_range = c(0, 43),
+  y_range = c(83, 107), mtbs = "dids.pmse", plot_option = "full",
   ci_app = "ribbon")
 gg3

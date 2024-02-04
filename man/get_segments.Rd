@@ -18,23 +18,23 @@ get_segments(
 )
 }
 \arguments{
-\item{sl}{A numeric value or a numeric vector of length \code{2} specifying
-the specification limit or limits.}
+\item{sl}{A numeric value or a numeric vector of length \code{2} that
+specifies the specification limit or limits.}
 
-\item{ivl_side}{A character string specifying if the \dQuote{upper} or the
-\dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-\code{"lower"}, respectively.}
+\item{ivl_side}{A character string that specifies if the \dQuote{upper} or
+the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
+or \code{"lower"}, respectively.}
 
 \item{wisle_est}{A data frame of the intercepts, the differences between
 release and shelf life limits, the worst case scenario limits (WCSLs),
 the expiry and release specification limits, the shelf lives and POI
 values. The default is \code{NULL}.}
 
-\item{rl}{A numeric value or a numeric vector specifying the release
+\item{rl}{A numeric value or a numeric vector that specifies the release
 specification limit(s) for which the corresponding expiry should be
 estimated.}
 
-\item{rl_index}{A positive integer specifying which of the release limit
+\item{rl_index}{A positive integer that specifies which of the release limit
 values that have been handed over to \code{\link{expirest_wisle}()} should
 be displayed. The default is \code{NULL}.}
 
@@ -46,13 +46,13 @@ representing the worst case scenario (woca) model. The default is
 \item{wc_icpt}{A data frame of the worst case intercepts of each of the
 four fitted models. The default is \code{NULL}.}
 
-\item{x_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the time variable to be plotted.}
+\item{x_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the time variable to be plotted.}
 
-\item{sl_model_name}{A character string specifying the name of the
-model with the shelf life limit.}
+\item{sl_model_name}{A character string that specifies the name of the
+model with the shelf life limit of interest.}
 
-\item{wcsl_model_name}{A character string specifying the name of the
+\item{wcsl_model_name}{A character string that specifies the name of the
 model with the worst case scenario limit. The default is \code{NULL}.}
 }
 \value{
@@ -75,6 +75,6 @@ the function prepares a data frame that can be handed over to the
 }
 \seealso{
 \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
-  \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+\code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 }
 \keyword{internal}

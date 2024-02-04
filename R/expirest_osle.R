@@ -7,36 +7,37 @@
 #'
 #' @param data A data frame with the columns specified by \code{response_vbl},
 #'   \code{time_vbl} and \code{batch_vbl}.
-#' @param response_vbl A character string specifying the response variable name
+#' @param response_vbl A character string that specifies the response variable
+#'   name that must be a column of \code{data}.
+#' @param time_vbl A character string that specifies the time variable name
 #'   that must be a column of \code{data}.
-#' @param time_vbl A character string specifying the time variable name that
-#'   must be a column of \code{data}.
-#' @param batch_vbl A character string specifying the column in \code{data}
+#' @param batch_vbl A character string that specifies the column in \code{data}
 #'   with the grouping information (i.e. a factorial variable) for the
 #'   differentiation of the observations of the various batches.
-#' @param sl A numeric value or a numeric vector of length \code{2} specifying
-#'   the specification limit or limits. If a vector is provided it must be of
-#'   the form \code{c(lower limit, upper limit)}.
-#' @param sl_sf A positive integer or a vector of positive integers specifying
-#'   the number of \dQuote{significant figures} (sf) of \code{sl}. It must have
-#'   the same length as \code{sl}.
-#' @param srch_range A vector of length \code{2} specifying the end-points of
-#'   the (time) range that is supposed to contain the shelf life or retest
+#' @param sl A numeric value or a numeric vector of length \code{2} that
+#'   specifies the specification limit or limits. If a vector is provided it
+#'   must be of the form \code{c(lower limit, upper limit)}.
+#' @param sl_sf A positive integer or a vector of positive integers that
+#'   specifies the number of \dQuote{significant figures} (sf) of \code{sl}.
+#'   It must have the same length as \code{sl}.
+#' @param srch_range A vector of length \code{2} that specifies the end-points
+#'   of the (time) range that is supposed to contain the shelf life or retest
 #'   period.
-#' @param alpha A numeric value between 0 and 1 specifying the significance
+#' @param alpha A numeric value between 0 and 1 that specifies the significance
 #'   level for the calculation of confidence or prediction intervals. The
 #'   default is \code{0.05}.
-#' @param alpha_pool A numeric value between 0 and 1 specifying the type I
+#' @param alpha_pool A numeric value between 0 and 1 that specifies the type I
 #'   error rate for the test of the poolability of the batches. The default
 #'   is \code{0.25}, following ICH Q1E guideline. The value should not be
 #'   changed unless supported by well-founded reasons.
-#' @param xform A vector of two character strings specifying the transformation
-#'   of the response and the time variable. The default is \dQuote{no}
-#'   transformation, i.e. \code{c("no", "no")}, where the first element
-#'   specifies the transformation of the \eqn{x} variable and the second
-#'   element the transformation of the \eqn{y} variable. Valid alternatives
-#'   for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-#'   (natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).
+#' @param xform A vector of two character strings that specifies the
+#'   transformation of the response and the time variable. The default is
+#'   \dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+#'   element specifies the transformation of the \eqn{x} variable and the
+#'   second element the transformation of the \eqn{y} variable. Valid
+#'   alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+#'   \code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+#'   \code{"sq"} (square).
 #' @param shift A vector of two values which will be added to the variables
 #'   \eqn{x} and/or \eqn{y} before they are transformed as specified by the
 #'   \code{xform} parameter, where the first element will be added to the
@@ -44,7 +45,7 @@
 #'   purpose is to prevent an undefined state which could arise when variables
 #'   with values of \eqn{\leq 0} are log or square root transformed. The
 #'   default is \code{c(0, 0)}.
-#' @param sf_option A character string specifying if the limits (\code{rl}
+#' @param sf_option A character string that specifies if the limits (\code{rl}
 #'   or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
 #'   either \code{"tight"} or \code{"loose"}, respectively. The option
 #'   \code{"tight"} means that the limits are rounded to the specified number
@@ -56,14 +57,14 @@
 #'   \code{"lower"}, or followed by the addition of \eqn{4} to the
 #'   \eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.
 #' @param ivl A character string of either \code{"confidence"} or
-#'   \code{"prediction"}, i.e. specifying the type of interval of interest.
+#'   \code{"prediction"} that specifies the type of interval of interest.
 #'   The default is \code{"confidence"}.
-#' @param ivl_type A character string specifying if a \dQuote{one sided} or
-#'   a \dQuote{two sided} interval should be calculated, i.e. either
+#' @param ivl_type A character string that specifies if a \dQuote{one sided}
+#'   or a \dQuote{two sided} interval should be calculated, i.e. either
 #'   \code{"one.sided"} or \code{"two.sided"}, respectively. The default is
 #'   \code{"one.sided"}.
-#' @param ivl_side A character string specifying if the specification limit,
-#'   given that the limit has only one side, is an \dQuote{upper} or a
+#' @param ivl_side A character string that specifies if the specification
+#'   limit, given that the limit has only one side, is an \dQuote{upper} or a
 #'   \dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
 #'   \code{"lower"}, respectively. The default is \code{"lower"}. If the
 #'   specification has two boundaries, then this parameter specifies the
@@ -143,10 +144,10 @@
 #' \item{Variables}{A list of the variable names, i.e. the original names of
 #'   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
 #'   applicable, of the transformed variables.}
-#' \item{Model.Type}{A list of two elements specifying which model, based on
-#'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
-#'   is a numeric vector of length 2 specifying the best model accepted at the
-#'   significance level specified by \code{alpha.pool}. The first number
+#' \item{Model.Type}{A list of two elements that specifies which model, based
+#'   on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+#'   is a numeric vector of length 2 that specifies the best model accepted at
+#'   the significance level specified by \code{alpha.pool}. The first number
 #'   represents the decision on the intercept and the second on the slope,
 #'   where \code{1} stands for \dQuote{common} and \code{2} stands for
 #'   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
@@ -186,9 +187,8 @@
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).
 #'
-#' @seealso \code{\link{expirest_wisle}}, \code{\link{find_poi}},
-#' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-#' \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+#' @seealso \code{\link{expirest_wisle}}, \code{\link[stats]{uniroot}},
+#' \code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 #'
 #' @example man/examples/examples_expirest_osle.R
 #'
@@ -385,8 +385,8 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Fitting of all possible models that are relevant
 
-  tmp <- get_linear_models(data = d_dat, response_vbl = response_vbl,
-                           time_vbl = time_vbl, batch_vbl = batch_vbl)
+  tmp <- get_model_list(data = d_dat, response_vbl = response_vbl,
+                        time_vbl = time_vbl, batch_vbl = batch_vbl)
 
   l_models <- tmp$Models
   t_AIC <- tmp$AIC
@@ -476,17 +476,17 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
 #'   \code{mtbs} parameter instead which allows choosing a specific model,
 #'   i.e. also the \emph{common intercept / common slope case} model which
 #'   was the default model when \code{show_grouping} was \code{"no"}.
-#' @param response_vbl_unit A character string specifying the unit associated
-#'   with the response variable. The default is \code{NULL}.
-#' @param x_range A numeric vector of the form \code{c(min, max)} specifying
-#'   the range of the time variable to be plotted. The default is \code{NULL}
-#'   and the \eqn{x} range is calculated automatically on the basis of the
-#'   estimated shelf life.
-#' @param y_range A numeric vector of the form \code{c(min, max)} specifying
-#'   the range of the response variable to be plotted. The default is
-#'   \code{NULL} and the \eqn{y} range is calculated automatically on the
+#' @param response_vbl_unit A character string that specifies the unit
+#'   associated with the response variable. The default is \code{NULL}.
+#' @param x_range A numeric vector of the form \code{c(min, max)} that
+#'   specifies the range of the time variable to be plotted. The default is
+#'   \code{NULL} and the \eqn{x} range is calculated automatically on the basis
+#'   of the estimated shelf life.
+#' @param y_range A numeric vector of the form \code{c(min, max)} that
+#'   specifies the range of the response variable to be plotted. The default
+#'   is \code{NULL} and the \eqn{y} range is calculated automatically on the
 #'   basis of the time course of the response.
-#' @param mtbs A characters string specifying the \dQuote{model to be shown},
+#' @param mtbs A character string that specifies the \dQuote{model to be shown},
 #'   i.e. either \code{verified}, which is the default, or one of \code{cics},
 #'   \code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
 #'   is the model that was identified through the poolability check. It is
@@ -497,15 +497,15 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
 #'   interaction term with the \eqn{time} variable (\eqn{batch \times time}),
 #'   i.e. a model where the mean square error is pooled across batches.
 #' @param plot_option A character string of either \code{"full"} or
-#'   \code{"lean"}, i.e. specifying if additional information should be put out
+#'   \code{"lean"} that specifies if additional information should be put out
 #'   on the plot (option \code{"full"}) or only basic information (option
 #'   \code{"lean"}), i.e. the data points, the fitted regression line with
 #'   the confidence interval, the specification limit(s) and the estimated
 #'   shelf life limit(s). The default is \code{"full"}.
 #' @param ci_app A character string of either \code{"line"} or \code{"ribbon"},
-#'   specifying the appearance of the confidence interval, i.e. if the limits
-#'   should be plotted as lines (option \code{"line"}) or as a shaded ribbon
-#'   (option \code{"ribbon"}). The default is \code{"line"}.
+#'   that specifies the appearance of the confidence interval, i.e. if the
+#'   limits should be plotted as lines (option \code{"line"}) or as a shaded
+#'   ribbon (option \code{"ribbon"}). The default is \code{"line"}.
 #'
 #' @details The function \code{plot_expirest_osle()} uses the data and the
 #' information about the linear model that was used for the estimation of
@@ -532,7 +532,8 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
 #' \item{hlines}{A data frame of the horizontal line elements on the plot.}
 #' \item{vlines}{A data frame of the vertical line elements on the plot.}
 #'
-#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+#' \code{\link{plot_expirest_wisle}}.
 #'
 #' @example man/examples/examples_plot_expirest_osle.R
 #'
@@ -568,9 +569,10 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
 #'
 #' @export
 
-plot_expirest_osle <- function(
-  model, show_grouping = "yes", response_vbl_unit = NULL, x_range = NULL,
-  y_range = NULL, mtbs = "verified", plot_option = "full", ci_app = "line") {
+plot_expirest_osle <- function(model, show_grouping = "yes",
+                               response_vbl_unit = NULL, x_range = NULL,
+                               y_range = NULL, mtbs = "verified",
+                               plot_option = "full", ci_app = "line") {
   if (!inherits(model, "expirest_osle")) {
     stop("The model must be an object of class expirest_osle.")
   }

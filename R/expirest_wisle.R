@@ -8,15 +8,15 @@
 #' (because it estimates the shelf life (\dQuote{what}) for a given release
 #' limit (\dQuote{if})).
 #'
-#' @param rl A numeric value or a numeric vector specifying the release
+#' @param rl A numeric value or a numeric vector that specifies the release
 #'   specification limit(s) for which the corresponding expiry should be
 #'   estimated.
-#' @param rl_sf A positive integer or a vector of positive integers specifying
-#'   the number of \dQuote{significant figures} (sf) of \code{rl}. It must have
-#'   the same length as \code{rl}.
-#' @param ivl_side A character string specifying if the \dQuote{upper} or the
-#'   \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-#'   \code{"lower"}, respectively. The default is \code{"lower"}. Since this
+#' @param rl_sf A positive integer or a vector of positive integers that
+#'   specifies the number of \dQuote{significant figures} (sf) of \code{rl}.
+#'   It must have the same length as \code{rl}.
+#' @param ivl_side A character string that specifies if the \dQuote{upper} or
+#'   the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
+#'   or \code{"lower"}, respectively. The default is \code{"lower"}. Since this
 #'   parameter additionally specifies the relationship of \code{rl} with
 #'   \code{sl}, i.e. which of the two sides of \code{sl} the \code{rl} is
 #'   compared to, only either either \code{"upper"} or \code{"lower"} is
@@ -88,10 +88,10 @@
 #' \item{Variables}{A list of the variable names, i.e. the original names of
 #'   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
 #'   applicable, of the transformed variables.}
-#' \item{Model.Type}{A list of two elements specifying which model, based on
-#'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
-#'   is a numeric vector of length 2 specifying the best model accepted at the
-#'   significance level specified by \code{alpha.pool}. The first number
+#' \item{Model.Type}{A list of two elements that specifies which model, based
+#'   on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+#'   is a numeric vector of length 2 that specifies the best model accepted at
+#'   the significance level specified by \code{alpha.pool}. The first number
 #'   represents the decision on the intercept and the second on the slope,
 #'   where \code{1} stands for \dQuote{common} and \code{2} stands for
 #'   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
@@ -172,9 +172,8 @@
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).
 #'
-#' @seealso \code{\link{expirest_osle}}, \code{\link{find_poi}},
-#' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-#' \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+#' @seealso \code{\link{expirest_osle}}, \code{\link[stats]{uniroot}},
+#' \code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 #'
 #' @example man/examples/examples_expirest_wisle.R
 #'
@@ -344,15 +343,8 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   rel_lim <- get_relevant_limits(limits_list = r_ret[["Limits"]],
                                  xform = xform, ivl_side = ivl_side)
 
-  sl_orig <- rel_lim[["sl.orig"]]
   sl <- rel_lim[["sl"]]
-  rl_orig <- rel_lim[["rl.orig"]]
   rl <- rel_lim[["rl"]]
-
-  if (xform[2] == "no") {
-    sl_bt <- rel_lim[["sl.bt"]]
-    rl_bt <- rel_lim[["rl.bt"]]
-  }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Calculation of POI values for all models (according to ARGPM)
@@ -400,20 +392,20 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #'
 #' @param model An \sQuote{\code{expirest_wisle}} object, i.e. a list returned
 #'   by the \code{\link{expirest_wisle}()} function.
-#' @param rl_index A positive integer specifying which of the release limit
+#' @param rl_index A positive integer that specifies which of the release limit
 #'   values that have been handed over to \code{\link{expirest_wisle}()} should
 #'   be displayed. The default value is \code{1}.
-#' @param scenario A character string specifying if the plot should be extended
-#'   (with respect to the \eqn{x} axis) up to the \dQuote{standard scenario}
-#'   (\code{"standard"}) or up to the \dQuote{worst case scenario}
+#' @param scenario A character string that specifies if the plot should be
+#'   extended (with respect to the \eqn{x} axis) up to the \dQuote{standard
+#'   scenario} (\code{"standard"}) or up to the \dQuote{worst case scenario}
 #'   (\code{"worst"}). The default is \code{"standard"}.
 #' @param plot_option A character string of either \code{"full"},
-#'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
-#'   specifying if additional information should be shown in the plot (option
-#'   \code{"full"}) or only basic information (options \code{"lean"} and
-#'   \code{"basic"}). Full means the data points, the fitted regression line
-#'   with the confidence or prediction interval, the specification limit(s)
-#'   and the estimated shelf life. The default is \code{"full"}.
+#'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"}
+#'   that specifies if additional information should be shown in the plot
+#'   (option \code{"full"}) or only basic information (options \code{"lean"}
+#'   and \code{"basic"}). Full means the data points, the fitted regression
+#'   line with the confidence or prediction interval, the specification
+#'   limit(s) and the estimated shelf life. The default is \code{"full"}.
 #' @inheritParams plot_expirest_osle
 #'
 #' @details The function \code{plot_expirest_wisle()} uses the data and the
@@ -444,7 +436,8 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' \item{segments}{A data frame of segment line elements on the plot.}
 #' \item{arrow}{A data frame of arrow elements on the plot.}
 #'
-#' @seealso \code{\link{expirest_wisle}}, \code{\link{expirest_osle}}.
+#' @seealso \code{\link{expirest_wisle}}, \code{\link{expirest_osle}},
+#' \code{\link{plot_expirest_osle}}.
 #'
 #' @example man/examples/examples_plot_expirest_wisle.R
 #'

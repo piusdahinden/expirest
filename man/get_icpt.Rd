@@ -16,24 +16,26 @@ get_icpt(
 \arguments{
 \item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
-\item{response_vbl}{A character string specifying the response variable name
-that must be a column of the data frame that was used for model fitting.}
+\item{response_vbl}{A character string that specifies the response variable
+name that must be a column of the data frame that was used for model
+fitting.}
 
-\item{time_vbl}{A character string specifying the time variable name that
-must be a column of data frame that was used for model fitting.}
+\item{time_vbl}{A character string that specifies the time variable name
+that must be a column of data frame that was used for model fitting.}
 
-\item{batch_vbl}{A character string specifying the column of the data frame
-that was used for model fitting with the grouping information (i.e. a
-factorial variable) for the differentiation of the observations from the
-different batches.}
+\item{batch_vbl}{A character string that specifies the column of the data
+frame that was used for model fitting with the grouping information (i.e.
+a categorical variable) for the differentiation of the observations from
+the different batches.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 
 \item{shift}{A vector of two values which will be added to the variables
 \eqn{x} and/or \eqn{y} before they are transformed as specified by the
@@ -46,8 +48,8 @@ default is \code{c(0, 0)}.}
 \value{
 A list with a single element containing the numeric value or a
 numeric vector of the intercept(s) or, if the data have been transformed,
-a list with an additional element that contains the numeric value or numeric
-vector on the original scale.
+a list with an additional element that contains the numeric value or
+numeric vector on the original scale is returned.
 }
 \description{
 The function \code{get_icpt()} determines the intercept(s) of the provided
@@ -56,5 +58,9 @@ model.
 \details{
 The function \code{get_icpt()} determines the intercept(s) of the
 model that has been handed over via the \code{model} parameter.
+}
+\seealso{
+\code{\link{get_icpt_list}}, \code{\link{expirest_osle}},
+\code{\link{expirest_wisle}}, \code{\link[stats]{lm}}.
 }
 \keyword{internal}

@@ -1,15 +1,15 @@
 context("Preparation of list of points of intersection")
 
 test_that("get_poi_list_succeeds", {
-  l_mod <-
-    get_linear_models(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
-                      response_vbl = "Potency", time_vbl = "Month",
-                      batch_vbl = "Batch")$Models
+  t_dat <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
 
-  re <- get_poi_list(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
-                     batch_vbl = "Batch", model_list = l_mod, sl = 95,
-                     srch_range = c(0, 500), mode = "minimal", alpha = 0.05,
-                     ivl = "confidence", ivl_type = "one.sided",
+  l_mod <-
+    get_model_list(data = t_dat, response_vbl = "Potency",
+                   time_vbl = "Month", batch_vbl = "Batch")$Models
+
+  re <- get_poi_list(data = t_dat, batch_vbl = "Batch", model_list = l_mod,
+                     sl = 95, srch_range = c(0, 500), mode = "minimal",
+                     alpha = 0.05, ivl = "confidence", ivl_type = "one.sided",
                      ivl_side = "lower")
 
   # <-><-><-><->
@@ -29,9 +29,8 @@ test_that("get_poi_list_fails", {
   t_dal$Batch <- as.character(t_dal$Batch)
 
   l_mod <- l_mod2 <-
-    get_linear_models(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
-                      response_vbl = "Potency", time_vbl = "Month",
-                      batch_vbl = "Batch")$Models
+    get_model_list(data = t_dat, response_vbl = "Potency",
+                   time_vbl = "Month", batch_vbl = "Batch")$Models
   names(l_mod2) <- gsub("dids.pmse", "individual", names(l_mod))
 
   # <-><-><-><->

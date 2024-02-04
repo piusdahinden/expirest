@@ -10,26 +10,26 @@ check_ancova(data, response_vbl, time_vbl, batch_vbl, alpha = 0.05)
 \item{data}{A data frame with the columns specified by \code{response_vbl},
 \code{time_vbl} and \code{batch_vbl}.}
 
-\item{response_vbl}{A character string specifying the response variable name
+\item{response_vbl}{A character string that specifies the response variable
+name that must be a column of \code{data}.}
+
+\item{time_vbl}{A character string that specifies the time variable name
 that must be a column of \code{data}.}
 
-\item{time_vbl}{A character string specifying the time variable name that
-must be a column of \code{data}.}
-
-\item{batch_vbl}{A character string specifying the column in \code{data}
+\item{batch_vbl}{A character string that specifies the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
 differentiation of the observations of the various batches.}
 
-\item{alpha}{A numeric value specifying the significance level for the
+\item{alpha}{A numeric value that specifies the significance level for the
 decision which model is appropriate, i.e. if the assumption of
 \emph{common slope} or \emph{common intercept} is appropriate or not.
 The default is \code{0.05}.}
 }
 \value{
-A list of two elements is returned specifying which model, based on
-  the ANCOVA analysis, suits best. The first element (\code{type.spec})
-  is a numeric vector of length 2 specifying the best model accepted at the
-  significance level specified by \code{alpha}. It has the form
+A list of two elements is returned that specifies which model, based
+  on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+  is a numeric vector of length 2 that specifies the best model accepted at
+  the significance level specified by \code{alpha}. It has the form
   \code{c(ci, cs)}, where \code{ci} specifies if a common intercept is
   appropriate (\code{ci = 1}) or not (\code{ci = 0}) and \code{cs} specifies
   if a common slope is appropriate (\code{cs = 1}) or not (\code{cs = 0}).
@@ -49,6 +49,7 @@ on \code{alpha}, it checks if the intercepts and/or slopes between the
 groups differ significantly or not.
 }
 \seealso{
+\code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
 \code{\link[stats]{aov}}.
 }
 \keyword{internal}

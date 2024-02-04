@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility.R
 \name{get_wc_icpt}
 \alias{get_wc_icpt}
-\title{List of intercepts of worst case batches}
+\title{Get intercepts of the worst case batches}
 \usage{
 get_wc_icpt(data, batch_vbl, icpt_list, poi_list, wc_batch, xform)
 }
@@ -10,44 +10,53 @@ get_wc_icpt(data, batch_vbl, icpt_list, poi_list, wc_batch, xform)
 \item{data}{A data frame with the columns specified by \code{response_vbl},
 \code{time_vbl} and \code{batch_vbl}.}
 
-\item{batch_vbl}{A character string specifying the column in \code{data}
+\item{batch_vbl}{A character string that specifies the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
 differentiation of the observations of the various batches.}
 
-\item{icpt_list}{A list of the intercepts of each model type, i.e. a list
-of four elements named \code{cics}, \code{dics}, \code{dids.pmse} and
-\code{dids}.}
+\item{icpt_list}{A list of four elements named \code{cics}, \code{dics},
+\code{dids.pmse} and \code{dids} with the intercepts of each linear
+regression model and batch. The \code{cics}, \code{dics} and
+\code{dids.pmse} elements are \code{NA} if data of only a single batch
+is available.}
 
-\item{poi_list}{A list of the points of intersection (POI) of each model
-type, i.e. a list of four elements named \code{cics}, \code{dics},
-\code{dids.pmse} and \code{dids}.}
+\item{poi_list}{A list of four elements named \code{cics}, \code{dics},
+\code{dids.pmse} and \code{dids} with the points of intersection (POI)
+of each linear regression model and batch. The \code{cics}, \code{dics}
+and \code{dids.pmse} elements are \code{NA} if data of only a single
+batch is available.}
 
 \item{wc_batch}{A numeric vector of the indices of the worst case batches
 of each model type, i.e. a vector of four elements named \code{cics},
-\code{dics}, \code{dids.pmse} and \code{dids}.}
+\code{dics}, \code{dids.pmse} and \code{dids}. The \code{cics} element
+is \code{NA} because in the \dQuote{common intercept / common slope} model
+the data from different batches is pooled.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 }
 \value{
 A named vector of the intercepts of the worst case batches is
 returned.
 }
 \description{
-The function \code{get_wc_icpt()} prepares a list of worst case intercepts
-of the worst case batches of the regression models fitted to the data.
+The function \code{get_wc_icpt()} prepares a vector of the intercepts
+of the worst case batches of all the regression models fitted to the data.
 }
 \details{
-The function \code{get_wc_icpt()} applies the \code{find_poi()}
-function (find the \dQuote{point of intersection}) on all the models that
-are provided.
+The function \code{get_wc_icpt()} extracts the worst case batches
+from the list of intercepts (\code{icpt_list}), given that the estimation
+of the corresponding POIs (\code{poi_list}) was successful.
 }
 \seealso{
+\code{\link{get_icpt_list}}, \code{\link{get_poi_list}},
+\code{\link{get_osle_poi_list}}, \code{\link{get_wisle_poi_list}},
 \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 }
 \keyword{internal}

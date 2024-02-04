@@ -23,7 +23,7 @@ respectively.}
 
 \item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
-\item{sl}{A numeric variable specifying the \dQuote{specification limit}
+\item{sl}{A numeric variable that specifies the \dQuote{specification limit}
 (SL) or, for determinations according to ARGPM guidance \dQuote{Stability
 testing for prescription medicines}, the \dQuote{expiry limit} (EL). The
 EL is defined as the intercept \eqn{\pm} the difference between the
@@ -32,25 +32,25 @@ which is the relevant limit, it is added (\code{+}) to the intercept,
 otherwise it is subtracted (\code{-}) from the intercept.}
 
 \item{mode}{A character string of either \code{"minimal"} or \code{"all"},
-specifying if only the minimal distance of a factorial regression model
+that specifies if only the minimal distance of a factor regression model
 is returned or if the distances of all lines belonging to the different
 factor levels is returned. The default is \code{"minimal"}.}
 
-\item{alpha}{A numeric value between 0 and 1 specifying the significance
+\item{alpha}{A numeric value between 0 and 1 that specifies the significance
 level for the calculation of confidence or prediction intervals. The
 default is \code{0.05}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
-\code{"prediction"}, i.e. specifying the type of interval of interest.
+\code{"prediction"} that specifies the type of interval of interest.
 The default is \code{"confidence"}.}
 
-\item{ivl_type}{A character string specifying if a \dQuote{one sided} or
-a \dQuote{two sided} interval should be calculated, i.e. either
+\item{ivl_type}{A character string that specifies if a \dQuote{one sided}
+or a \dQuote{two sided} interval should be calculated, i.e. either
 \code{"one.sided"} or \code{"two.sided"}, respectively. The default is
 \code{"one.sided"}.}
 
-\item{ivl_side}{A character string specifying if the specification limit,
-given that the limit has only one side, is an \dQuote{upper} or a
+\item{ivl_side}{A character string that specifies if the specification
+limit, given that the limit has only one side, is an \dQuote{upper} or a
 \dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
 \code{"lower"}, respectively. The default is \code{"lower"}. If the
 specification has two boundaries, then this parameter specifies the
@@ -107,7 +107,8 @@ Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 (CPMP/ICH/420/02).
 }
 \seealso{
-\code{\link{find_poi}}, \code{\link{expirest_osle}},
-\code{\link{expirest_wisle}}.
+\code{\link{get_intvl_limit}}, \code{\link{find_poi}},
+\code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+\code{\link[stats]{lm}}.
 }
 \keyword{internal}

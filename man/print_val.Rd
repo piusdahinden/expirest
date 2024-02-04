@@ -7,16 +7,16 @@
 print_val(val_name, val_value, val_unit, val_sf, prefix = "", suffix = "")
 }
 \arguments{
-\item{val_name}{A character string specifying the text preceding the value
-of the parameter to be displayed.}
+\item{val_name}{A character string that specifies the text preceding the
+value of the parameter to be displayed.}
 
-\item{val_value}{A numeric value specifying the value of the parameter to
-be displayed.}
+\item{val_value}{A numeric value that specifies the value of the parameter
+to be displayed.}
 
-\item{val_unit}{A character string specifying the text following the value
-of the parameter to be displayed.}
+\item{val_unit}{A character string that specifies the text following the
+value of the parameter to be displayed.}
 
-\item{val_sf}{A positive integer specifying the number of significant
+\item{val_sf}{A positive integer that specifies the number of significant
 figures for the display of the limit.}
 
 \item{prefix}{A character string at the beginning of the whole text. The
@@ -43,6 +43,7 @@ is used. For concatenation of the various elements, the
 is used.
 }
 \seealso{
+\code{\link{get_text_annotation}}, \code{\link{get_n_whole_part}},
 \code{\link[base]{formatC}}, \code{\link[base]{paste}}.
 }
 \keyword{internal}

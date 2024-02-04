@@ -18,9 +18,9 @@ res1 <-
 # function. This function does not produce any output but returns a
 # 'plot_expirest_wisle' object.
 gg1 <- plot_expirest_wisle(
-  model = res1, rl_index = 1, show_grouping = "no",
-  response_vbl_unit = "%", y_range = c(93, 107), x_range = NULL,
-  scenario = "standard", plot_option = "full", ci_app = "line")
+  model = res1, rl_index = 1, response_vbl_unit = "%", x_range = NULL,
+  y_range = c(93, 105), scenario = "standard", mtbs = "verified",
+  plot_option = "full", ci_app = "line")
 gg2 <- plot(gg1)
 
 # The plot() function returns the 'plot_expirest_wisle' object invisibly.

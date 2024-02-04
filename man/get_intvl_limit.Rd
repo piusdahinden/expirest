@@ -19,21 +19,21 @@ confidence or prediction interval limit(s) should be calculated.}
 
 \item{model}{A linear model object of type \sQuote{\code{lm}}.}
 
-\item{alpha}{A numeric value between 0 and 1 specifying the significance
+\item{alpha}{A numeric value between 0 and 1 that specifies the significance
 level for the calculation of confidence or prediction intervals. The
 default is \code{0.05}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
-\code{"prediction"}, i.e. specifying the type of interval of interest.
+\code{"prediction"} that specifies the type of interval of interest.
 The default is \code{"confidence"}.}
 
-\item{ivl_type}{A character string specifying if a \dQuote{one sided} or
-a \dQuote{two sided} interval should be calculated, i.e. either
+\item{ivl_type}{A character string that specifies if a \dQuote{one sided}
+or a \dQuote{two sided} interval should be calculated, i.e. either
 \code{"one.sided"} or \code{"two.sided"}, respectively. The default is
 \code{"one.sided"}.}
 
-\item{ivl_side}{A character string specifying if the specification limit,
-given that the limit has only one side, is an \dQuote{upper} or a
+\item{ivl_side}{A character string that specifies if the specification
+limit, given that the limit has only one side, is an \dQuote{upper} or a
 \dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
 \code{"lower"}, respectively. The default is \code{"lower"}. If the
 specification has two boundaries, then this parameter specifies the
@@ -41,7 +41,7 @@ preferred side. If no side is preferred over the other, \code{"both"} can
 be used.}
 }
 \value{
-A numeric value or, if the model contained a categorical variable,
+A numeric value or, if \code{model} contains a categorical variable,
 a numeric vector of the predicted upper or lower confidence or prediction
 interval limit(s) at a given value of \eqn{x}.
 }

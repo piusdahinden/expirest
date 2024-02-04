@@ -14,14 +14,14 @@ has a sub-list of the same length as the number of intercepts. And each
 of these elements has a sub-sub-list of the same length as the number of
 release limits (\code{rl}).}
 
-\item{element}{A character string specifying the element to be extracted,
+\item{element}{A character string that specifies the element to be extracted,
 i.e. either one of  \code{"delta.lim"}, \code{"delta.lim.orig"},
 \code{"wcs.lim"} or \code{"wcs.lim.orig"}.}
 }
 \value{
 A list of the same length as \code{ll_wcsl} is returned. The
 individual elements of the list are matrices of the values specified by
-\code{element} that have been extracted from \code{x}.
+\code{element} that have been extracted from \code{ll}.
 }
 \description{
 The function \code{extract_from_ll_wcsl()} extracts specific elements from

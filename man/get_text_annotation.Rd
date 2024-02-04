@@ -22,28 +22,28 @@ get_text_annotation(
 )
 }
 \arguments{
-\item{rvu}{A character string specifying the unit associated with the
+\item{rvu}{A character string that specifies the unit associated with the
 response variable.}
 
-\item{x_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the time variable to be plotted.}
+\item{x_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the time variable to be plotted.}
 
-\item{y_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the response variable to be plotted.}
+\item{y_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the response variable to be plotted.}
 
-\item{sl}{A numeric value or a numeric vector of length \code{2} specifying
-the specification limit or limits.}
+\item{sl}{A numeric value or a numeric vector of length \code{2} that
+specifies the specification limit or limits.}
 
-\item{sl_sf}{A positive integer or a vector of positive integers specifying
-the number of \dQuote{significant figures} (sf) of \code{sl}.}
+\item{sl_sf}{A positive integer or a vector of positive integers that
+specifies the number of \dQuote{significant figures} (sf) of \code{sl}.}
 
 \item{poi_model}{Point of intersection (POI) with the upper or lower
 confidence or prediction interval of the most appropriate model according
 to the ICH Q1E guideline.}
 
-\item{ivl_side}{A character string specifying if the \dQuote{upper} or the
-\dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-\code{"lower"}, respectively.}
+\item{ivl_side}{A character string that specifies if the \dQuote{upper} or
+the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
+or \code{"lower"}, respectively.}
 
 \item{poi_woca}{Point of intersection (POI) with the upper or lower
 confidence or prediction interval of the linear regression model
@@ -58,24 +58,26 @@ values. The default is \code{NULL}.}
 \item{wc_icpt}{A data frame of the worst case intercepts of each of the
 four fitted models. The default is \code{NULL}.}
 
-\item{rl_sf}{A positive integer or a vector of positive integers specifying
-the number of \dQuote{significant figures} (sf) of \code{rl}. The default
-is \code{NULL}.}
+\item{rl_sf}{A positive integer or a vector of positive integers that
+specifies the number of \dQuote{significant figures} (sf) of \code{rl}.
+The default is \code{NULL}.}
 
-\item{rl_index}{A positive integer specifying which of the release limit
+\item{rl_index}{A positive integer that specifies which of the release limit
 values that have been handed over to \code{\link{expirest_wisle}()} should
 be displayed. The default is \code{NULL}.}
 
-\item{wcsl_model_name}{A character string specifying the name of the
+\item{wcsl_model_name}{A character string that specifies the name of the
 model with the worst case scenario limit. The default is \code{NULL}.}
 
-\item{plot_option}{A character string of either \code{"full"},
+\item{plot_option}{A character string of either \code{"full"}, \code{"lean"},
 \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
-specifying if additional information should be shown in the plot (option
-\code{"full"}) or only basic information (options \code{"lean"} and
-\code{"basic"}). Full means the data points, the fitted regression line
-with the confidence or prediction interval, the specification limit(s)
-and the estimated shelf life. The default is \code{"full"}.}
+that specifies if additional information should be shown in the plot
+(option \code{"full"}) or only basic information (options \code{"lean"}
+and \code{"basic"}). Full means the data points, the fitted regression
+line with the confidence or prediction interval, the specification
+limit(s) and the estimated shelf life. For \sQuote{expirest_osle} objects,
+only the options \code{"full"} and \code{"lean"} are relevant. The default
+is \code{"full"}.}
 }
 \value{
 A data frame with the columns Time, Response, Label and Colour
@@ -95,6 +97,7 @@ the function prepares a data frame that can be handed over to the
 }
 \seealso{
 \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
-  \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+\code{\link{print_val}}, \code{\link[ggplot2]{ggplot}},
+\code{\link[ggplot2]{geom_text}}.
 }
 \keyword{internal}

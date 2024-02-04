@@ -8,14 +8,14 @@ extract_wc_x(l1, l2)
 }
 \arguments{
 \item{l1}{A list of matrices of \eqn{x} values or a list of lists of one
-element being a numeric vector. The list must have four elements named
+vectors of \eqn{x} values. The list must have four elements named
 \code{"cics"}, \code{"dics"}, \code{"dids.pmse"} and \code{"dids"}.}
 
-\item{l2}{A list of vectors of indices which specify the worst case elements.
-As \code{l1}, the list must have four elements named \code{"cics"},
-\code{"dics"}, \code{"dids.pmse"} and \code{"dids"}. The length of the
-vectors of \code{l2} must be equal to the number of rows of the matrices
-in \code{l1} or the length of the vectors of the list elements.}
+\item{l2}{A list of vectors of indices. As \code{l1}, the list must have
+four elements named \code{"cics"}, \code{"dics"}, \code{"dids.pmse"} and
+\code{"dids"}. The length of the vectors of \code{l2} must be equal to
+the number of rows of the matrices in \code{l1} or the length of the
+vectors in \code{l1}.}
 }
 \value{
 A matrix of the worst case values with the number of rows
@@ -28,9 +28,9 @@ from a list of matrices of possible \eqn{x} values based on a list of
 vectors of indices which specify the worst case elements.
 }
 \details{
-Information from a list of matrices of values or list of list of
-one vector by aid of a list of vectors of indices which specify which
-elements in row of each matrix or which elements of the vectors are the
-worst case elements.
+Information from a list of matrices or a list of lists of vectors
+is extracted by aid of a list of vectors of indices which specify which
+elements per row of each matrix or which elements of the vectors have to
+be returned.
 }
 \keyword{internal}

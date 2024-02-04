@@ -24,8 +24,11 @@ res1$POI
 # [1] "cics"
 
 # Expected results in res1$POI
-#     cics     dics     dids
-# 26.22410 24.80030 23.34184
+#     cics      dics dids.pmse      dids
+# 26.22410  24.80030  23.66724  23.34184
+# attr(,"side")
+#     cics      dics dids.pmse      dids
+#  "lower"   "lower"   "lower"   "lower"
 
 res2 <-
   expirest_osle(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
@@ -43,8 +46,11 @@ res2$POI
 # [1] "dids"
 
 # Expected results in res2$POI
-#     cics     dics     dids
-# 28.12518 22.47939 15.96453
+#     cics      dics dids.pmse      dids
+# 28.12518  22.47939  15.72348  15.96453
+# attr(,"side")
+#     cics      dics dids.pmse      dids
+#  "lower"   "lower"   "lower"   "lower"
 
 # Moisture stability data (% (w/w)) of three batches of a drug product obtained
 # over a 24 months period:
@@ -66,8 +72,11 @@ res3 <-
 res3$POI
 
 # (Expected) results in res3$POI
-# cics dics dids
-#   NA   NA   NA
+#    cics      dics dids.pmse      dids
+#     NA        NA        NA        NA
+# attr(,"side")
+#    cics      dics dids.pmse      dids
+# "lower"   "lower"   "lower"   "lower"
 
 # Estimation may also fail because of an inappropriate 'srch-range' setting.
 res4 <-
@@ -77,5 +86,8 @@ res4 <-
 res4$POI
 
 # (Expected) results in res4$POI
-# cics dics dids
-#   NA   NA   NA
+#    cics      dics dids.pmse      dids
+#     NA        NA        NA        NA
+# attr(,"side")
+#    cics      dics dids.pmse      dids
+# "lower"   "lower"   "lower"   "lower"
