@@ -48,7 +48,7 @@ test_that("get_text_annotation_succeeds", {
   expect_equal(d_res$Label,
                c("LSL: 94.95 mg/kg", "USL: 105.04 mg/kg", "98.405 mg/kg ",
                  "100.45 mg/kg",
-                 "7.5\n(worst case scenario)", "23.7\n(standard scenario)",
+                 "7.5\n(worst case\nscenario)", "23.7\n(standard\nscenario)",
                  "LRL: 96.995 mg/kg"))
   expect_equal(d_res$Colour,
                c("black", "black", "red", "royalblue", "forestgreen",
@@ -229,15 +229,7 @@ test_that("get_text_annotation_fails", {
                         wisle_est = re[["POI"]], wc_icpt = "100",
                         rl_sf = rl_sf, rl_index = rl_index,
                         wcsl_model_name = wcsl_mn, plot_option = "full"),
-    "wc_icpt must be a numeric")
-  expect_error(
-    get_text_annotation(rvu = " mg/kg", x_range = x_range, y_range = y_range,
-                        sl = sl, sl_sf = sl_sf, poi_model = poi_model,
-                        ivl_side = ivl_side, poi_woca = poi_woca,
-                        wisle_est = re[["POI"]], wc_icpt = c(100, 101),
-                        rl_sf = rl_sf, rl_index = rl_index,
-                        wcsl_model_name = wcsl_mn, plot_option = "full"),
-    "wc_icpt must be a numeric of length 1")
+    "wc_icpt must be a numeric vector")
   expect_error(
     get_text_annotation(rvu = " mg/kg", x_range = x_range, y_range = y_range,
                         sl = sl, sl_sf = sl_sf, poi_model = poi_model,

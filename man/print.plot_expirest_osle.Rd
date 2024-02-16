@@ -51,9 +51,8 @@ res1 <-
 # function. This function does not produce any output but returns a
 # 'plot_expirest_osle' object.
 gg1 <- plot_expirest_osle(
-  model = res1, show_grouping = "no", response_vbl_unit = "\%",
-  y_range = c(93, 107), x_range = NULL, plot_option = "full",
-  ci_app = "line")
+  model = res1, response_vbl_unit = "\%", x_range = NULL, y_range = c(93, 105),
+  mtbs = "verified", plot_option = "full", ci_app = "line")
 gg2 <- print(gg1)
 
 # The print() function returns the 'plot_expirest_osle' object invisibly.

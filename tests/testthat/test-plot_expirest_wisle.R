@@ -31,6 +31,14 @@ test_that("plot_expirest_wisle_succeeds", {
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
+  re5 <-
+    expirest_wisle(
+      data = exp2, response_vbl = "Related", time_vbl = "Month",
+      batch_vbl = "Batch", rl = seq(0.06, 0.18, 0.02), rl_sf = rep(3, 7),
+      sl = 0.3, sl_sf = 2, srch_range = c(0, 500), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")
 
   # <-><-><-><->
 
@@ -106,6 +114,12 @@ test_that("plot_expirest_wisle_succeeds", {
       response_vbl_unit = "% (w/w)", y_range = NULL,
       x_range = NULL, scenario = "standard", mtbs = "verified",
       plot_option = "full", ci_app = "line"))
+    tmp8 <-
+      plot_expirest_wisle(
+        model = re5, rl_index = 7, show_grouping = "yes",
+        response_vbl_unit = "%", y_range = c(-0.01, 0.50),
+        x_range = NULL, scenario = "standard", mtbs = "verified",
+        plot_option = "full", ci_app = "ribbon")
 
   # <-><-><-><->
 
@@ -118,7 +132,7 @@ test_that("plot_expirest_wisle_succeeds", {
                c(0.35000, 0.29822, 0.11222, 0.39000, 0.39000, 0.16400))
   expect_equal(tmp1[["text"]][, "Label"],
                c("USL: 0.340%", "0.2982% ", "0.1122% ",
-                 "15.7\n(worst case scenario)", "19.0\n(standard scenario)",
+                 "15.7\n(worst case\nscenario)", "19.0\n(standard\nscenario)",
                  "URL: 0.1540%"))
   expect_equal(tmp1[["text"]][, "Colour"],
                c("black", "red", "royalblue", "forestgreen", "grey50", "grey0"))
@@ -172,7 +186,7 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(tmp2[["text"]][, "Label"],
                c("LSL: 94.95 mg/kg", "USL: 105.04 mg/kg", "98.405 mg/kg ",
                  "100.45 mg/kg",
-                 "7.5\n(worst case scenario)", "23.7\n(standard scenario)",
+                 "7.5\n(worst case\nscenario)", "23.7\n(standard\nscenario)",
                  "LRL: 96.995 mg/kg"))
   expect_equal(tmp2[["text"]][, "Colour"],
                c("black", "black", "red", "royalblue", "forestgreen",
@@ -220,7 +234,7 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_length(tmp3stsc[["Graph"]]$labels, 11)
   expect_equal(tmp3stsc[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "98.405 ", "100.45",
-                 "7.5\n(worst case scenario)", "23.7\n(standard scenario)",
+                 "7.5\n(worst case\nscenario)", "23.7\n(standard\nscenario)",
                  "LRL: 96.995"))
   expect_equal(signif(tmp3stsc[["text"]][, "Month"], 5),
                c(29.000, 29.0000, 0.00000, 0.00000, 7.5187, 23.698, 29.000))
@@ -228,7 +242,7 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_length(tmp3wcsc[["Graph"]]$labels, 11)
   expect_equal(tmp3wcsc[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "98.405 ", "100.45",
-                 "7.5\n(worst case scenario)", "23.7\n(standard scenario)",
+                 "7.5\n(worst case\nscenario)", "23.7\n(standard\nscenario)",
                  "LRL: 96.995"))
   expect_equal(signif(tmp3wcsc[["text"]][, "Month"], 5),
                c(10.000, 10.0000, 0.00000, 0.00000, 7.5187, 23.698, 10.000))
@@ -236,12 +250,12 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_length(tmp4[["Graph"]]$labels, 8)
   expect_equal(tmp4[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
-                 "8.3\n(worst case scenario)", "30.2\n(standard scenario)",
+                 "8.3\n(worst case\nscenario)", "30.2\n(standard\nscenario)",
                  "LRL: 96.995"))
   expect_length(tmp4l1[["Graph"]]$labels, 8)
   expect_equal(tmp4l1[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
-                 "8.3\n(worst case scenario)", "30.2\n(standard scenario)",
+                 "8.3\n(worst case\nscenario)", "30.2\n(standard\nscenario)",
                  "LRL: 96.995"))
   expect_length(tmp4l2[["Graph"]]$labels, 8)
   expect_equal(tmp4l2[["text"]][, "Label"],
@@ -250,12 +264,12 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_length(tmp4b1[["Graph"]]$labels, 5)
   expect_equal(tmp4b1[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
-                 "8.3\n(worst case scenario)", "30.2\n(standard scenario)",
+                 "8.3\n(worst case\nscenario)", "30.2\n(standard\nscenario)",
                  "LRL: 96.995"))
   expect_length(tmp4b2[["Graph"]]$labels, 5)
   expect_equal(tmp4b2[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
-                 "8.3\n(worst case scenario)", "30.2\n(standard scenario)",
+                 "8.3\n(worst case\nscenario)", "30.2\n(standard\nscenario)",
                  "LRL: 96.995"))
 
   expect_equal(signif(tmp5[["text"]][, "Month"], 5),
@@ -265,7 +279,7 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(tmp5[["text"]][, "Label"],
                c("LSL: 0.5% (w/w)", "USL: 4.5% (w/w)", "3.96% (w/w) ",
                  "2.46% (w/w)",
-                 "72.5\n(worst case scenario)", "96.3\n(standard scenario)",
+                 "72.5\n(worst case\nscenario)", "96.3\n(standard\nscenario)",
                  "URL: 3.00% (w/w)"))
   expect_equal(tmp5[["text"]][, "Colour"],
                c("black", "black", "red", "royalblue", "forestgreen",
@@ -316,7 +330,7 @@ test_that("plot_expirest_wisle_succeeds", {
                c(1.4000, 0.95678, 2.4568, 1.0000, 1.0000, 2.9000))
   expect_equal(tmp6[["text"]][, "Label"],
                c("LSL: 1.5% (w/w)", "0.957% (w/w) ", "2.46% (w/w) ",
-                 "90.5\n(worst case scenario)", "60.8\n(standard scenario)",
+                 "90.5\n(worst case\nscenario)", "60.8\n(standard\nscenario)",
                  "LRL: 3.00% (w/w)"))
   expect_equal(tmp6[["text"]][, "Colour"],
                c("black", "red", "royalblue", "forestgreen",
@@ -367,7 +381,7 @@ test_that("plot_expirest_wisle_succeeds", {
                c(1.4000, 0.95678, 2.4568, 1.0000, 1.0000, 2.9000))
   expect_equal(tmp7[["text"]][, "Label"],
                c("LSL: 1.5% (w/w)", "0.957% (w/w) ", "2.46% (w/w) ",
-                 "90.5\n(worst case scenario)", "60.8\n(standard scenario)",
+                 "90.5\n(worst case\nscenario)", "60.8\n(standard\nscenario)",
                  "LRL: 3.00% (w/w)"))
   expect_equal(tmp7[["text"]][, "Colour"],
                c("black", "red", "royalblue", "forestgreen",
@@ -411,6 +425,57 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(tmp7[["arrow"]][1, "Curvature"], 0.5)
   expect_equal(tmp7[["arrow"]][1, "Angle"], 90)
   expect_equal(tmp7[["arrow"]][1, "Length"], 7)
+
+  expect_equal(signif(tmp8[["text"]][, "Month"], 5),
+               c(20.000,  0.00000,  0.00000, 10.303, 15.845, 20.000))
+  expect_equal(signif(tmp8[["text"]][, "Related"], 5),
+               c(0.31000, 0.23222, 0.11222, 0.35000, 0.35000, 0.19000))
+  expect_equal(tmp8[["text"]][, "Label"],
+               c("USL: 0.30%", "0.232% ", "0.112% " ,
+                 "10.3\n(worst case\nscenario)", "15.8\n(standard\nscenario)",
+                 "URL: 0.180%"))
+  expect_equal(tmp8[["text"]][, "Colour"],
+               c("black", "red", "royalblue", "forestgreen",
+                 "grey50", "grey0"))
+
+  expect_equal(tmp8[["hlines"]][, "Related"], 0.30)
+  expect_equal(tmp8[["hlines"]][, "Item"], "USL")
+  expect_equal(tmp8[["hlines"]][, "Colour"], "black")
+  expect_equal(tmp8[["hlines"]][, "Type"], "dotted")
+
+  expect_equal(signif(tmp8[["vlines"]][, "Month"], 5), c(10.303, 15.845))
+  expect_equal(tmp8[["vlines"]][, "Item"], c("poi.woca", "poi.model"))
+  expect_equal(tmp8[["vlines"]][, "Colour"], c("forestgreen", "grey50"))
+  expect_equal(tmp8[["vlines"]][, "Type"], c("dashed", "dotdash"))
+
+  expect_equal(signif(tmp8[["segments"]][, "Month.1"], 5),
+               c(0.00000, 0.00000, -0.33333, -0.11111))
+  expect_equal(signif(tmp8[["segments"]][, "Month.2"], 5),
+               c(10.303, 20.000, -0.33333, -0.11111))
+  expect_equal(signif(tmp8[["segments"]][, "Related.1"], 5),
+               c(0.23222, 0.18000, 0.30000, 0.23222))
+  expect_equal(signif(tmp8[["segments"]][, "Related.2"], 5),
+               c(0.23222, 0.18000, 0.18000, 0.11222))
+  expect_equal(tmp8[["segments"]][, "Item"],
+               c("x.delta", "x.delta.shifted", "y.delta", "y.delta.shifted"))
+  expect_equal(tmp8[["segments"]][, "Colour"],
+               c("red", "grey0", "grey50", "grey50"))
+  expect_equal(tmp8[["segments"]][, "Type"],
+               c("dashed", "dotted", "solid", "solid"))
+  expect_equal(tmp8[["segments"]][, "Size"], c(0.5, 0.5, 1.0, 1.0))
+
+  expect_equal(signif(tmp8[["arrow"]][, "Month.1"], 5), -0.11111)
+  expect_equal(signif(tmp8[["arrow"]][, "Month.2"], 5), -0.5)
+  expect_equal(signif(tmp8[["arrow"]][, "Related.1"], 5), 0.17222)
+  expect_equal(signif(tmp8[["arrow"]][, "Related.2"], 5), 0.24000)
+  expect_equal(tmp8[["arrow"]][1, "Item"], "arrow")
+  expect_equal(tmp8[["arrow"]][1, "Colour"], "grey50")
+  expect_equal(tmp8[["arrow"]][1, "Line.Type"], "solid")
+  expect_equal(tmp8[["arrow"]][1, "Arrow.Type"], "closed")
+  expect_equal(tmp8[["arrow"]][1, "Size"], 0.5)
+  expect_equal(tmp8[["arrow"]][1, "Curvature"], -0.5)
+  expect_equal(tmp8[["arrow"]][1, "Angle"], 90)
+  expect_equal(tmp8[["arrow"]][1, "Length"], 5)
 })
 
 test_that("plot_expirest_wisle_succeeds_with_transformations", {

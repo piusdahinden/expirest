@@ -248,7 +248,6 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
                   ivl_side = "lower")
 
   r_mod <- stats::lm(Conc ~ Month * Batch, data = exp4)
-  usl <- 105
   lsl <- 95
 
   tmp <- find_poi(srch_range = c(0, 500), model = r_mod, sl = lsl,

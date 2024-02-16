@@ -3125,8 +3125,8 @@ get_text_annotation <- function(rvu, x_range, y_range, sl, sl_sf, poi_model,
     }
   }
   if (!is.null(wc_icpt)) {
-    if (!is.numeric(wc_icpt) || length(wc_icpt) > 1) {
-      stop("The parameter wc_icpt must be a numeric of length 1.")
+    if (!is.numeric(wc_icpt)) {
+      stop("The parameter wc_icpt must be a numeric vector.")
     }
   }
   if (!is.null(rl_sf) && !is.null(wisle_est)) {
@@ -3253,13 +3253,13 @@ get_text_annotation <- function(rvu, x_range, y_range, sl, sl_sf, poi_model,
                                    get_n_whole_part(poi_woca) + 1),
                          print_val("", poi_woca, "",
                                    get_n_whole_part(poi_woca) + 1,
-                                   suffix = "\n(worst case scenario)")),
+                                   suffix = "\n(worst case\nscenario)")),
                   ifelse(plot_option %in% "lean2",
                          print_val("", poi_model, "",
                                    get_n_whole_part(poi_model) + 1),
                          print_val("", poi_model, "",
                                    get_n_whole_part(poi_model) + 1,
-                                   suffix = "\n(standard scenario)"))),
+                                   suffix = "\n(standard\nscenario)"))),
         Colour = c("black", "black", "red", "royalblue", "forestgreen",
                    "grey50"),
         stringsAsFactors = FALSE)
@@ -3313,13 +3313,13 @@ get_text_annotation <- function(rvu, x_range, y_range, sl, sl_sf, poi_model,
                                       get_n_whole_part(poi_woca) + 1),
                             print_val("", poi_woca, "",
                                       get_n_whole_part(poi_woca) + 1,
-                                      suffix = "\n(worst case scenario)")),
+                                      suffix = "\n(worst case\nscenario)")),
                      ifelse(plot_option %in% "lean2",
                             print_val("", poi_model, "",
                                       get_n_whole_part(poi_model) + 1),
                             print_val("", poi_model, "",
                                       get_n_whole_part(poi_model) + 1,
-                                      suffix = "\n(standard scenario)")),
+                                      suffix = "\n(standard\nscenario)")),
                      print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
                                rl_sf[rl_index])),
                  Colour = c("black", "red", "royalblue", "forestgreen",
@@ -3347,13 +3347,13 @@ get_text_annotation <- function(rvu, x_range, y_range, sl, sl_sf, poi_model,
                                       get_n_whole_part(poi_woca) + 1),
                             print_val("", poi_woca, "",
                                       get_n_whole_part(poi_woca) + 1,
-                                      suffix = "\n(worst case scenario)")),
+                                      suffix = "\n(worst case\nscenario)")),
                      ifelse(plot_option %in% "lean2",
                             print_val("", poi_model, "",
                                       get_n_whole_part(poi_model) + 1),
                             print_val("", poi_model, "",
                                       get_n_whole_part(poi_model) + 1,
-                                      suffix = "\n(standard scenario)")),
+                                      suffix = "\n(standard\nscenario)")),
                      print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
                                rl_sf[rl_index])),
                  Colour = c("black", "red", "royalblue", "forestgreen",
@@ -3501,8 +3501,8 @@ get_segments <- function(sl, ivl_side, wisle_est, rl, rl_index, poi_woca,
   if (!is.numeric(poi_woca) && !is.na(poi_woca) || length(poi_woca) > 1) {
     stop("The parameter poi_woca must be a numeric of length 1.")
   }
-  if (!is.numeric(wc_icpt) || length(wc_icpt) > 1) {
-    stop("The parameter wc_icpt must be a numeric of length 1.")
+  if (!is.numeric(wc_icpt)) {
+    stop("The parameter wc_icpt must be a numeric vector.")
   }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {
@@ -3652,8 +3652,8 @@ get_arrow <- function(sl, ivl_side, wisle_est, rl, rl_index,
     stop("The parameter rl_index must be between 1 and the number of rows ",
          "of the parameter wisle_est.")
   }
-  if (!is.numeric(wc_icpt) || length(wc_icpt) > 1) {
-    stop("The parameter wc_icpt must be a numeric of length 1.")
+  if (!is.numeric(wc_icpt)) {
+    stop("The parameter wc_icpt must be a numeric vector.")
   }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {

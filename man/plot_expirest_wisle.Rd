@@ -129,9 +129,9 @@ res1 <-
 # object that is essentially an 'expirest_wisle' object augmented by a 'ggplot'
 # object.
 gg1 <- plot_expirest_wisle(
-  model = res1, rl_index = 1, show_grouping = "no",
-  response_vbl_unit = "\%", y_range = c(93, 107), x_range = NULL,
-  scenario = "standard", plot_option = "full", ci_app = "line")
+  model = res1, rl_index = 1, response_vbl_unit = "\%", x_range = NULL,
+  y_range = c(93, 105), scenario = "standard", mtbs = "verified",
+  plot_option = "full", ci_app = "line")
 gg1
 
 # Since the element gg1$Graph is a 'ggplot' object it can be used for further
@@ -144,13 +144,6 @@ if (requireNamespace("ggplot2")) {
     scale_x_continuous(limits = c(-5, 31), breaks = seq(0, 30, 6))
 }
 
-# Illustration of the grouping
-gg2 <- plot_expirest_wisle(
-  model = res1, rl_index = 1, show_grouping = "yes",
-  response_vbl_unit = "\%", y_range = c(93, 107), x_range = NULL,
-  scenario = "standard", plot_option = "full", ci_app = "line")
-gg2
-
 # Repeat this for a different intercept / different slope (dids) model.
 res2 <-
   expirest_wisle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
@@ -158,10 +151,22 @@ res2 <-
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
                  sl_sf = 3, srch_range = c(0, 500))
 
+gg2 <- plot_expirest_wisle(
+  model = res2, rl_index = 1, response_vbl_unit = "\%", x_range = c(0, 26),
+  y_range = c(89, 107),  scenario = "standard",  mtbs = "verified",
+  plot_option = "full", ci_app = "ribbon")
+gg2
+
+# In case of different intercept / different slope models, individually fit
+# linear models are shown by default, i.e. with the 'mtbs' parameter set
+# as "verified". To get the different intercept / different slope model
+# displayed where the mean square error is pooled across batches, i.e. the
+# dids.pmse model, the 'mtbs' parameter has to be set accordingly.
+
 gg3 <- plot_expirest_wisle(
-  model = res2, rl_index = 1, show_grouping = "yes",
-  response_vbl_unit = "\%", y_range = c(89, 107), x_range = c(0, 26),
-  scenario = "standard", plot_option = "full", ci_app = "ribbon")
+  model = res2, rl_index = 1, response_vbl_unit = "\%", x_range = c(0, 26),
+  y_range = c(89, 107),  scenario = "standard",  mtbs = "dids.pmse",
+  plot_option = "full", ci_app = "ribbon")
 gg3
 }
 \seealso{

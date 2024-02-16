@@ -309,8 +309,8 @@ test_that("plot.plot_expirest_wisle_succeeds", {
   expect_s3_class(ggre1_2$Graph, c("gg", "ggplot"))
   expect_equal(
     ggre1_2$Graph$layers[[6]]$aes_params$label,
-    c("USL: 0.340%", "0.2982% ", "0.1122% ", "15.7\n(worst case scenario)",
-      "19.0\n(standard scenario)", "URL: 0.1540%"))
+    c("USL: 0.340%", "0.2982% ", "0.1122% ", "15.7\n(worst case\nscenario)",
+      "19.0\n(standard\nscenario)", "URL: 0.1540%"))
 })
 
 test_that("print.plot_expirest_wisle_succeeds", {
@@ -339,6 +339,6 @@ test_that("print.plot_expirest_wisle_succeeds", {
   expect_s3_class(ggre1_2$Graph, c("gg", "ggplot"))
   expect_equal(
     ggre1_2$Graph$layers[[6]]$aes_params$label,
-    c("USL: 0.340%", "0.2982% ", "0.1122% ", "15.7\n(worst case scenario)",
-      "19.0\n(standard scenario)", "URL: 0.1540%"))
+    c("USL: 0.340%", "0.2982% ", "0.1122% ", "15.7\n(worst case\nscenario)",
+      "19.0\n(standard\nscenario)", "URL: 0.1540%"))
 })

@@ -82,6 +82,61 @@ test_that("expirest_wisle_estimation_succeeds_for_poi", {
                  28.4323876929, NA, 31.149707448336, NA))
 })
 
+test_that("expirest_wisle_estimation_succeeds_with_multiple_rl", {
+  re <-
+    expirest_wisle(
+      data = exp2, response_vbl = "Related", time_vbl = "Month",
+      batch_vbl = "Batch", rl = seq(0.06, 0.18, 0.02), rl_sf = rep(3, 7),
+      sl = 0.3, sl_sf = 2, srch_range = c(0, 500), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")[["POI"]]
+
+  # <-><-><-><->
+
+  expect_equal(signif(re[, "Intercept.cics"], 12), rep(0.103507214947, 7))
+  expect_equal(signif(re[, "Intercept.dics"], 12), rep(0.135353267317, 7))
+  expect_equal(signif(re[, "Intercept.dids"], 12), rep(0.112218750000, 7))
+  expect_equal(signif(re[, "Intercept.dids.pmse"], 12),
+               c(rep(0.112218750000, 6), 0.126543831957))
+  expect_equal(signif(re[, "Delta.cics"], 2),
+               c(0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12))
+  expect_equal(signif(re[, "Delta.dics"], 2),
+               c(0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12))
+  expect_equal(signif(re[, "Delta.dids"], 2),
+               c(0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12))
+  expect_equal(signif(re[, "Delta.dids.pmse"], 2),
+               c(0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12))
+  expect_equal(signif(re[, "WCSL.cics"], 12),
+               c(0.343507214947, 0.323507214947, 0.303507214947, 0.283507214947,
+                 0.263507214947, 0.243507214947, 0.223507214947))
+  expect_equal(signif(re[, "WCSL.dics"], 12),
+               c(0.375353267317, 0.355353267317, 0.335353267317, 0.315353267317,
+                 0.295353267317, 0.275353267317, 0.255353267317))
+  expect_equal(signif(re[, "WCSL.dids"], 12),
+               c(0.352218750000, 0.332218750000, 0.312218750000, 0.292218750000,
+                 0.272218750000, 0.252218750000, 0.232218750000))
+  expect_equal(signif(re[, "WCSL.dids.pmse"], 12),
+               c(0.352218750000, 0.332218750000, 0.312218750000, 0.292218750000,
+                 0.272218750000, 0.252218750000, 0.246543831957))
+  expect_equal(signif(re[, "Shelf.Life.cics"], 12),
+               c(33.7023497447, 31.0532056728, 28.3929462116, 25.7169240050,
+                 23.0173720770, 20.2808184067, 17.4818579854))
+  expect_equal(signif(re[, "Shelf.Life.dics"], 12),
+               c(32.8209904768, 30.0399757667, 27.2465732221, 24.4371980849,
+                 21.6069843973, 18.7493384428, 15.8554616662))
+  expect_equal(signif(re[, "Shelf.Life.dids"], 12),
+               c(19.9814248519, 18.4029062578, 16.8177772438, 15.2229638050,
+                 13.6133111973, 11.9793567488, 10.3030302984))
+  expect_equal(signif(re[, "Shelf.Life.dids.pmse"], 12),
+               c(19.6600800851, 18.1137833890, 16.5601981827, 14.9959803788,
+                 13.4153149598, 11.8078402523, 11.3444065974))
+  expect_equal(signif(re[, "POI.Model.cics"], 12), rep(27.9249797381, 7))
+  expect_equal(signif(re[, "POI.Model.dics"], 12), rep(22.2667191569, 7))
+  expect_equal(signif(re[, "POI.Model.dids"], 12), rep(15.8448655130, 7))
+  expect_equal(signif(re[, "POI.Model.dids.pmse"], 12), rep(15.6061043981, 7))
+})
+
 test_that("expirest_wisle_estimation_succeeds_with_transformations", {
   tmp <- rep(NA, 7)
 
@@ -236,7 +291,6 @@ test_that("expirest_wisle_estimation_succeeds_for_model_type", {
   t_dat2 <- exp1[exp1$Batch %in% c("b3", "b4", "b5"), ]
   t_dat3 <- exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]
 
-  usl <- 105
   lsl <- 95
   lrl <- 98
 
@@ -280,7 +334,6 @@ test_that("expirest_wisle_estimation_succeeds_for_model_type", {
 })
 
 test_that("expirest_wisle_warns", {
-  usl <- 3.5
   lsl <- 1.5
   lrl <- 2.0
 
@@ -305,9 +358,7 @@ test_that("expirest_wisle_warns", {
 })
 
 test_that("expirest_wisle_fails_with_warning_tight_spec_limits", {
-  usl <- 3.5
   lsl <- 1.5
-  url <- 3.0
   lrl <- 2.0
 
   tmp <- numeric(2)

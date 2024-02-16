@@ -189,14 +189,7 @@ test_that("get_segments_fails", {
                  wc_icpt = "100", x_range = x_range,
                  sl_model_name = sl_model_name,
                  wcsl_model_name = wcsl_model_name),
-    "wc_icpt must be a numeric")
-  expect_error(
-    get_segments(sl = sl, ivl_side = ivl_side, wisle_est = re[["POI"]],
-                 rl = rl, rl_index = rl_index, poi_woca = poi_woca,
-                 wc_icpt = c(100, 101), x_range = x_range,
-                 sl_model_name = sl_model_name,
-                 wcsl_model_name = wcsl_model_name),
-    "wc_icpt must be a numeric of length 1")
+    "wc_icpt must be a numeric vector")
   expect_error(
     get_segments(sl = sl, ivl_side = ivl_side, wisle_est = re[["POI"]],
                  rl = rl, rl_index = rl_index, poi_woca = poi_woca,
