@@ -8,6 +8,7 @@ str(exp1)
 # $ Potency: num  101 101.3 99.8 99.2 99.5 ...
 
 # Successful estimations
+# A model with common intercepts / common slopes (cics)
 res1 <-
   expirest_wisle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                  response_vbl = "Potency", time_vbl = "Month",
@@ -36,6 +37,7 @@ res1$POI
 #   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
 # 1        26.2241        24.8003       23.34184            23.66724
 
+# A model with different intercepts / different slopes (dids)
 res2 <-
   expirest_wisle(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
                  response_vbl = "Potency", time_vbl = "Month",
@@ -64,33 +66,66 @@ res2$POI
 #   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
 # 1       28.12518       22.47939       15.96453            15.72348
 
-# Unsuccessful estimation
+# Analysis with a single batch (i.e. the worst case batch of res2 above)
 res3 <-
-  expirest_wisle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
+  expirest_wisle(data = exp1[exp1$Batch == "b8", ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500), alpha = 1E-16)
+                 sl_sf = 3, srch_range = c(0, 500))
+res3$Model.Type
 res3$POI
+
+# Since only one batch is involved there is no model type. Nevertheless, the
+# result is reported under the dids model name.
+
+# Expected results in res3$Model.Type
+# $type.spec
+# common.icpt  common.slp
+#         NA           NA
+#
+# $type.acronym
+# [1] "n.a."
+
+# (Expected) results in res3$POI
+#   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
+# 1             NA             NA       101.2594                  NA         NA
+#   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
+# 1         NA          3              NA        NA        NA  98.25938
+#   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
+# 1             NA              95    94.95              98    97.95
+#   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
+# 1              NA              NA        7.619661                   NA
+#   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
+# 1             NA             NA       15.96453                  NA
+
+# Unsuccessful estimation
+# The interval does not cross the limit (i.e. not within srch_range).
+res4 <-
+  expirest_wisle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
+                 response_vbl = "Potency", time_vbl = "Month",
+                 batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 105,
+                 sl_sf = 4, srch_range = c(0, 500), ivl_side = "upper")
+res4$POI
 
 # (Expected) results in res3$POI
 #   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics
 # 1       100.5669             NA             NA                  NA          3
 #   Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
-# 1         NA         NA              NA  97.56688        NA        NA
+# 1         NA         NA              NA  107.5669        NA        NA
 #   WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
-# 1             NA              95    94.95              98    97.95
+# 1             NA             105   105.04              98    97.95
 #   Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
 # 1              NA              NA              NA                   NA
 #   POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
-# 1       14.42089       2.480635             NA                  NA
+# 1             NA             NA             NA                  NA
 
-# Estimation may also fail because of an inappropriate 'srch-range' setting.
-res4 <-
+# Estimation may also fail because of an inappropriate 'srch_range' setting.
+res5 <-
   expirest_wisle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
                  sl_sf = 3, srch_range = c(0, 5))
-res4$POI
+res5$POI
 
 # (Expected) results in res4$POI
 #   Intercept.cics Intercept.dics Intercept.dids Intercept.dids.pmse Delta.cics

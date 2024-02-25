@@ -4,74 +4,63 @@
 \alias{get_segments}
 \title{Prepare segments explaining graphical elements}
 \usage{
-get_segments(
-  sl,
-  ivl_side,
-  wisle_est,
-  rl,
-  rl_index,
-  poi_woca,
-  wc_icpt,
-  x_range,
-  sl_model_name,
-  wcsl_model_name
-)
+get_segments(model, x_range, rl_index, mtbs = "verified")
 }
 \arguments{
-\item{sl}{A numeric value or a numeric vector of length \code{2} that
-specifies the specification limit or limits.}
+\item{model}{An \sQuote{\code{expirest_osle}} or an
+\sQuote{\code{expirest_Wisle}} object, i.e. a list returned
+by the \code{\link{expirest_osle}()} or by the
+\code{\link{expirest_wisle}()} function.}
 
-\item{ivl_side}{A character string that specifies if the \dQuote{upper} or
-the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
-or \code{"lower"}, respectively.}
-
-\item{wisle_est}{A data frame of the intercepts, the differences between
-release and shelf life limits, the worst case scenario limits (WCSLs),
-the expiry and release specification limits, the shelf lives and POI
-values. The default is \code{NULL}.}
-
-\item{rl}{A numeric value or a numeric vector that specifies the release
-specification limit(s) for which the corresponding expiry should be
-estimated.}
+\item{x_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the time variable to be plotted.}
 
 \item{rl_index}{A positive integer that specifies which of the release limit
 values that have been handed over to \code{\link{expirest_wisle}()} should
 be displayed. The default is \code{NULL}.}
 
-\item{poi_woca}{Point of intersection (POI) with the upper or lower
-confidence or prediction interval of the linear regression model
-representing the worst case scenario (woca) model. The default is
-\code{NULL}.}
+\item{mtbs}{A character string that specifies the \dQuote{model to be shown},
+i.e. either \code{verified}, which is the default, or one of \code{cics},
+\code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
+is the model that was identified through the poolability check. It is
+thus also one of the possible optional models. The \code{dids} model
+represents the case where a separate model is fitted to the data of each
+individual batch while the \code{dids.pmse} model is the interaction
+model which includes the \eqn{batch} variable as main effect and in the
+interaction term with the \eqn{time} variable (\eqn{batch \times time}),
+i.e. a model where the mean square error is pooled across batches.}
 
-\item{wc_icpt}{A data frame of the worst case intercepts of each of the
-four fitted models. The default is \code{NULL}.}
-
-\item{x_range}{A numeric vector of the form \code{c(min, max)} that
-specifies the range of the time variable to be plotted.}
+\item{rl}{A numeric value or a numeric vector that specifies the release
+specification limit(s) for which the corresponding expiry should be
+estimated.}
 
 \item{sl_model_name}{A character string that specifies the name of the
 model with the shelf life limit of interest.}
-
-\item{wcsl_model_name}{A character string that specifies the name of the
-model with the worst case scenario limit. The default is \code{NULL}.}
 }
 \value{
-A data frame with the columns Time.1, Time.2, Response.1,
-Response.2, Item, Colour, Type, Size. Time.1 and Time.2 represent the
-maximal allowed difference over time from intercept and Response.1 and
-Response.2 represent the release limit.
+A data frame with the columns \sQuote{Time.1}, \sQuote{Time.2},
+\sQuote{Response.1}, \sQuote{Response.2}, Item, Colour, Type and Size is
+returned, where the column names \sQuote{Time.1}, \sQuote{Time.2},
+\sQuote{Response.1} and \sQuote{Response.2} are placeholders for the
+corresponding variable names. The items in the four rows represent the
+maximal allowed difference over time from the intercept (shown as red
+dashed horizontal line), the release limit (shown as black dotted horizontal
+line), the maximal allowed difference over time from the specification limit
+(shown as grey solid vertical line) and the maximal allowed difference over
+time from the intercept (shown as grey solid vertical line).
 }
 \description{
 The function \code{get_segments()} prepares a data frame for putting
-segments on a plot prepared by the \code{ggplot()} function from
-the \sQuote{\code{ggplot2}} package
+segments on a plot prepared by the \code{ggplot()} function from the
+\sQuote{\code{ggplot2}} package.
 }
 \details{
 The function \code{get_segments()} expects various pieces
 of information characterising an \sQuote{\code{expirest_osle}} or an
 \sQuote{\code{expirest_wisle}} model. Based on the information provided,
-the function prepares a data frame that can be handed over to the
-\code{geom_vline()} function from the \sQuote{\code{ggplot2}} package.
+the function prepares a data frame that that is used by the function
+\code{\link{plot_expirest_wisle}(})) to put line segments on the graph that
+is prepared by this function.
 }
 \seealso{
 \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},

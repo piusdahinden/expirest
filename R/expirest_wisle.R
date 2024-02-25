@@ -266,10 +266,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!is.numeric(shift)) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
   if (!(sf_option %in% c("tight", "loose"))) {
@@ -324,49 +321,37 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 
   d_dat <- r_ret[["Data"]]
 
-  if (sum(xform %in% "no") == 0) {
-    time_vbl <- r_ret[["Variables"]][["time"]]
-    response_vbl <- r_ret[["Variables"]][["response"]]
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      time_vbl <- r_ret[["Variables"]][["time"]]
-    }
-    if (xform[2] != "no") {
-      response_vbl <- r_ret[["Variables"]][["response"]]
-    }
-  }
-
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
 
   rel_lim <- get_relevant_limits(limits_list = r_ret[["Limits"]],
                                  xform = xform, ivl_side = ivl_side)
 
-  sl <- rel_lim[["sl"]]
-  rl <- rel_lim[["rl"]]
-
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Calculation of POI values for all models (according to ARGPM)
 
-  l_wisle <-
-    get_wisle_poi_list(icpt_list = r_ret[["Intercepts"]],
-                       model_list = r_ret[["Models"]], rl = rl, sl = sl,
-                       srch_range = srch_range, alpha = alpha,  xform = xform,
-                       shift = shift, ivl = ivl, ivl_type = ivl_type,
-                       ivl_side = ivl_side, ...)
+  l_wisle <- get_wisle_poi_list(icpt_list = r_ret[["Intercepts"]],
+                                model_list = r_ret[["Models"]],
+                                rl = rel_lim[["rl"]], sl = rel_lim[["sl"]],
+                                srch_range = srch_range, alpha = alpha,
+                                xform = xform, shift = shift, ivl = ivl,
+                                ivl_type = ivl_type, ivl_side = ivl_side, ...)
+
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Compilation of summary data frame
 
-  l_ws <-
-    compile_wisle_summary(data = d_dat, batch_vbl = batch_vbl, rl = rl,
-                          poi_list = l_wisle[["all.poi"]],
-                          icpt_list = r_ret[["Intercepts"]],
-                          wcsl_list = l_wisle[["all.wcsl"]],
-                          wcb_list = l_wisle[["which.wc.batch"]],
-                          limits_list = rel_lim, poi_ich = r_ret[["POI"]],
-                          xform = xform, shift = shift)
+  l_ws <- compile_wisle_summary(data = d_dat,
+                                batch_vbl = batch_vbl,
+                                rl = rel_lim[["rl"]],
+                                poi_list = l_wisle[["all.poi"]],
+                                icpt_list = r_ret[["Intercepts"]],
+                                wcsl_list = l_wisle[["all.wcsl"]],
+                                wcb_list = l_wisle[["which.wc.batch"]],
+                                limits_list = rel_lim,
+                                poi_ich = r_ret[["POI"]],
+                                xform = xform, shift = shift)
+
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Putting results into a list
@@ -441,10 +426,6 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #'
 #' @example man/examples/examples_plot_expirest_wisle.R
 #'
-#' @importFrom stats lm
-#' @importFrom stats as.formula
-#' @importFrom stats coef
-#' @importFrom stats predict
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 aes
@@ -494,7 +475,7 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
     lifecycle::deprecate_warn(
       when = "0.1.7",
       what = "plot_expirest_wisle(show_grouping)",
-      with = "plot_expirest_osle(mtbs)",
+      with = "plot_expirest_wisle(mtbs)",
       details =
         c("If you do not want to see the grouping, use mtbs = \"cics\". ",
           "If you have set show_grouping = \"no\", mtbs is set to \"cics\".",
@@ -538,6 +519,9 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
 
   expob <- model
 
+  d_dat <- expob[["Data"]]
+  xform <- expob[["Limits"]][["xform"]]
+
   # Make visible binding for global variable
   LL <- UL <- NULL
 
@@ -545,28 +529,23 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
   # Extraction of models and of the model type
   # If show_grouping = "no", the model_type is "cics"
 
-  l_models <- expob[["Models"]]
-
   if (show_grouping == "yes") {
     model_name <- ifelse(mtbs == "verified",
                          expob[["Model.Type"]][["type.acronym"]],
                          mtbs)
   } else {
     model_name <- "cics"
+    mtbs <- "cics"
   }
 
   # Most appropriate model based on the ANCOVA analysis, or as specified
   # via the mtbs parameter
-  model <- l_models[[model_name]]
   poi_model_name <- paste("POI.Model", model_name, sep = ".")
   sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
-  wcsl_model_name <- paste("WCSL", model_name, sep = ".")
 
-  # <-><-><->
   # Checking if estimation of POI.Model or Shelf.Life was successful (for the
   # release limit value that was deemed relevant, i.e. the one specified by
   # the rl_index parameter)
-
   t_exp <- expob[["POI"]]
 
   if (sum(is.na(
@@ -576,70 +555,6 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
     > 0) {
     stop("Expiry determination was not successful.")
   }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Extraction of data and parameters
-
-  d_dat <- expob[["Data"]]
-
-  alpha <- expob[["Parameters"]][["alpha"]]
-  ivl <- expob[["Parameters"]][["ivl"]]
-  ivl_type <- expob[["Parameters"]][["ivl.type"]]
-  ivl_side <- expob[["Parameters"]][["ivl.side"]]
-
-  if (expob[["Limits"]][["sf.option"]] == "tight") {
-    rl_sf <- expob[["Limits"]][["rl.sf"]]
-    sl_sf <- expob[["Limits"]][["sl.sf"]]
-  } else {
-    rl_sf <- expob[["Limits"]][["rl.sf"]] + 1
-    sl_sf <- expob[["Limits"]][["sl.sf"]] + 1
-  }
-
-  xform <- expob[["Limits"]][["xform"]]
-  shift <- expob[["Limits"]][["shift"]]
-  wc_icpt <- expob[["wc.icpt"]][, model_name]
-
-  if (sum(xform %in% "no") == 2) {
-    response_vbl <- expob[["Variables"]][["response"]]
-    time_vbl <- expob[["Variables"]][["time"]]
-    batch_vbl <- expob[["Variables"]][["batch"]]
-  }
-  if (sum(xform %in% "no") == 0) {
-    old_response_vbl <- expob[["Variables"]][["response.orig"]]
-    response_vbl <- expob[["Variables"]][["response"]]
-    old_time_vbl <- expob[["Variables"]][["time.orig"]]
-    time_vbl <- expob[["Variables"]][["time"]]
-    batch_vbl <- expob[["Variables"]][["batch"]]
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      response_vbl <- expob[["Variables"]][["response"]]
-      old_time_vbl <- expob[["Variables"]][["time.orig"]]
-      time_vbl <- expob[["Variables"]][["time"]]
-      batch_vbl <- expob[["Variables"]][["batch"]]
-    }
-    if (xform[2] != "no") {
-      old_response_vbl <- expob[["Variables"]][["response.orig"]]
-      response_vbl <- expob[["Variables"]][["response"]]
-      time_vbl <- expob[["Variables"]][["time"]]
-      batch_vbl <- expob[["Variables"]][["batch"]]
-    }
-  }
-
-  # Note: since the predict.lm() function from the 'stats' package always
-  # calculates two-sided limits the value of alpha must be doubled in case
-  # that the ivl_type is "one-sided".
-  if (ivl_type == "one.sided") {
-    alpha <- alpha * 2
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Extraction of limits and the intercept
-
-  l_lim <- expob[["Limits"]]
-
-  sl <- l_lim[["sl"]]
-  rl <- l_lim[["rl"]]
 
   # POI with the upper or lower confidence or prediction interval of the
   # linear regression model representing the worst case scenario (woca) case
@@ -653,9 +568,9 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
     x_min <- min(x_range)
   } else {
     if (xform[1] == "no") {
-      x_min <- pretty(d_dat[, time_vbl], n = 1)[1]
+      x_min <- pretty(d_dat[, expob[["Variables"]][["time"]]], n = 1)[1]
     } else {
-      x_min <- pretty(d_dat[, old_time_vbl], n = 1)[1]
+      x_min <- pretty(d_dat[, expob[["Variables"]][["time.orig"]]], n = 1)[1]
     }
   }
 
@@ -673,94 +588,11 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
 
   x_range <- c(x_min, x_max)
 
-  if (plot_option == "full") {
-    x_range[1] <- x_range[1] - x_range[2] / 5
-  }
-
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Prediction based on linear model
 
-  # Generate the new x values (on the original scale) for prediction
-  x_new <- seq(x_min, x_max, length.out = 100)
-
-  # Transformation of new x values, if necessary
-  switch(xform[1],
-         "no" = {
-         },
-         "log" = {
-           x_new_trfmd <- log(x_new + shift[1])
-         },
-         "sqrt" = {
-           x_new_trfmd <- sqrt(x_new + shift[1])
-         },
-         "sq" = {
-           x_new_trfmd <- (x_new + shift[1])^2
-         })
-
-  # Creation of data frame for the predict.lm() function
-  t_batches <- levels(d_dat[, batch_vbl])
-
-  if (xform[1] == "no") {
-    d_new <- data.frame(rep(t_batches, each = length(x_new)),
-                        rep(x_new, times = length(t_batches)))
-  } else {
-    d_new <- data.frame(rep(t_batches, each = length(x_new_trfmd)),
-                        rep(x_new_trfmd, times = length(t_batches)))
-  }
-
-  colnames(d_new) <- c(batch_vbl, time_vbl)
-
-  # Prediction
-  if (model_name != "dids") {
-    m_pred <- predict(model, newdata = d_new, interval = ivl,
-                      level = 1 - alpha)
-  } else {
-    l_pred <- lapply(t_batches, function(x) {
-      predict(l_models$dids[[x]],
-              newdata = d_new[d_new[, batch_vbl] == x, ],
-              interval = ivl, level = 1 - alpha)
-    })
-    m_pred <- do.call(rbind, l_pred)
-  }
-
-  # Back-transformation of predicted (response) values, if necessary
-  switch(xform[2],
-         "no" = {
-         },
-         "log" = {
-           m_pred <- exp(m_pred) - shift[2]
-         },
-         "sqrt" = {
-           m_pred <- m_pred^2 - shift[2]
-         },
-         "sq" = {
-           m_pred[m_pred < 0] <- NA
-           m_pred <- sqrt(m_pred) - shift[2]
-         })
-
-  # Generation of data frame for plotting (with x values in original scale)
-  if (sum(xform %in% "no") == 2) {
-    d_pred <- as.data.frame(cbind(d_new, m_pred))
-    colnames(d_pred) <- c(batch_vbl, time_vbl, response_vbl, "LL", "UL")
-  }
-  if (sum(xform %in% "no") == 0) {
-    d_pred <- data.frame(rep(t_batches, each = length(x_new)),
-                         rep(x_new, times = length(t_batches)),
-                         m_pred)
-    colnames(d_pred) <- c(batch_vbl, old_time_vbl, old_response_vbl, "LL", "UL")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      d_pred <- data.frame(rep(t_batches, each = length(x_new)),
-                           rep(x_new, times = length(t_batches)),
-                           m_pred)
-      colnames(d_pred) <- c(batch_vbl, old_time_vbl, response_vbl, "LL", "UL")
-    }
-    if (xform[2] != "no") {
-      d_pred <- as.data.frame(cbind(d_new, m_pred))
-      colnames(d_pred) <- c(batch_vbl, time_vbl, old_response_vbl, "LL", "UL")
-    }
-  }
+  d_pred <- get_predictions(model = expob, model_name = model_name,
+                            x_range = x_range)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Setting y_range and ticks
@@ -779,6 +611,11 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ancillary data frames for plotting
 
+  # Modification of the x range if necessary
+  if (plot_option == "full") {
+    x_range[1] <- x_range[1] - x_range[2] / 5
+  }
+
   # <-><-><->
   # d_text - display of text elements
   # The rows in data frame d_text have the following meaning and position
@@ -788,27 +625,19 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
   # POI worst case (low at poi.woca), POI model (low at poi.model)
   # RL (lower right or upper right)
 
-  d_text <-
-    get_text_annotation(rvu = rvu, x_range = x_range, y_range = y_range,
-                        sl = sl, sl_sf = sl_sf, poi_model = poi_model,
-                        ivl_side = ivl_side, poi_woca = poi_woca,
-                        wisle_est = t_exp, wc_icpt = wc_icpt, rl_sf = rl_sf,
-                        rl_index = rl_index, wcsl_model_name = wcsl_model_name,
-                        plot_option = plot_option)
+  d_text <- get_text_annotation(model = expob, rvu = rvu, x_range = x_range,
+                                y_range = y_range, rl_index = rl_index,
+                                plot_option = plot_option, mtbs = mtbs)
 
   # <-><-><->
   # d_hlines - display of horizontal lines
 
-  d_hlines <- get_hlines(sl, ivl_side)
+  d_hlines <- get_hlines(model = expob)
 
   # <-><-><->
   # d_vlines - display of vertical lines
 
-  d_vlines <- data.frame(Month = c(poi_woca, poi_model),
-                         Item = c("poi.woca", "poi.model"),
-                         Colour = c("forestgreen", "grey50"),
-                         Type = c("dashed", "dotdash"),
-                         stringsAsFactors = FALSE)
+  d_vlines <- get_vlines(model = expob, rl_index = rl_index, mtbs = mtbs)
 
   # <-><-><->
   # d_seg - display of segments explaining the TGA method
@@ -820,76 +649,15 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
   # Maximal allowed difference over time from intercept (vertical)
   # The elements of d_seg are not displayed if plot_option is "basic".
 
-  d_seg <-
-    get_segments(sl = sl, ivl_side = ivl_side, wisle_est = t_exp,
-                 rl = rl, rl_index = rl_index, sl_model_name = sl_model_name,
-                 poi_woca = poi_woca, wc_icpt = wc_icpt,
-                 x_range = x_range, wcsl_model_name = wcsl_model_name)
+  d_seg <- get_segments(model = expob, x_range = x_range, rl_index = rl_index,
+                        mtbs = mtbs)
 
   # <-><-><->
   # d_arr - display of arrow explaining the TGA method
   # The elements of d_arr are not displayed if plot_option is not "full".
 
-  d_arr <- get_arrow(sl = sl, ivl_side = ivl_side, wisle_est = t_exp, rl = rl,
-                     rl_index = rl_index, sl_model_name = sl_model_name,
-                     wc_icpt = wc_icpt, x_range = x_range,
-                     wcsl_model_name = wcsl_model_name)
-
-  # <-><-><->
-  # Renaming of columns for plotting on the original scale
-
-  if (sum(xform %in% "no") == 2) {
-    colnames(d_text) <- c(time_vbl, response_vbl, "Label", "Colour")
-    colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
-    colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
-    colnames(d_seg) <- c(paste(time_vbl, 1:2, sep = "."),
-                         paste(response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Type", "Size")
-    colnames(d_arr) <- c(paste(time_vbl, 1:2, sep = "."),
-                         paste(response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Line.Type", "Arrow.Type",
-                         "Size", "Curvature", "Angle", "Length")
-  }
-  if (sum(xform %in% "no") == 0) {
-    colnames(d_text) <- c(old_time_vbl, old_response_vbl, "Label", "Colour")
-    colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
-    colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
-    colnames(d_seg) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                         paste(old_response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Type", "Size")
-    colnames(d_arr) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                         paste(old_response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Line.Type", "Arrow.Type",
-                         "Size", "Curvature", "Angle", "Length")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      colnames(d_text) <- c(old_time_vbl, response_vbl, "Label", "Colour")
-      colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
-      colnames(d_seg) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                           paste(response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Type", "Size")
-      colnames(d_arr) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                           paste(response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Line.Type", "Arrow.Type",
-                           "Size", "Curvature", "Angle", "Length")
-    } else {
-      colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
-    }
-    if (xform[2] != "no") {
-      colnames(d_text) <- c(time_vbl, old_response_vbl, "Label", "Colour")
-      colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
-      colnames(d_seg) <- c(paste(time_vbl, 1:2, sep = "."),
-                           paste(old_response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Type", "Size")
-      colnames(d_arr) <- c(paste(time_vbl, 1:2, sep = "."),
-                           paste(old_response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Line.Type", "Arrow.Type",
-                           "Size", "Curvature", "Angle", "Length")
-    } else {
-      colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
-    }
-  }
+  d_arr <- get_arrow(model = expob, x_range = x_range, rl_index = rl_index,
+                     mtbs = mtbs)
 
   # <-><-><->
   # Determination of items to be shown depending on plot_option
@@ -925,17 +693,21 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ggplot object
 
-  # Resetting time_vbl and response_vbl, if necessary
+  # Setting variable names
+  time_vbl <- expob[["Variables"]][["time"]]
+  response_vbl <- expob[["Variables"]][["response"]]
+  batch_vbl <- expob[["Variables"]][["batch"]]
+
   if (sum(xform %in% "no") == 0) {
-    time_vbl <- old_time_vbl
-    response_vbl <- old_response_vbl
+    time_vbl <- expob[["Variables"]][["time.orig"]]
+    response_vbl <- expob[["Variables"]][["response.orig"]]
   }
   if (sum(xform %in% "no") == 1) {
     if (xform[1] != "no") {
-      time_vbl <- old_time_vbl
+      time_vbl <- expob[["Variables"]][["time.orig"]]
     }
     if (xform[2] != "no") {
-      response_vbl <- old_response_vbl
+      response_vbl <- expob[["Variables"]][["response.orig"]]
     }
   }
 
@@ -992,7 +764,7 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
                                fill = .data[[batch_vbl]]), alpha = 0.25)
            })
 
-    ggraph <- ggraph + theme(legend.position = c(0.04, 0.96),
+    ggraph <- ggraph + theme(legend.position.inside = c(0.04, 0.96),
                              legend.justification = c(0.1, 1),
                              legend.text = element_text(size = 11),
                              legend.title = element_blank(),
@@ -1054,7 +826,7 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Collecting the results
 
-  invisible(structure(list(Model = model,
+  invisible(structure(list(Model = expob[["Models"]][[model_name]],
                            Expiry = t_exp,
                            Graph = ggraph,
                            Prediction = d_pred,

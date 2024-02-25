@@ -5,23 +5,21 @@
 \title{Prepare text annotation}
 \usage{
 get_text_annotation(
+  model,
   rvu,
   x_range,
   y_range,
-  sl,
-  sl_sf,
-  poi_model,
-  ivl_side,
-  poi_woca = NULL,
-  wisle_est = NULL,
-  wc_icpt = NULL,
-  rl_sf = NULL,
   rl_index = NULL,
-  wcsl_model_name = NULL,
-  plot_option = "full"
+  plot_option = "full",
+  mtbs = "verified"
 )
 }
 \arguments{
+\item{model}{An \sQuote{\code{expirest_osle}} or an
+\sQuote{\code{expirest_Wisle}} object, i.e. a list returned
+by the \code{\link{expirest_osle}()} or by the
+\code{\link{expirest_wisle}()} function.}
+
 \item{rvu}{A character string that specifies the unit associated with the
 response variable.}
 
@@ -31,43 +29,9 @@ specifies the range of the time variable to be plotted.}
 \item{y_range}{A numeric vector of the form \code{c(min, max)} that
 specifies the range of the response variable to be plotted.}
 
-\item{sl}{A numeric value or a numeric vector of length \code{2} that
-specifies the specification limit or limits.}
-
-\item{sl_sf}{A positive integer or a vector of positive integers that
-specifies the number of \dQuote{significant figures} (sf) of \code{sl}.}
-
-\item{poi_model}{Point of intersection (POI) with the upper or lower
-confidence or prediction interval of the most appropriate model according
-to the ICH Q1E guideline.}
-
-\item{ivl_side}{A character string that specifies if the \dQuote{upper} or
-the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
-or \code{"lower"}, respectively.}
-
-\item{poi_woca}{Point of intersection (POI) with the upper or lower
-confidence or prediction interval of the linear regression model
-representing the worst case scenario (woca) model. The default is
-\code{NULL}.}
-
-\item{wisle_est}{A data frame of the intercepts, the differences between
-release and shelf life limits, the worst case scenario limits (WCSLs),
-the expiry and release specification limits, the shelf lives and POI
-values. The default is \code{NULL}.}
-
-\item{wc_icpt}{A data frame of the worst case intercepts of each of the
-four fitted models. The default is \code{NULL}.}
-
-\item{rl_sf}{A positive integer or a vector of positive integers that
-specifies the number of \dQuote{significant figures} (sf) of \code{rl}.
-The default is \code{NULL}.}
-
 \item{rl_index}{A positive integer that specifies which of the release limit
 values that have been handed over to \code{\link{expirest_wisle}()} should
 be displayed. The default is \code{NULL}.}
-
-\item{wcsl_model_name}{A character string that specifies the name of the
-model with the worst case scenario limit. The default is \code{NULL}.}
 
 \item{plot_option}{A character string of either \code{"full"}, \code{"lean"},
 \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
@@ -78,22 +42,44 @@ line with the confidence or prediction interval, the specification
 limit(s) and the estimated shelf life. For \sQuote{expirest_osle} objects,
 only the options \code{"full"} and \code{"lean"} are relevant. The default
 is \code{"full"}.}
+
+\item{mtbs}{A character string that specifies the \dQuote{model to be shown},
+i.e. either \code{verified}, which is the default, or one of \code{cics},
+\code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
+is the model that was identified through the poolability check. It is
+thus also one of the possible optional models. The \code{dids} model
+represents the case where a separate model is fitted to the data of each
+individual batch while the \code{dids.pmse} model is the interaction
+model which includes the \eqn{batch} variable as main effect and in the
+interaction term with the \eqn{time} variable (\eqn{batch \times time}),
+i.e. a model where the mean square error is pooled across batches.}
 }
 \value{
-A data frame with the columns Time, Response, Label and Colour
-is returned.
+A data frame with the columns \sQuote{Time}, \sQuote{Response},
+Label and Colour is returned, where the column names \sQuote{Time} and
+\sQuote{Response} are placeholders for the corresponding variable names.
+If \code{model} is an \sQuote{expirest_osle} object, the data frame has up
+to three rows representing the relevant specification limit(s) (row 1 or
+rows 1 and 2) and the POI obtained from ordinary shelf life estimation (row
+2 or 3). If \code{model} is an \sQuote{expirest_wisle} object, the data
+frame has up to seven rows representing the relevant specification limit(s),
+the worst case scenario limit (row 2 or 3), the intercept (row 3 or 4), the
+POI of the worst case scenario model (row 4 or 5), the POI obtained from
+ordinary shelf life  estimation (row 5 or 6) and the release limit (row 6
+or 7).
 }
 \description{
 The function \code{get_text_annotation()} prepares a data frame for putting
-text on a plot prepared by the \code{ggplot()} function from
-the \sQuote{\code{ggplot2}} package.
+text on a plot prepared by the \code{ggplot()} function from the
+\sQuote{\code{ggplot2}} package.
 }
 \details{
 The function \code{get_text_annotation()} expects various pieces
 of information characterising an \sQuote{\code{expirest_osle}} or an
-\sQuote{\code{expirest_wisle}} model. Based on the information provided,
-the function prepares a data frame that can be handed over to the
-\code{geom_text()} function from the \sQuote{\code{ggplot2}} package.
+\sQuote{\code{expirest_wisle}} model. With this information, the function
+prepares a data frame that that is used by the functions
+\code{\link{plot_expirest_osle}()} or \code{\link{plot_expirest_wisle}(}))
+to put text annotations on the graph that is prepared by these functions.
 }
 \seealso{
 \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},

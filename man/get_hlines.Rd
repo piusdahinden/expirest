@@ -4,31 +4,32 @@
 \alias{get_hlines}
 \title{Prepare horizontal lines}
 \usage{
-get_hlines(sl, ivl_side)
+get_hlines(model)
 }
 \arguments{
-\item{sl}{A numeric value or a numeric vector of length \code{2} that
-specifies the specification limit or limits.}
-
-\item{ivl_side}{A character string that specifies if the \dQuote{upper} or
-the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
-or \code{"lower"}, respectively.}
+\item{model}{An \sQuote{\code{expirest_osle}} or an
+\sQuote{\code{expirest_Wisle}} object, i.e. a list returned
+by the \code{\link{expirest_osle}()} or by the
+\code{\link{expirest_wisle}()} function.}
 }
 \value{
-A data frame with the columns Response, Item, Colour and Type
-is returned.
+A data frame with the columns \sQuote{Response}, Item, Colour and
+Type is returned, where the column name \sQuote{Response} is a placeholder
+for the corresponding variable name. The data frame has up to two rows
+representing the specification limit(s).
 }
 \description{
 The function \code{get_hlines()} prepares a data frame for putting
 horizontal lines on a plot prepared by the \code{ggplot()} function from
-the \sQuote{\code{ggplot2}} package
+the \sQuote{\code{ggplot2}} package.
 }
 \details{
 The function \code{get_hlines()} expects various pieces
 of information characterising an \sQuote{\code{expirest_osle}} or an
 \sQuote{\code{expirest_wisle}} model. Based on the information provided,
-the function prepares a data frame that can be handed over to the
-\code{geom_hline()} function from the \sQuote{\code{ggplot2}} package.
+the function prepares a data frame that that is used by the functions
+\code{\link{plot_expirest_osle}()} or \code{\link{plot_expirest_wisle}()}
+to put lines on the graph that is prepared by these functions.
 }
 \seealso{
 \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},

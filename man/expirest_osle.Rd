@@ -236,6 +236,7 @@ str(exp1)
 # $ Potency: num  101 101.3 99.8 99.2 99.5 ...
 
 # Successful estimations
+# A model with common intercepts / common slopes (cics)
 res1 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                 response_vbl = "Potency", time_vbl = "Month",
@@ -258,6 +259,7 @@ res1$POI
 #     cics      dics dids.pmse      dids
 #  "lower"   "lower"   "lower"   "lower"
 
+# A model with different intercepts / different slopes (dids)
 res2 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
                 response_vbl = "Potency", time_vbl = "Month",
@@ -289,31 +291,85 @@ str(exp3)
 # $ Month   : num  0 1 2 3 3 6 6 12 12 24 ...
 # $ Moisture: num  2.2 1.7 3.32 2.76 2.43 ...
 
-# Unsuccessful estimations
-# Intervals are wider than the specification limits (no intersection)
+# Estimation where it is not know a priori which limit is crossed first, i.e.
+# letting the estimation be done for both specification limits.
 res3 <-
+  expirest_osle(
+    data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+    batch_vbl = "Batch", sl = c(1.5, 3.5), sl_sf = c(2, 2),
+    srch_range = c(0, 500), sf_option = "tight", ivl = "confidence",
+    ivl_type = "two.sided", ivl_side = "both")
+res3$Model.Type
+res3$POI
+
+# Expected results in res3$Model.Type
+# $type.spec
+# common.icpt  common.slp
+#           1           1
+#
+# $type.acronym
+# [1] "cics"
+
+# Expected results in res3$POI
+#     cics      dics dids.pmse      dids
+# 45.34604  40.28562  21.73080  21.42596
+# attr(,"side")
+#    cics      dics dids.pmse      dids
+# "upper"   "upper"   "upper"   "lower"
+
+# Analysis with a single batch
+res4 <-
+  expirest_osle(
+    data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+    time_vbl = "Month", batch_vbl = "Batch", sl = c(1.5, 3.5),
+    sl_sf = c(2, 2), srch_range = c(0, 500), sf_option = "tight",
+    ivl = "confidence", ivl_type = "two.sided", ivl_side = "both")
+
+# Since only one batch is involved there is no model type. Nevertheless, the
+# result is reported under the dids model name.
+res4$Model.Type
+res4$POI
+
+# Expected results in res4$Model.Type
+# $type.spec
+# common.icpt  common.slp
+#         NA           NA
+#
+# $type.acronym
+# [1] "n.a."
+
+# Expected results in res4$POI
+# cics      dics dids.pmse      dids
+#   NA        NA        NA  21.42596
+# attr(,"side")
+# cics      dics dids.pmse      dids
+# "NA"      "NA"      "NA"   "lower"
+
+# Unsuccessful estimations
+# Intervals are wider than the specification limits (no intersection).
+res5 <-
   expirest_osle(
     data = exp3, response_vbl = "Moisture", time_vbl = "Month",
     batch_vbl = "Batch", sl = 1.5, sl_sf = 2, srch_range = c(0, 500),
     sf_option = "tight", ivl = "prediction", ivl_type = "two.sided",
     ivl_side = "lower")
-res3$POI
+res5$POI
 
-# (Expected) results in res3$POI
+# (Expected) results in res5$POI
 #    cics      dics dids.pmse      dids
 #     NA        NA        NA        NA
 # attr(,"side")
 #    cics      dics dids.pmse      dids
 # "lower"   "lower"   "lower"   "lower"
 
-# Estimation may also fail because of an inappropriate 'srch-range' setting.
-res4 <-
+# Estimation may also fail because of an inappropriate 'srch_range' setting.
+res6 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                 response_vbl = "Potency", time_vbl = "Month",
                 batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 5))
-res4$POI
+res6$POI
 
-# (Expected) results in res4$POI
+# (Expected) results in res6$POI
 #    cics      dics dids.pmse      dids
 #     NA        NA        NA        NA
 # attr(,"side")

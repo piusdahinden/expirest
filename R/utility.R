@@ -18,6 +18,8 @@
 #'
 #' @seealso \code{\link[stats]{predict.lm}}.
 #'
+#' @importFrom stats predict
+#'
 #' @keywords internal
 
 get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
@@ -691,10 +693,7 @@ get_icpt_list <- function(data, response_vbl, time_vbl, batch_vbl, model_list,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!is.numeric(shift)) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
 
@@ -1569,6 +1568,8 @@ get_relevant_limits <- function(limits_list, xform = c("no", "no"),
 #' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
 #' \code{\link[stats]{aov}}.
 #'
+#' @importFrom stats aov
+#' @importFrom stats as.formula
 #' @importFrom stats summary.aov
 #' @importFrom stats setNames
 #'
@@ -2093,10 +2094,7 @@ get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!is.numeric(shift)) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
   if (!(ivl %in% c("confidence", "prediction"))) {
@@ -2133,25 +2131,34 @@ get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
     # Extraction of all worst case POI values
     d_poi <-
       rbind(lower = vapply(l_poi$lower, function(x) {
-        ifelse(all(is.na(x)), NA, min(x, na.rm = TRUE))
+        ifelse(all(is.na(x)),
+               NA,
+               min(x, na.rm = TRUE))
       },
       numeric(1)),
       upper = vapply(l_poi$upper, function(x) {
-        ifelse(all(is.na(x)), NA, min(x, na.rm = TRUE))
+        ifelse(all(is.na(x)),
+               NA,
+               min(x, na.rm = TRUE))
       },
       numeric(1)))
     d_poi[is.infinite(d_poi)] <- NA
 
     # Determination of the side of the worst case POI value
-    t_poi_side <- t_sides[(d_poi["upper", ] < d_poi["lower", ]) + 1L]
-    names(t_poi_side) <- names(l_models)
+    t_poi_side <- vapply(colnames(d_poi), function(cn) {
+      ifelse(all(is.na(d_poi[, cn])),
+             "NA",
+             t_sides[which.min(d_poi[, cn])])
+    },
+    character(1))
 
     # Summary vector of the worst case POI values
-    t_poi <- vapply(seq_along(colnames(d_poi)), function(i) {
-      ifelse(is.na(t_poi_side[i]), NA, d_poi[t_poi_side[i], i])
+    t_poi <- vapply(colnames(d_poi), function(cn) {
+      ifelse(t_poi_side[cn] == "NA",
+             NA,
+             d_poi[t_poi_side[cn], cn])
     },
     numeric(1))
-    names(t_poi) <- colnames(d_poi)
     attr(t_poi, "side") <- t_poi_side
   } else {
     l_poi <- setNames(list(NA), ivl_side)
@@ -2167,7 +2174,9 @@ get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
 
     # Summary vector of the worst case POI values
     t_poi <- vapply(l_poi[[ivl_side]], function(x) {
-      ifelse(all(is.na(x)), NA, min(x, na.rm = TRUE))
+      ifelse(all(is.na(x)),
+             NA,
+             min(x, na.rm = TRUE))
     },
     numeric(1))
     t_poi[is.infinite(t_poi)] <- NA
@@ -2206,26 +2215,31 @@ get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
 
   # Worst case batch (of each model)
   if (ivl_side == "both" && length(sl) == 2) {
-    l_wc_batch <-
-      lapply(l_poi, function(ll) {
-        vapply(ll, function(x) {
-          ifelse(!length(which.min(x)), NA, which.min(x))
-        },
-        numeric(1))
-      })
+    l_wc_batch <- lapply(l_poi, function(ll) {
+      vapply(ll, function(x) {
+        ifelse(!length(which.min(x)),
+               NA,
+               which.min(x))
+      },
+      numeric(1))
+    })
 
     l_wc_batch$lower["cics"] <- NA
     l_wc_batch$upper["cics"] <- NA
 
     # Summary vector of the worst case batches
-    wc_batch <- vapply(seq_along(names(l_models)), function(i) {
-      ifelse(is.na(t_poi_side[i]), NA, l_wc_batch[[t_poi_side[i]]][i])
+    wc_batch <- vapply(names(t_poi_side), function(cn) {
+      ifelse(t_poi_side[cn] == "NA",
+             NA,
+             l_wc_batch[[t_poi_side[cn]]][cn])
     },
     numeric(1))
     attr(wc_batch, "side") <- t_poi_side
   } else {
     wc_batch <- vapply(l_poi[[ivl_side]], function(x) {
-      ifelse(!length(which.min(x)), NA, which.min(x))
+      ifelse(!length(which.min(x)),
+             NA,
+             which.min(x))
     },
     numeric(1))
 
@@ -2244,8 +2258,10 @@ get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
     names(l_wc_icpt) <- t_sides
 
     # Summary vector of the intercepts of the worst case batches
-    wc_icpt <- vapply(seq_along(names(l_models)), function(i) {
-      ifelse(is.na(t_poi_side[i]), NA, l_wc_icpt[[t_poi_side[i]]][i])
+    wc_icpt <- vapply(names(t_poi_side), function(cn) {
+      ifelse(t_poi_side[cn] == "NA",
+             NA,
+             l_wc_icpt[[t_poi_side[cn]]][cn])
     },
     numeric(1))
     attr(wc_icpt, "side") <- t_poi_side
@@ -2355,10 +2371,7 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!is.numeric(shift)) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
   if (!(ivl %in% c("confidence", "prediction"))) {
@@ -2504,7 +2517,9 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
                NA
              } else {
                apply(x, c(1, 2), FUN = function(y) {
-                 ifelse(length(which.min(y)) != 0, which.min(abs(y)), NA)
+                 ifelse(length(which.min(y)) != 0,
+                        which.min(abs(y)),
+                        NA)
                })
              }
            })
@@ -2515,7 +2530,9 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
                NA
              } else {
                apply(x, c(1, 2), FUN = function(y) {
-                 ifelse(length(which.max(y)) != 0, which.max(abs(y)), NA)
+                 ifelse(length(which.max(y)) != 0,
+                        which.max(abs(y)),
+                        NA)
                })
              }
            })
@@ -2527,7 +2544,9 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
       NA
     } else {
       apply(x, 1, function(y) {
-        ifelse(length(which.min(y)) != 0, which.min(y), NA)
+        ifelse(length(which.min(y)) != 0,
+               which.min(y),
+               NA)
       })
     }
   })
@@ -2707,10 +2726,7 @@ compile_wisle_summary <- function(data, batch_vbl, rl, poi_list, icpt_list,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!is.numeric(shift)) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
 
@@ -3008,43 +3024,22 @@ get_n_list_levels <- function(x) {
 #' Prepare text annotation
 #'
 #' The function \code{get_text_annotation()} prepares a data frame for putting
-#' text on a plot prepared by the \code{ggplot()} function from
-#' the \sQuote{\code{ggplot2}} package.
+#' text on a plot prepared by the \code{ggplot()} function from the
+#' \sQuote{\code{ggplot2}} package.
 #'
+#' @param model An \sQuote{\code{expirest_osle}} or an
+#'   \sQuote{\code{expirest_Wisle}} object, i.e. a list returned
+#'   by the \code{\link{expirest_osle}()} or by the
+#'   \code{\link{expirest_wisle}()} function.
 #' @param rvu A character string that specifies the unit associated with the
 #'   response variable.
 #' @param x_range A numeric vector of the form \code{c(min, max)} that
 #'   specifies the range of the time variable to be plotted.
 #' @param y_range A numeric vector of the form \code{c(min, max)} that
 #'   specifies the range of the response variable to be plotted.
-#' @param sl A numeric value or a numeric vector of length \code{2} that
-#'   specifies the specification limit or limits.
-#' @param sl_sf A positive integer or a vector of positive integers that
-#'   specifies the number of \dQuote{significant figures} (sf) of \code{sl}.
-#' @param poi_model Point of intersection (POI) with the upper or lower
-#'   confidence or prediction interval of the most appropriate model according
-#'   to the ICH Q1E guideline.
-#' @param ivl_side A character string that specifies if the \dQuote{upper} or
-#'   the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
-#'   or \code{"lower"}, respectively.
-#' @param poi_woca Point of intersection (POI) with the upper or lower
-#'   confidence or prediction interval of the linear regression model
-#'   representing the worst case scenario (woca) model. The default is
-#'   \code{NULL}.
-#' @param wisle_est A data frame of the intercepts, the differences between
-#'   release and shelf life limits, the worst case scenario limits (WCSLs),
-#'   the expiry and release specification limits, the shelf lives and POI
-#'   values. The default is \code{NULL}.
-#' @param wc_icpt A data frame of the worst case intercepts of each of the
-#'   four fitted models. The default is \code{NULL}.
-#' @param rl_sf A positive integer or a vector of positive integers that
-#'   specifies the number of \dQuote{significant figures} (sf) of \code{rl}.
-#'   The default is \code{NULL}.
 #' @param rl_index A positive integer that specifies which of the release limit
 #'   values that have been handed over to \code{\link{expirest_wisle}()} should
 #'   be displayed. The default is \code{NULL}.
-#' @param wcsl_model_name A character string that specifies the name of the
-#'   model with the worst case scenario limit. The default is \code{NULL}.
 #' @param plot_option A character string of either \code{"full"}, \code{"lean"},
 #'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
 #'   that specifies if additional information should be shown in the plot
@@ -3054,15 +3049,27 @@ get_n_list_levels <- function(x) {
 #'   limit(s) and the estimated shelf life. For \sQuote{expirest_osle} objects,
 #'   only the options \code{"full"} and \code{"lean"} are relevant. The default
 #'   is \code{"full"}.
+#' @inheritParams plot_expirest_osle
 #'
 #' @details The function \code{get_text_annotation()} expects various pieces
 #' of information characterising an \sQuote{\code{expirest_osle}} or an
-#' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
-#' the function prepares a data frame that can be handed over to the
-#' \code{geom_text()} function from the \sQuote{\code{ggplot2}} package.
+#' \sQuote{\code{expirest_wisle}} model. With this information, the function
+#' prepares a data frame that that is used by the functions
+#' \code{\link{plot_expirest_osle}()} or \code{\link{plot_expirest_wisle}(}))
+#' to put text annotations on the graph that is prepared by these functions.
 #'
-#' @return A data frame with the columns Time, Response, Label and Colour
-#' is returned.
+#' @return A data frame with the columns \sQuote{Time}, \sQuote{Response},
+#' Label and Colour is returned, where the column names \sQuote{Time} and
+#' \sQuote{Response} are placeholders for the corresponding variable names.
+#' If \code{model} is an \sQuote{expirest_osle} object, the data frame has up
+#' to three rows representing the relevant specification limit(s) (row 1 or
+#' rows 1 and 2) and the POI obtained from ordinary shelf life estimation (row
+#' 2 or 3). If \code{model} is an \sQuote{expirest_wisle} object, the data
+#' frame has up to seven rows representing the relevant specification limit(s),
+#' the worst case scenario limit (row 2 or 3), the intercept (row 3 or 4), the
+#' POI of the worst case scenario model (row 4 or 5), the POI obtained from
+#' ordinary shelf life  estimation (row 5 or 6) and the release limit (row 6
+#' or 7).
 #'
 #' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
 #' \code{\link{print_val}}, \code{\link[ggplot2]{ggplot}},
@@ -3070,304 +3077,307 @@ get_n_list_levels <- function(x) {
 #'
 #' @keywords internal
 
-get_text_annotation <- function(rvu, x_range, y_range, sl, sl_sf, poi_model,
-                                ivl_side, poi_woca = NULL, wisle_est = NULL,
-                                wc_icpt = NULL, rl_sf = NULL, rl_index = NULL,
-                                wcsl_model_name = NULL, plot_option = "full") {
+get_text_annotation <- function(model, rvu, x_range, y_range, rl_index = NULL,
+                                plot_option = "full", mtbs = "verified") {
+  if (!inherits(model, "expirest_osle") && !inherits(model, "expirest_wisle")) {
+    stop("The model must be an object of class expirest_osle or ",
+         "expirest_wisle.")
+  }
   if (!is.character(rvu)) {
     stop("The parameter rvu must be a string.")
   }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {
-      stop("The parameter x_range must be a vector of length 2.")
+      stop("The parameter x_range must be a numeric vector of length 2.")
     }
   }
   if (!is.null(y_range)) {
     if (!is.numeric(y_range) || length(y_range) != 2) {
-      stop("The parameter y_range must be a vector of length 2.")
+      stop("The parameter y_range must be a numeric vector of length 2.")
     }
   }
-  if (!is.numeric(sl) || length(sl) > 2) {
-    stop("The parameter sl must be a numeric or vector of length 1 or 2.")
-  }
-  if (length(sl) == 2) {
-    if (sl[2] < sl[1]) {
-      stop("The parameter sl must be of the form c(lower, upper).")
-    }
-  }
-  if (!is.numeric(sl_sf) && all(!is.na(sl_sf))) {
-    stop("The parameter sl_sf must be a positive integer of length sl.")
-  }
-  if (sum(sl_sf < 0) > 0) {
-    stop("The parameter sl_sf must be a positive integer of length sl.")
-  }
-  if (length(sl_sf) != length(sl)) {
-    stop("The parameter sl_sf must be a positive integer of length sl.")
-  }
-  if (!isTRUE(all.equal(sl_sf, as.integer(sl_sf)))) {
-    stop("The parameter sl_sf must be a positive integer of length sl.")
-  }
-  if (!is.numeric(poi_model) && !is.na(poi_model) || length(poi_model) > 1) {
-    stop("The parameter poi_model must be a numeric of length 1.")
-  }
-  if (!(ivl_side %in% c("lower", "upper", "both"))) {
-    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
-  }
-
-  if (!is.null(poi_woca)) {
-    if (!is.numeric(poi_woca) && !is.na(poi_woca) || length(poi_woca) > 1) {
-      stop("The parameter poi_woca must be a numeric of length 1.")
-    }
-  }
-  if (!is.null(wisle_est)) {
-    if (!is.data.frame(wisle_est) || ncol(wisle_est) != 24) {
-      stop("The parameter wisle_est must be a data frame with 24 columns.")
-    }
-  }
-  if (!is.null(wc_icpt)) {
-    if (!is.numeric(wc_icpt)) {
-      stop("The parameter wc_icpt must be a numeric vector.")
-    }
-  }
-  if (!is.null(rl_sf) && !is.null(wisle_est)) {
-    if (!is.numeric(rl_sf) && all(!is.na(rl_sf))) {
-      stop("The parameter rl_sf must be a positive integer of the same length ",
-           "as the parameter wisle_est has rows.")
-    }
-    if (sum(rl_sf < 0) > 0) {
-      stop("The parameter rl_sf must be a positive integer of the same length ",
-           "as the parameter wisle_est has rows.")
-    }
-    if (length(rl_sf) != nrow(wisle_est)) {
-      stop("The parameter rl_sf must be a positive integer of the same length ",
-           "as the parameter wisle_est has rows.")
-    }
-    if (!isTRUE(all.equal(rl_sf, as.integer(rl_sf)))) {
-      stop("The parameter rl_sf must be a positive integer of the same length ",
-           "as the parameter wisle_est has rows.")
-    }
-  }
-  if (!is.null(rl_index) && !is.null(wisle_est)) {
+  if (!is.null(rl_index)) {
     if (!is.numeric(rl_index) || length(rl_index) > 1) {
       stop("The parameter rl_index must be a positive integer of length 1.")
     }
     if (rl_index != as.integer(rl_index)) {
       stop("The parameter rl_index must be a positive integer of length 1.")
     }
-    if (rl_index < 1 || rl_index > nrow(wisle_est)) {
-      stop("The parameter rl_index must be between 1 and the number of rows ",
-           "of the parameter wisle_est.")
-    }
   }
-  if (!is.null(wcsl_model_name)) {
-    if (!is.character(wcsl_model_name) || length(wcsl_model_name) != 1) {
-      stop("The parameter wcsl_model_name must be a single string.")
-    }
+  if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify mtbs either as \"verified\", \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
   }
-  if (!(plot_option %in% c("full", "lean1", "lean2", "basic1", "basic2"))) {
-    stop("Please specify plot_option either as \"full\", \"lean1\", ",
-         "\"lean2\", \"basic1\" or \"basic2\".")
+  if (!(plot_option %in%
+        c("full", "lean", "lean1", "lean2", "basic1", "basic2"))) {
+    stop("Please specify plot_option either as \"full\", \"lean\", ",
+         "\"lean1\", \"lean2\", \"basic1\" or \"basic2\".")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Preparation of data
+  # Extraction of data and parameters
 
-  y_breaks <- pretty(y_range, 5)
-  t_exp <- wisle_est
+  # General parameters
+  expob <- model
+  t_exp <- expob[["POI"]]
 
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  if (is.null(poi_woca)) {
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Display of text elements for plot_expirest_osle()
-    # The rows in data frame d_text have the following meaning and position
-    # (position in brackets):
-    # LSL (lower right), USL (upper right), POI model (low at poi.model)
-
-    if (length(sl) == 2) {
-      d_text <- data.frame(
-        Time = c(rep(x_range[2], 2), poi_model),
-        Response = c(sl, sl[1]),
-        Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
-                  print_val("USL: ", sl[2], rvu, sl_sf[2]),
-                  print_val("", poi_model, "",
-                            get_n_whole_part(poi_model) + 1)),
-        Colour = c("black", "black", "forestgreen"),
-        stringsAsFactors = FALSE)
-
-      d_text$Response <- d_text$Response +
-        rep(diff(y_breaks[1:2]), 3) * 1 / c(-10, 10, -2)
-    } else {
-      switch(ivl_side,
-             "lower" = {
-               d_text <- data.frame(
-                 Time = c(x_range[2], poi_model),
-                 Response = rep(sl, 2),
-                 Label =
-                   c(print_val("LSL: ", sl, rvu, sl_sf),
-                     print_val("", poi_model, "",
-                               get_n_whole_part(poi_model) + 1)),
-                 Colour = c("black", "forestgreen"),
-                 stringsAsFactors = FALSE)
-
-               d_text$Response <- d_text$Response +
-                 rep(diff(y_breaks[1:2]), 2) * 1 / c(-10, -2)
-             },
-             "upper" = {
-               d_text <- data.frame(
-                 Time = c(x_range[2], poi_model),
-                 Response = rep(sl, 2),
-                 Label =
-                   c(print_val("USL: ", sl, rvu, sl_sf),
-                     print_val("", poi_model, "",
-                               get_n_whole_part(poi_model) + 1)),
-                 Colour = c("black", "forestgreen"),
-                 stringsAsFactors = FALSE)
-
-               d_text$Response <- d_text$Response +
-                 rep(diff(y_breaks[1:2]), 2) * 1 / c(10, 2)
-             })
-    }
+  sl <- expob[["Limits"]][["sl"]]
+  if (expob[["Limits"]][["sf.option"]] == "tight") {
+    sl_sf <- expob[["Limits"]][["sl.sf"]]
   } else {
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Display of text elements for plot_expirest_wisle()
-    # The rows in data frame d_text have the following meaning and position
-    # (position in brackets):
-    # LSL (lower right), USL (upper right),
-    # WCSL (left, at RL), Intercept (left, at intercept),
-    # POI worst case (low at poi.woca), POI model (low at poi.model)
-    # RL (lower right or upper right)
-
-    if (length(sl) == 2) {
-      d_text <- data.frame(
-        Time = c(rep(x_range[2], 2), 0, 0, poi_woca, poi_model),
-        Response = c(sl, t_exp[rl_index, wcsl_model_name], wc_icpt[rl_index],
-                     rep(sl[1], 2)),
-        Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
-                  print_val("USL: ", sl[2], rvu, sl_sf[2]),
-                  print_val("", t_exp[rl_index, wcsl_model_name], rvu,
-                            rl_sf[rl_index], suffix = " "),
-                  print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index]),
-                  ifelse(plot_option %in% "lean2",
-                         print_val("", poi_woca, "",
-                                   get_n_whole_part(poi_woca) + 1),
-                         print_val("", poi_woca, "",
-                                   get_n_whole_part(poi_woca) + 1,
-                                   suffix = "\n(worst case\nscenario)")),
-                  ifelse(plot_option %in% "lean2",
-                         print_val("", poi_model, "",
-                                   get_n_whole_part(poi_model) + 1),
-                         print_val("", poi_model, "",
-                                   get_n_whole_part(poi_model) + 1,
-                                   suffix = "\n(standard\nscenario)"))),
-        Colour = c("black", "black", "red", "royalblue", "forestgreen",
-                   "grey50"),
-        stringsAsFactors = FALSE)
-
-      switch(ivl_side,
-             "lower" = {
-               d_text <- rbind(d_text, d_text[nrow(d_text), ])
-               d_text[nrow(d_text), "Time"] <- x_range[2]
-               d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
-               d_text[nrow(d_text), "Label"] <-
-                 print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                           rl_sf[rl_index])
-               d_text[nrow(d_text), "Colour"] <- "grey0"
-
-               d_text$Response <- d_text$Response +
-                 c(rep(diff(y_breaks[1:2]), 2), 0, 0,
-                   rep(diff(y_breaks[1:2]), 2),
-                   diff(y_breaks[1:2])) * 1 / c(-10, 10, 1, 1, -2, -2, -10)
-             },
-             "upper" = {
-               d_text <- rbind(d_text, d_text[nrow(d_text), ])
-               d_text[nrow(d_text), "Time"] <- x_range[2]
-               d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
-               d_text[nrow(d_text), "Label"] <-
-                 print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                           rl_sf[rl_index])
-               d_text[nrow(d_text), "Colour"] <- "grey0"
-               d_text[5:6, "Response"] <- rep(sl[2], 2)
-
-               d_text$Response <- d_text$Response +
-                 c(rep(diff(y_breaks[1:2]), 2), 0, 0,
-                   rep(diff(y_breaks[1:2]), 2),
-                   diff(y_breaks[1:2])) * 1 / c(10, 10, 1, 1, 2, 2, 1)
-             })
-    } else {
-      switch(ivl_side,
-             "lower" = {
-               d_text <- data.frame(
-                 Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
-                 Response = c(sl, t_exp[rl_index, wcsl_model_name],
-                              wc_icpt[rl_index], rep(sl, 2),
-                              t_exp[rl_index, "Rel.Spec"]),
-                 Label =
-                   c(print_val("LSL: ", sl, rvu, sl_sf),
-                     print_val("", t_exp[rl_index, wcsl_model_name], rvu,
-                               rl_sf[rl_index], suffix = " "),
-                     print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
-                               suffix = " "),
-                     ifelse(plot_option %in% "lean2",
-                            print_val("", poi_woca, "",
-                                      get_n_whole_part(poi_woca) + 1),
-                            print_val("", poi_woca, "",
-                                      get_n_whole_part(poi_woca) + 1,
-                                      suffix = "\n(worst case\nscenario)")),
-                     ifelse(plot_option %in% "lean2",
-                            print_val("", poi_model, "",
-                                      get_n_whole_part(poi_model) + 1),
-                            print_val("", poi_model, "",
-                                      get_n_whole_part(poi_model) + 1,
-                                      suffix = "\n(standard\nscenario)")),
-                     print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                               rl_sf[rl_index])),
-                 Colour = c("black", "red", "royalblue", "forestgreen",
-                            "grey50", "grey0"),
-                 stringsAsFactors = FALSE)
-               d_text$Response <- d_text$Response +
-                 c(diff(y_breaks[1:2]), 0, 0,
-                   rep(diff(y_breaks[1:2]), 2),
-                   diff(y_breaks[1:2])) * 1 / c(-10, 1, 1, -2, -2, -10)
-             },
-             "upper" = {
-               d_text <- data.frame(
-                 Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
-                 Response = c(sl, t_exp[rl_index, wcsl_model_name],
-                              wc_icpt[rl_index], rep(sl, 2),
-                              t_exp[rl_index, "Rel.Spec"]),
-                 Label =
-                   c(print_val("USL: ", sl, rvu, sl_sf),
-                     print_val("",  t_exp[rl_index, wcsl_model_name], rvu,
-                               rl_sf[rl_index], suffix = " "),
-                     print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
-                               suffix = " "),
-                     ifelse(plot_option %in% "lean2",
-                            print_val("", poi_woca, "",
-                                      get_n_whole_part(poi_woca) + 1),
-                            print_val("", poi_woca, "",
-                                      get_n_whole_part(poi_woca) + 1,
-                                      suffix = "\n(worst case\nscenario)")),
-                     ifelse(plot_option %in% "lean2",
-                            print_val("", poi_model, "",
-                                      get_n_whole_part(poi_model) + 1),
-                            print_val("", poi_model, "",
-                                      get_n_whole_part(poi_model) + 1,
-                                      suffix = "\n(standard\nscenario)")),
-                     print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                               rl_sf[rl_index])),
-                 Colour = c("black", "red", "royalblue", "forestgreen",
-                            "grey50", "grey0"),
-                 stringsAsFactors = FALSE)
-               d_text$Response <- d_text$Response +
-                 c(diff(y_breaks[1:2]), 0, 0,
-                   rep(diff(y_breaks[1:2]), 2),
-                   diff(y_breaks[1:2])) * 1 / c(10, 1, 1, 2, 2, 10)
-             })
-    }
+    sl_sf <- expob[["Limits"]][["sl.sf"]] + 1
   }
 
+  xform <- expob[["Limits"]][["xform"]]
+  ivl_side <- expob[["Parameters"]][["ivl.side"]]
+
+  model_name <- ifelse(mtbs == "verified",
+                       expob[["Model.Type"]][["type.acronym"]],
+                       mtbs)
+
+  # Setting of y breaks
+  y_breaks <- pretty(y_range, 5)
+
+  switch(class(model),
+         "expirest_osle" = {
+           poi_model <- t_exp[model_name]
+         },
+         "expirest_wisle" = {
+           if (expob[["Limits"]][["sf.option"]] == "tight") {
+             rl_sf <- expob[["Limits"]][["rl.sf"]]
+           } else {
+             rl_sf <- expob[["Limits"]][["rl.sf"]] + 1
+           }
+
+           poi_model_name <- paste("POI.Model", model_name, sep = ".")
+           sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
+           wcsl_model_name <- paste("WCSL", model_name, sep = ".")
+
+           poi_model <- t_exp[rl_index, poi_model_name]
+           poi_woca <- t_exp[rl_index, sl_model_name]
+
+           wc_icpt <- expob[["wc.icpt"]][, model_name]
+         })
+
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  switch(
+    class(model),
+    "expirest_osle" = {
+      # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      # Display of text elements for plot_expirest_osle()
+      # The rows in data frame d_text have the following meaning and position
+      # (position in brackets):
+      # LSL (lower right), USL (upper right), POI model (low at poi.model)
+
+      if (length(sl) == 2) {
+        d_text <- data.frame(
+          Time = c(rep(x_range[2], 2), poi_model),
+          Response = c(sl, sl[1]),
+          Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
+                    print_val("USL: ", sl[2], rvu, sl_sf[2]),
+                    print_val("", poi_model, "",
+                              get_n_whole_part(poi_model) + 1)),
+          Colour = c("black", "black", "forestgreen"),
+          stringsAsFactors = FALSE)
+
+        d_text$Response <- d_text$Response +
+          rep(diff(y_breaks[1:2]), 3) * 1 / c(-10, 10, -2)
+      } else {
+        switch(ivl_side,
+               "lower" = {
+                 d_text <- data.frame(
+                   Time = c(x_range[2], poi_model),
+                   Response = rep(sl, 2),
+                   Label =
+                     c(print_val("LSL: ", sl, rvu, sl_sf),
+                       print_val("", poi_model, "",
+                                 get_n_whole_part(poi_model) + 1)),
+                   Colour = c("black", "forestgreen"),
+                   stringsAsFactors = FALSE)
+
+                 d_text$Response <- d_text$Response +
+                   rep(diff(y_breaks[1:2]), 2) * 1 / c(-10, -2)
+               },
+               "upper" = {
+                 d_text <- data.frame(
+                   Time = c(x_range[2], poi_model),
+                   Response = rep(sl, 2),
+                   Label =
+                     c(print_val("USL: ", sl, rvu, sl_sf),
+                       print_val("", poi_model, "",
+                                 get_n_whole_part(poi_model) + 1)),
+                   Colour = c("black", "forestgreen"),
+                   stringsAsFactors = FALSE)
+
+                 d_text$Response <- d_text$Response +
+                   rep(diff(y_breaks[1:2]), 2) * 1 / c(10, 2)
+               })
+      }
+    }, "expirest_wisle" = {
+      # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      # Display of text elements for plot_expirest_wisle()
+      # The rows in data frame d_text have the following meaning and position
+      # (position in brackets):
+      # LSL (lower right), USL (upper right),
+      # WCSL (left, at RL), Intercept (left, at intercept),
+      # POI worst case (low at poi.woca), POI model (low at poi.model)
+      # RL (lower right or upper right)
+
+      if (length(sl) == 2) {
+        d_text <- data.frame(
+          Time = c(rep(x_range[2], 2), 0, 0, poi_woca, poi_model),
+          Response = c(sl, t_exp[rl_index, wcsl_model_name], wc_icpt[rl_index],
+                       rep(sl[1], 2)),
+          Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
+                    print_val("USL: ", sl[2], rvu, sl_sf[2]),
+                    print_val("", t_exp[rl_index, wcsl_model_name], rvu,
+                              rl_sf[rl_index], suffix = " "),
+                    print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index]),
+                    ifelse(plot_option %in% "lean2",
+                           print_val("", poi_woca, "",
+                                     get_n_whole_part(poi_woca) + 1),
+                           print_val("", poi_woca, "",
+                                     get_n_whole_part(poi_woca) + 1,
+                                     suffix = "\n(worst case\nscenario)")),
+                    ifelse(plot_option %in% "lean2",
+                           print_val("", poi_model, "",
+                                     get_n_whole_part(poi_model) + 1),
+                           print_val("", poi_model, "",
+                                     get_n_whole_part(poi_model) + 1,
+                                     suffix = "\n(standard\nscenario)"))),
+          Colour = c("black", "black", "red", "royalblue", "forestgreen",
+                     "grey50"),
+          stringsAsFactors = FALSE)
+
+        switch(ivl_side,
+               "lower" = {
+                 d_text <- rbind(d_text, d_text[nrow(d_text), ])
+                 d_text[nrow(d_text), "Time"] <- x_range[2]
+                 d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
+                 d_text[nrow(d_text), "Label"] <-
+                   print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
+                             rl_sf[rl_index])
+                 d_text[nrow(d_text), "Colour"] <- "grey0"
+
+                 d_text$Response <- d_text$Response +
+                   c(rep(diff(y_breaks[1:2]), 2), 0, 0,
+                     rep(diff(y_breaks[1:2]), 2),
+                     diff(y_breaks[1:2])) * 1 / c(-10, 10, 1, 1, -2, -2, -10)
+               },
+               "upper" = {
+                 d_text <- rbind(d_text, d_text[nrow(d_text), ])
+                 d_text[nrow(d_text), "Time"] <- x_range[2]
+                 d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
+                 d_text[nrow(d_text), "Label"] <-
+                   print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
+                             rl_sf[rl_index])
+                 d_text[nrow(d_text), "Colour"] <- "grey0"
+                 d_text[5:6, "Response"] <- rep(sl[2], 2)
+
+                 d_text$Response <- d_text$Response +
+                   c(rep(diff(y_breaks[1:2]), 2), 0, 0,
+                     rep(diff(y_breaks[1:2]), 2),
+                     diff(y_breaks[1:2])) * 1 / c(10, 10, 1, 1, 2, 2, 1)
+               })
+      } else {
+        switch(ivl_side,
+               "lower" = {
+                 d_text <- data.frame(
+                   Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
+                   Response = c(sl, t_exp[rl_index, wcsl_model_name],
+                                wc_icpt[rl_index], rep(sl, 2),
+                                t_exp[rl_index, "Rel.Spec"]),
+                   Label =
+                     c(print_val("LSL: ", sl, rvu, sl_sf),
+                       print_val("", t_exp[rl_index, wcsl_model_name], rvu,
+                                 rl_sf[rl_index], suffix = " "),
+                       print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
+                                 suffix = " "),
+                       ifelse(plot_option %in% "lean2",
+                              print_val("", poi_woca, "",
+                                        get_n_whole_part(poi_woca) + 1),
+                              print_val("", poi_woca, "",
+                                        get_n_whole_part(poi_woca) + 1,
+                                        suffix = "\n(worst case\nscenario)")),
+                       ifelse(plot_option %in% "lean2",
+                              print_val("", poi_model, "",
+                                        get_n_whole_part(poi_model) + 1),
+                              print_val("", poi_model, "",
+                                        get_n_whole_part(poi_model) + 1,
+                                        suffix = "\n(standard\nscenario)")),
+                       print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
+                                 rl_sf[rl_index])),
+                   Colour = c("black", "red", "royalblue", "forestgreen",
+                              "grey50", "grey0"),
+                   stringsAsFactors = FALSE)
+                 d_text$Response <- d_text$Response +
+                   c(diff(y_breaks[1:2]), 0, 0,
+                     rep(diff(y_breaks[1:2]), 2),
+                     diff(y_breaks[1:2])) * 1 / c(-10, 1, 1, -2, -2, -10)
+               },
+               "upper" = {
+                 d_text <- data.frame(
+                   Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
+                   Response = c(sl, t_exp[rl_index, wcsl_model_name],
+                                wc_icpt[rl_index], rep(sl, 2),
+                                t_exp[rl_index, "Rel.Spec"]),
+                   Label =
+                     c(print_val("USL: ", sl, rvu, sl_sf),
+                       print_val("",  t_exp[rl_index, wcsl_model_name], rvu,
+                                 rl_sf[rl_index], suffix = " "),
+                       print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
+                                 suffix = " "),
+                       ifelse(plot_option %in% "lean2",
+                              print_val("", poi_woca, "",
+                                        get_n_whole_part(poi_woca) + 1),
+                              print_val("", poi_woca, "",
+                                        get_n_whole_part(poi_woca) + 1,
+                                        suffix = "\n(worst case\nscenario)")),
+                       ifelse(plot_option %in% "lean2",
+                              print_val("", poi_model, "",
+                                        get_n_whole_part(poi_model) + 1),
+                              print_val("", poi_model, "",
+                                        get_n_whole_part(poi_model) + 1,
+                                        suffix = "\n(standard\nscenario)")),
+                       print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
+                                 rl_sf[rl_index])),
+                   Colour = c("black", "red", "royalblue", "forestgreen",
+                              "grey50", "grey0"),
+                   stringsAsFactors = FALSE)
+                 d_text$Response <- d_text$Response +
+                   c(diff(y_breaks[1:2]), 0, 0,
+                     rep(diff(y_breaks[1:2]), 2),
+                     diff(y_breaks[1:2])) * 1 / c(10, 1, 1, 2, 2, 10)
+               })
+      }
+    })
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Renaming of columns for plotting on the original scale
+
+  if (sum(xform %in% "no") == 2) {
+    colnames(d_text) <- c(expob[["Variables"]][["time"]],
+                          expob[["Variables"]][["response"]],
+                          "Label", "Colour")
+  }
+  if (sum(xform %in% "no") == 0) {
+    colnames(d_text) <- c(expob[["Variables"]][["time.orig"]],
+                          expob[["Variables"]][["response.orig"]],
+                          "Label", "Colour")
+  }
+  if (sum(xform %in% "no") == 1) {
+    if (xform[1] != "no") {
+      colnames(d_text) <- c(expob[["Variables"]][["time.orig"]],
+                            expob[["Variables"]][["response"]],
+                            "Label", "Colour")
+    }
+    if (xform[2] != "no") {
+      colnames(d_text) <- c(expob[["Variables"]][["time"]],
+                            expob[["Variables"]][["response.orig"]],
+                            "Label", "Colour")
+    }
+  }
 
   return(d_text)
 }
@@ -3376,36 +3386,40 @@ get_text_annotation <- function(rvu, x_range, y_range, sl, sl_sf, poi_model,
 #'
 #' The function \code{get_hlines()} prepares a data frame for putting
 #' horizontal lines on a plot prepared by the \code{ggplot()} function from
-#' the \sQuote{\code{ggplot2}} package
+#' the \sQuote{\code{ggplot2}} package.
 #'
 #' @inheritParams get_text_annotation
 #'
 #' @details The function \code{get_hlines()} expects various pieces
 #' of information characterising an \sQuote{\code{expirest_osle}} or an
 #' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
-#' the function prepares a data frame that can be handed over to the
-#' \code{geom_hline()} function from the \sQuote{\code{ggplot2}} package.
+#' the function prepares a data frame that that is used by the functions
+#' \code{\link{plot_expirest_osle}()} or \code{\link{plot_expirest_wisle}()}
+#' to put lines on the graph that is prepared by these functions.
 #'
-#' @return A data frame with the columns Response, Item, Colour and Type
-#' is returned.
+#' @return A data frame with the columns \sQuote{Response}, Item, Colour and
+#' Type is returned, where the column name \sQuote{Response} is a placeholder
+#' for the corresponding variable name. The data frame has up to two rows
+#' representing the specification limit(s).
 #'
 #' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
 #' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
 
-get_hlines <- function(sl, ivl_side) {
-  if (!is.numeric(sl) || length(sl) > 2) {
-    stop("The parameter sl must be a numeric or vector of length 1 or 2.")
+get_hlines <- function(model) {
+  if (!inherits(model, "expirest_osle") && !inherits(model, "expirest_wisle")) {
+    stop("The model must be an object of class expirest_osle or ",
+         "expirest_wisle.")
   }
-  if (length(sl) == 2) {
-    if (sl[2] < sl[1]) {
-      stop("The parameter sl must be of the form c(lower, upper).")
-    }
-  }
-  if (!(ivl_side %in% c("lower", "upper", "both"))) {
-    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
-  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Extraction of data and parameters
+
+  expob <- model
+  sl <- expob[["Limits"]][["sl"]]
+  xform <- expob[["Limits"]][["xform"]]
+  ivl_side <- expob[["Parameters"]][["ivl.side"]]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3433,14 +3447,171 @@ get_hlines <- function(sl, ivl_side) {
            })
   }
 
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Renaming of columns for plotting on the original scale
+
+  if (sum(xform %in% "no") == 2) {
+    colnames(d_hlines) <- c(expob[["Variables"]][["response"]],
+                            "Item", "Colour", "Type")
+  }
+  if (sum(xform %in% "no") == 0) {
+    colnames(d_hlines) <- c(expob[["Variables"]][["response.orig"]],
+                            "Item", "Colour", "Type")
+  }
+  if (sum(xform %in% "no") == 1) {
+    if (xform[2] != "no") {
+      colnames(d_hlines) <- c(expob[["Variables"]][["response.orig"]],
+                              "Item", "Colour", "Type")
+    } else {
+      colnames(d_hlines) <- c(expob[["Variables"]][["response"]],
+                              "Item", "Colour", "Type")
+    }
+  }
+
   return(d_hlines)
+}
+
+#' Prepare vertical lines
+#'
+#' The function \code{get_vlines()} prepares a data frame for putting
+#' vertical lines on a plot prepared by the \code{ggplot()} function from
+#' the \sQuote{\code{ggplot2}} package.
+#'
+#' @inheritParams get_text_annotation
+#'
+#' @details The function \code{get_vlines()} expects various pieces
+#' of information characterising an \sQuote{\code{expirest_osle}} or an
+#' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
+#' the function prepares a data frame that that is used by the functions
+#' \code{\link{plot_expirest_osle}()} or \code{\link{plot_expirest_wisle}(}))
+#' to put text annotations on the graph that is prepared by these functions.
+#'
+#' @return A data frame with the columns \sQuote{Time}, Item, Colour and Type
+#' is returned, where the column name \sQuote{Time} is a placeholder for the
+#' corresponding variable name. If \code{model} is an \sQuote{expirest_osle}
+#' object, the data frame has one row representing the POI obtained from
+#' ordinary shelf life estimation. If \code{model} is an \sQuote{expirest_wisle}
+#' object, the data frame has two rows representing the POI obtained from
+#' ordinary shelf life estimation (row 1) and the POI of the What-if approach
+#' for shelf life estimation (row 2).
+#'
+#' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
+#' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
+#'
+#' @keywords internal
+
+get_vlines <- function(model, rl_index = NULL, mtbs = "verified") {
+  if (!inherits(model, "expirest_osle") && !inherits(model, "expirest_wisle")) {
+    stop("The model must be an object of class expirest_osle or ",
+         "expirest_wisle.")
+  }
+  if (!is.null(rl_index)) {
+    if (!is.numeric(rl_index) || length(rl_index) > 1) {
+      stop("The parameter rl_index must be a positive integer of length 1.")
+    }
+    if (rl_index != as.integer(rl_index)) {
+      stop("The parameter rl_index must be a positive integer of length 1.")
+    }
+  }
+  if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify mtbs either as \"verified\", \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Extraction of data and parameters
+
+  expob <- model
+  t_exp <- expob[["POI"]]
+  xform <- expob[["Limits"]][["xform"]]
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Extraction of models and of the model type
+
+  model_name <- ifelse(mtbs == "verified",
+                       expob[["Model.Type"]][["type.acronym"]],
+                       mtbs)
+
+  switch(class(model),
+         "expirest_osle" = {
+           poi_model <- t_exp[model_name]
+         },
+         "expirest_wisle" = {
+           # Most appropriate model based on the ANCOVA analysis, or as
+           # specified via the mtbs parameter
+           poi_model_name <- paste("POI.Model", model_name, sep = ".")
+           sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
+
+           # POI with the upper or lower confidence or prediction interval of
+           # the linear regression model representing the worst case scenario
+           # (woca) case
+           poi_model <- t_exp[rl_index, poi_model_name]
+           poi_woca <- t_exp[rl_index, sl_model_name]
+         })
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Setting variable names
+
+  if (sum(xform %in% "no") == 2) {
+    time_vbl <- expob[["Variables"]][["time"]]
+  }
+  if (sum(xform %in% "no") == 0) {
+    old_time_vbl <- expob[["Variables"]][["time.orig"]]
+    time_vbl <- expob[["Variables"]][["time"]]
+  }
+  if (sum(xform %in% "no") == 1) {
+    if (xform[1] != "no") {
+      old_time_vbl <- expob[["Variables"]][["time.orig"]]
+      time_vbl <- expob[["Variables"]][["time"]]
+    }
+    if (xform[2] != "no") {
+      time_vbl <- expob[["Variables"]][["time"]]
+    }
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  switch(class(model),
+         "expirest_osle" = {
+           d_vlines <- data.frame(Time = c(poi_model),
+                                  Item = c("poi.model"),
+                                  Colour = c("forestgreen"),
+                                  Type = c("dotdash"),
+                                  stringsAsFactors = FALSE)
+         },
+         "expirest_wisle" = {
+           d_vlines <- data.frame(Time = c(poi_woca, poi_model),
+                                  Item = c("poi.woca", "poi.model"),
+                                  Colour = c("forestgreen", "grey50"),
+                                  Type = c("dashed", "dotdash"),
+                                  stringsAsFactors = FALSE)
+         })
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Renaming of columns for plotting on the original scale
+
+  if (sum(xform %in% "no") == 2) {
+    colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
+  }
+  if (sum(xform %in% "no") == 0) {
+    colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
+  }
+  if (sum(xform %in% "no") == 1) {
+    if (xform[1] != "no") {
+      colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
+    } else {
+      colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
+    }
+  }
+
+  return(d_vlines)
 }
 
 #' Prepare segments explaining graphical elements
 #'
 #' The function \code{get_segments()} prepares a data frame for putting
-#' segments on a plot prepared by the \code{ggplot()} function from
-#' the \sQuote{\code{ggplot2}} package
+#' segments on a plot prepared by the \code{ggplot()} function from the
+#' \sQuote{\code{ggplot2}} package.
 #'
 #' @param rl A numeric value or a numeric vector that specifies the release
 #'   specification limit(s) for which the corresponding expiry should be
@@ -3452,74 +3623,69 @@ get_hlines <- function(sl, ivl_side) {
 #' @details The function \code{get_segments()} expects various pieces
 #' of information characterising an \sQuote{\code{expirest_osle}} or an
 #' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
-#' the function prepares a data frame that can be handed over to the
-#' \code{geom_vline()} function from the \sQuote{\code{ggplot2}} package.
+#' the function prepares a data frame that that is used by the function
+#' \code{\link{plot_expirest_wisle}(})) to put line segments on the graph that
+#' is prepared by this function.
 #'
-#' @return A data frame with the columns Time.1, Time.2, Response.1,
-#' Response.2, Item, Colour, Type, Size. Time.1 and Time.2 represent the
-#' maximal allowed difference over time from intercept and Response.1 and
-#' Response.2 represent the release limit.
+#' @return A data frame with the columns \sQuote{Time.1}, \sQuote{Time.2},
+#' \sQuote{Response.1}, \sQuote{Response.2}, Item, Colour, Type and Size is
+#' returned, where the column names \sQuote{Time.1}, \sQuote{Time.2},
+#' \sQuote{Response.1} and \sQuote{Response.2} are placeholders for the
+#' corresponding variable names. The items in the four rows represent the
+#' maximal allowed difference over time from the intercept (shown as red
+#' dashed horizontal line), the release limit (shown as black dotted horizontal
+#' line), the maximal allowed difference over time from the specification limit
+#' (shown as grey solid vertical line) and the maximal allowed difference over
+#' time from the intercept (shown as grey solid vertical line).
 #'
 #' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
 #' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
 
-get_segments <- function(sl, ivl_side, wisle_est, rl, rl_index, poi_woca,
-                         wc_icpt, x_range, sl_model_name, wcsl_model_name) {
-  if (!is.numeric(sl) || length(sl) > 2) {
-    stop("The parameter sl must be a numeric or vector of length 1 or 2.")
-  }
-  if (length(sl) == 2) {
-    if (sl[2] < sl[1]) {
-      stop("The parameter sl must be of the form c(lower, upper).")
-    }
-  }
-  if (!(ivl_side %in% c("lower", "upper", "both"))) {
-    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
-  }
-  if (!is.data.frame(wisle_est) || ncol(wisle_est) != 24) {
-    stop("The parameter wisle_est must be a data frame with 24 columns.")
-  }
-  if (!is.numeric(rl)) {
-    stop("The parameter rl must be a numeric.")
-  }
-  if (length(rl) != nrow(wisle_est)) {
-    stop("The parameter rl must be a positive integer of the same length ",
-         "as the parameter wisle_est has rows.")
-  }
-  if (!is.numeric(rl_index) || length(rl_index) > 1) {
-    stop("The parameter rl_index must be a positive integer of length 1.")
-  }
-  if (rl_index != as.integer(rl_index)) {
-    stop("The parameter rl_index must be a positive integer of length 1.")
-  }
-  if (rl_index < 1 || rl_index > nrow(wisle_est)) {
-    stop("The parameter rl_index must be between 1 and the number of rows ",
-         "of the parameter wisle_est.")
-  }
-  if (!is.numeric(poi_woca) && !is.na(poi_woca) || length(poi_woca) > 1) {
-    stop("The parameter poi_woca must be a numeric of length 1.")
-  }
-  if (!is.numeric(wc_icpt)) {
-    stop("The parameter wc_icpt must be a numeric vector.")
+get_segments <- function(model, x_range, rl_index, mtbs = "verified") {
+  if (!inherits(model, "expirest_wisle")) {
+    stop("The model must be an object of class expirest_wisle.")
   }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {
-      stop("The parameter x_range must be a vector of length 2.")
+      stop("The parameter x_range must be a numeric vector of length 2.")
     }
   }
-  if (!is.character(sl_model_name) || length(sl_model_name) != 1) {
-    stop("The parameter sl_model_name must be a single string.")
+  if (!is.null(rl_index)) {
+    if (!is.numeric(rl_index) || length(rl_index) > 1) {
+      stop("The parameter rl_index must be a positive integer of length 1.")
+    }
+    if (rl_index != as.integer(rl_index)) {
+      stop("The parameter rl_index must be a positive integer of length 1.")
+    }
   }
-  if (!is.character(wcsl_model_name) || length(wcsl_model_name) != 1) {
-    stop("The parameter wcsl_model_name must be a single string.")
+  if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify mtbs either as \"verified\", \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Preparation of data
+  # Extraction of data and parameters
 
-  t_exp <- wisle_est
+  # General parameters
+  expob <- model
+  t_exp <- expob[["POI"]]
+
+  sl <- expob[["Limits"]][["sl"]]
+  rl <- expob[["Limits"]][["rl"]]
+  xform <- expob[["Limits"]][["xform"]]
+  ivl_side <- expob[["Parameters"]][["ivl.side"]]
+
+  model_name <- ifelse(mtbs == "verified",
+                       expob[["Model.Type"]][["type.acronym"]],
+                       mtbs)
+
+  sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
+  wcsl_model_name <- paste("WCSL", model_name, sep = ".")
+
+  poi_woca <- t_exp[rl_index, sl_model_name]
+  wc_icpt <- expob[["wc.icpt"]][, model_name]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3592,85 +3758,109 @@ get_segments <- function(sl, ivl_side, wisle_est, rl, rl_index, poi_woca,
       stringsAsFactors = FALSE)
   }
 
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Renaming of columns for plotting on the original scale
+
+  if (sum(xform %in% "no") == 2) {
+    colnames(d_seg) <-
+      c(paste(expob[["Variables"]][["time"]], 1:2, sep = "."),
+        paste(expob[["Variables"]][["response"]], 1:2, sep = "."),
+        "Item", "Colour", "Type", "Size")
+  }
+  if (sum(xform %in% "no") == 0) {
+    colnames(d_seg) <-
+      c(paste(expob[["Variables"]][["time.orig"]], 1:2, sep = "."),
+        paste(expob[["Variables"]][["response.orig"]], 1:2, sep = "."),
+        "Item", "Colour", "Type", "Size")
+  }
+  if (sum(xform %in% "no") == 1) {
+    if (xform[1] != "no") {
+      colnames(d_seg) <-
+        c(paste(expob[["Variables"]][["time.orig"]], 1:2, sep = "."),
+          paste(expob[["Variables"]][["response"]], 1:2, sep = "."),
+          "Item", "Colour", "Type", "Size")
+    }
+    if (xform[2] != "no") {
+      colnames(d_seg) <-
+        c(paste(expob[["Variables"]][["time"]], 1:2, sep = "."),
+          paste(expob[["Variables"]][["response.orig"]], 1:2, sep = "."),
+          "Item", "Colour", "Type", "Size")
+    }
+  }
+
   return(d_seg)
 }
 
 #' Prepare arrow supporting the explanation of graphical elements
 #'
 #' The function \code{get_arrows()} prepares a data frame for putting an
-#' arrow on a plot prepared by the \code{ggplot()} function from
-#' the \sQuote{\code{ggplot2}} package
+#' arrow on a plot prepared by the \code{ggplot()} function from the
+#' \sQuote{\code{ggplot2}} package.
 #'
 #' @inheritParams get_segments
 #'
 #' @details The function \code{get_arrows()} expects various pieces
 #' of information that characterises an \sQuote{\code{expirest_osle}} or an
 #' \sQuote{\code{expirest_wisle}} model. Based on the information provided,
-#' the function prepares a data frame that can be handed over to the
-#' \code{geom_vline()} function from the \sQuote{\code{ggplot2}} package.
+#' the function prepares a data frame that that is used by the function
+#' \code{\link{plot_expirest_wisle}(})) to put an arrow on the graph that
+#' is prepared by this function.
 #'
-#' @return A data frame with the columns Time.1, Time.2, Response.1, Response.2,
-#' Item, Colour, Line.Type, Arrow.Type, Size, Curvature, Angle and Length.
-#' Time.1 and Time.2 represent the maximal allowed difference over time from
-#' intercept and Response.1 and Response.2 represent the release limit.
+#' @return A data frame with the columns \sQuote{Time.1}, \sQuote{Time.2},
+#' \sQuote{Response.1}, \sQuote{Response.2}, Item, Colour, Line.Type,
+#' Arrow.Type, Size, Curvature, Angle and Length is returned, where the column
+#' names \sQuote{Time.1}, \sQuote{Time.2}, \sQuote{Response.1} and
+#' \sQuote{Response.2} are placeholders for the corresponding variable names.
+#' The data frame has a single row representing the arrow that is put on the
+#' graphical illustration.
 #'
 #' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}},
 #' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
 
-get_arrow <- function(sl, ivl_side, wisle_est, rl, rl_index,
-                      wc_icpt, x_range, sl_model_name, wcsl_model_name) {
-  if (!is.numeric(sl) || length(sl) > 2) {
-    stop("The parameter sl must be a numeric or vector of length 1 or 2.")
-  }
-  if (length(sl) == 2) {
-    if (sl[2] < sl[1]) {
-      stop("The parameter sl must be of the form c(lower, upper).")
-    }
-  }
-  if (!(ivl_side %in% c("lower", "upper", "both"))) {
-    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
-  }
-  if (!is.data.frame(wisle_est) || ncol(wisle_est) != 24) {
-    stop("The parameter wisle_est must be a data frame with 24 columns.")
-  }
-  if (!is.numeric(rl)) {
-    stop("The parameter rl must be a numeric.")
-  }
-  if (length(rl) != nrow(wisle_est)) {
-    stop("The parameter rl must be a positive integer of the same length ",
-         "as the parameter wisle_est has rows.")
-  }
-  if (!is.numeric(rl_index) || length(rl_index) > 1) {
-    stop("The parameter rl_index must be a positive integer of length 1.")
-  }
-  if (rl_index != as.integer(rl_index)) {
-    stop("The parameter rl_index must be a positive integer of length 1.")
-  }
-  if (rl_index < 1 || rl_index > nrow(wisle_est)) {
-    stop("The parameter rl_index must be between 1 and the number of rows ",
-         "of the parameter wisle_est.")
-  }
-  if (!is.numeric(wc_icpt)) {
-    stop("The parameter wc_icpt must be a numeric vector.")
+get_arrow <- function(model, x_range, rl_index, mtbs = "verified") {
+  if (!inherits(model, "expirest_wisle")) {
+    stop("The model must be an object of class expirest_wisle.")
   }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {
-      stop("The parameter x_range must be a vector of length 2.")
+      stop("The parameter x_range must be a numeric vector of length 2.")
     }
   }
-  if (!is.character(sl_model_name) || length(sl_model_name) != 1) {
-    stop("The parameter sl_model_name must be a single string.")
+  if (!is.null(rl_index)) {
+    if (!is.numeric(rl_index) || length(rl_index) > 1) {
+      stop("The parameter rl_index must be a positive integer of length 1.")
+    }
+    if (rl_index != as.integer(rl_index)) {
+      stop("The parameter rl_index must be a positive integer of length 1.")
+    }
   }
-  if (!is.character(wcsl_model_name) || length(wcsl_model_name) != 1) {
-    stop("The parameter wcsl_model_name must be a single string.")
+  if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify mtbs either as \"verified\", \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Preparation of data
+  # Extraction of data and parameters
 
-  t_exp <- wisle_est
+  # General parameters
+  expob <- model
+  t_exp <- expob[["POI"]]
+
+  sl <- expob[["Limits"]][["sl"]]
+  rl <- expob[["Limits"]][["rl"]]
+  xform <- expob[["Limits"]][["xform"]]
+  ivl_side <- expob[["Parameters"]][["ivl.side"]]
+
+  model_name <- ifelse(mtbs == "verified",
+                       expob[["Model.Type"]][["type.acronym"]],
+                       mtbs)
+
+  sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
+  wcsl_model_name <- paste("WCSL", model_name, sep = ".")
+
+  wc_icpt <- expob[["wc.icpt"]][, model_name]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3748,5 +3938,216 @@ get_arrow <- function(sl, ivl_side, wisle_est, rl, rl_index,
            })
   }
 
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Renaming of columns for plotting on the original scale
+
+  if (sum(xform %in% "no") == 2) {
+    colnames(d_arr) <-
+      c(paste(expob[["Variables"]][["time"]], 1:2, sep = "."),
+        paste(expob[["Variables"]][["response"]], 1:2, sep = "."),
+        "Item", "Colour", "Line.Type", "Arrow.Type",
+        "Size", "Curvature", "Angle", "Length")
+  }
+  if (sum(xform %in% "no") == 0) {
+    colnames(d_arr) <-
+      c(paste(expob[["Variables"]][["time.orig"]], 1:2, sep = "."),
+        paste(expob[["Variables"]][["response.orig"]], 1:2, sep = "."),
+        "Item", "Colour", "Line.Type", "Arrow.Type",
+        "Size", "Curvature", "Angle", "Length")
+  }
+  if (sum(xform %in% "no") == 1) {
+    if (xform[1] != "no") {
+      colnames(d_arr) <-
+        c(paste(expob[["Variables"]][["time.orig"]], 1:2, sep = "."),
+          paste(expob[["Variables"]][["response"]], 1:2, sep = "."),
+          "Item", "Colour", "Line.Type", "Arrow.Type",
+          "Size", "Curvature", "Angle", "Length")
+    }
+    if (xform[2] != "no") {
+     colnames(d_arr) <-
+       c(paste(expob[["Variables"]][["time"]], 1:2, sep = "."),
+         paste(expob[["Variables"]][["response.orig"]], 1:2, sep = "."),
+         "Item", "Colour", "Line.Type", "Arrow.Type",
+         "Size", "Curvature", "Angle", "Length")
+    }
+  }
+
   return(d_arr)
+}
+
+#' Get the predicted values
+#'
+#' The function \code{get_predictions()} makes the predictions to be shown
+#' on the graphs prepared by the function \code{\link{plot_expirest_osle}()}
+#' or \code{\link{plot_expirest_wisle}()}.
+#'
+#' @param model An \sQuote{\code{expirest_osle}} or an
+#'   \sQuote{\code{expirest_Wisle}} object, i.e. a list returned
+#'   by the \code{\link{expirest_osle}()} or by the
+#'   \code{\link{expirest_wisle}()} function.
+#' @param model_name A character string representing the acronym that specifies
+#'   which model, based on the ANCOVA analysis, suits best.
+#' @param x_range A numeric vector of the form \code{c(min, max)} that
+#'   specifies the range of the time variable to be plotted.
+#'
+#' @details The function \code{get_predictions()} prepares a data frame that
+#' contains the predicted values .
+#'
+#' @return A data frame with the columns named after the \code{batch_vbl}, the
+#' \code{time_vbl} and the \code{response_vbl} (see function descriptions of
+#' \code{\link{plot_expirest_osle}()} or \code{\link{plot_expirest_wisle}()})
+#' and further two columns named \code{LL} and \code{UL} which represent the
+#' lower or the upper confidence or prediction interval limits, respectively.
+#'
+#' @seealso \code{\link{plot_expirest_osle}}, \code{\link{plot_expirest_wisle}}.
+#'
+#' @importFrom stats predict
+#'
+#' @keywords internal
+
+get_predictions <- function(model, model_name, x_range) {
+  if (!inherits(model, "expirest_osle") && !inherits(model, "expirest_wisle")) {
+    stop("The model must be an object of class expirest_osle or ",
+         "expirest_wisle.")
+  }
+  if (!(model_name %in% c("cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify model_name either as \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
+  }
+  if (!is.numeric(x_range) || length(x_range) != 2) {
+    stop("The parameter x_range must be a vector of length 2.")
+  }
+  if (x_range[2] < x_range[1]) {
+    stop("The parameter x_range must be of the form c(lower, upper).")
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Extraction of data and parameters
+
+  expob <- model
+  l_models <- expob[["Models"]]
+  model <- l_models[[model_name]]
+
+  d_dat <- expob[["Data"]]
+
+  alpha <- expob[["Parameters"]][["alpha"]]
+  ivl <- expob[["Parameters"]][["ivl"]]
+  ivl_type <- expob[["Parameters"]][["ivl.type"]]
+
+  # Note: since the predict.lm() function from the 'stats' package always
+  # calculates two-sided limits the value of alpha must be doubled in case that
+  # the ivl_type is "one-sided".
+
+  if (ivl_type == "one.sided") {
+    alpha <- alpha * 2
+  }
+
+  xform <- expob[["Limits"]][["xform"]]
+  shift <- expob[["Limits"]][["shift"]]
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Preparation the prediction
+
+  # Generate the new x values (on the original scale) for prediction
+  x_new <- seq(min(x_range), max(x_range), length.out = 100)
+
+  # Transformation of new x values, if necessary
+  switch(xform[1],
+         "no" = {
+         },
+         "log" = {
+           x_new_trfmd <- log(x_new + shift[1])
+         },
+         "sqrt" = {
+           x_new_trfmd <- sqrt(x_new + shift[1])
+         },
+         "sq" = {
+           x_new_trfmd <- (x_new + shift[1])^2
+         })
+
+  # Creation of data frame for the predict.lm() function
+  t_batches <- levels(d_dat[, expob[["Variables"]][["batch"]]])
+
+  if (xform[1] == "no") {
+    d_new <- data.frame(rep(t_batches, each = length(x_new)),
+                        rep(x_new, times = length(t_batches)))
+  } else {
+    d_new <- data.frame(rep(t_batches, each = length(x_new_trfmd)),
+                        rep(x_new_trfmd, times = length(t_batches)))
+  }
+
+  colnames(d_new) <- c(expob[["Variables"]][["batch"]],
+                       expob[["Variables"]][["time"]])
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Performing the prediction
+
+  if (model_name != "dids") {
+    m_pred <- predict(model, newdata = d_new, interval = ivl, level = 1 - alpha)
+  } else {
+    l_pred <- lapply(t_batches, function(x) {
+      predict(l_models$dids[[x]],
+              newdata = d_new[d_new[, expob[["Variables"]][["batch"]]] == x, ],
+              interval = ivl, level = 1 - alpha)
+    })
+    m_pred <- do.call(rbind, l_pred)
+  }
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Preparation of the results
+
+  # Back-transformation of predicted (response) values, if necessary
+  switch(xform[2],
+         "no" = {
+         },
+         "log" = {
+           m_pred <- exp(m_pred) - shift[2]
+         },
+         "sqrt" = {
+           m_pred <- m_pred^2 - shift[2]
+         },
+         "sq" = {
+           m_pred[m_pred < 0] <- NA
+           m_pred <- sqrt(m_pred) - shift[2]
+         })
+
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Generation of data frame for plotting (with values in original scale)
+
+  if (sum(xform %in% "no") == 2) {
+    d_pred <- as.data.frame(cbind(d_new, m_pred))
+    colnames(d_pred) <- c(expob[["Variables"]][["batch"]],
+                          expob[["Variables"]][["time"]],
+                          expob[["Variables"]][["response"]],
+                          "LL", "UL")
+  }
+  if (sum(xform %in% "no") == 0) {
+    d_pred <- data.frame(rep(t_batches, each = length(x_new)),
+                         rep(x_new, times = length(t_batches)),
+                         m_pred)
+    colnames(d_pred) <- c(expob[["Variables"]][["batch"]],
+                          expob[["Variables"]][["time.orig"]],
+                          expob[["Variables"]][["response.orig"]],
+                          "LL", "UL")
+  }
+  if (sum(xform %in% "no") == 1) {
+    if (xform[1] != "no") {
+      d_pred <- data.frame(rep(t_batches, each = length(x_new)),
+                           rep(x_new, times = length(t_batches)),
+                           m_pred)
+      colnames(d_pred) <- c(expob[["Variables"]][["batch"]],
+                            expob[["Variables"]][["time.orig"]],
+                            expob[["Variables"]][["response"]],
+                            "LL", "UL")
+    }
+    if (xform[2] != "no") {
+      d_pred <- as.data.frame(cbind(d_new, m_pred))
+      colnames(d_pred) <- c(expob[["Variables"]][["batch"]],
+                            expob[["Variables"]][["time"]],
+                            expob[["Variables"]][["response.orig"]],
+                            "LL", "UL")
+    }
+  }
+
+  return(d_pred)
 }
