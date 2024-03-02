@@ -83,7 +83,7 @@ test_that("expirest_wisle_estimation_succeeds_for_poi", {
 })
 
 test_that("expirest_wisle_estimation_succeeds_with_multiple_rl", {
-  re <-
+  re1 <-
     expirest_wisle(
       data = exp2, response_vbl = "Related", time_vbl = "Month",
       batch_vbl = "Batch", rl = seq(0.06, 0.18, 0.02), rl_sf = rep(3, 7),
@@ -91,50 +91,65 @@ test_that("expirest_wisle_estimation_succeeds_with_multiple_rl", {
       alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
       sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
       ivl_side = "upper")[["POI"]]
+  re2 <-
+    expirest_wisle(
+      data = exp2, response_vbl = "Related", time_vbl = "Month",
+      batch_vbl = "Batch", rl = seq(0.24, 0.34, 0.02), rl_sf = rep(3, 6),
+      sl = 0.3, sl_sf = 1, srch_range = c(0, 500), alpha = 0.05,
+      alpha_pool = 0.25, xform = c("no", "no"), shift = c(0, 0),
+      sf_option = "tight", ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "upper")[["POI"]]
 
   # <-><-><-><->
 
-  expect_equal(signif(re[, "Intercept.cics"], 12), rep(0.103507214947, 7))
-  expect_equal(signif(re[, "Intercept.dics"], 12), rep(0.135353267317, 7))
-  expect_equal(signif(re[, "Intercept.dids"], 12), rep(0.112218750000, 7))
-  expect_equal(signif(re[, "Intercept.dids.pmse"], 12),
+  expect_equal(signif(re1[, "Intercept.cics"], 12), rep(0.103507214947, 7))
+  expect_equal(signif(re1[, "Intercept.dics"], 12), rep(0.135353267317, 7))
+  expect_equal(signif(re1[, "Intercept.dids"], 12), rep(0.112218750000, 7))
+  expect_equal(signif(re1[, "Intercept.dids.pmse"], 12),
                c(rep(0.112218750000, 6), 0.126543831957))
-  expect_equal(signif(re[, "Delta.cics"], 2),
+  expect_equal(signif(re1[, "Delta.cics"], 2),
                c(0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12))
-  expect_equal(signif(re[, "Delta.dics"], 2),
+  expect_equal(signif(re1[, "Delta.dics"], 2),
                c(0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12))
-  expect_equal(signif(re[, "Delta.dids"], 2),
+  expect_equal(signif(re1[, "Delta.dids"], 2),
                c(0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12))
-  expect_equal(signif(re[, "Delta.dids.pmse"], 2),
+  expect_equal(signif(re1[, "Delta.dids.pmse"], 2),
                c(0.24, 0.22, 0.20, 0.18, 0.16, 0.14, 0.12))
-  expect_equal(signif(re[, "WCSL.cics"], 12),
+  expect_equal(signif(re1[, "WCSL.cics"], 12),
                c(0.343507214947, 0.323507214947, 0.303507214947, 0.283507214947,
                  0.263507214947, 0.243507214947, 0.223507214947))
-  expect_equal(signif(re[, "WCSL.dics"], 12),
+  expect_equal(signif(re1[, "WCSL.dics"], 12),
                c(0.375353267317, 0.355353267317, 0.335353267317, 0.315353267317,
                  0.295353267317, 0.275353267317, 0.255353267317))
-  expect_equal(signif(re[, "WCSL.dids"], 12),
+  expect_equal(signif(re1[, "WCSL.dids"], 12),
                c(0.352218750000, 0.332218750000, 0.312218750000, 0.292218750000,
                  0.272218750000, 0.252218750000, 0.232218750000))
-  expect_equal(signif(re[, "WCSL.dids.pmse"], 12),
+  expect_equal(signif(re1[, "WCSL.dids.pmse"], 12),
                c(0.352218750000, 0.332218750000, 0.312218750000, 0.292218750000,
                  0.272218750000, 0.252218750000, 0.246543831957))
-  expect_equal(signif(re[, "Shelf.Life.cics"], 12),
+  expect_equal(signif(re1[, "Shelf.Life.cics"], 12),
                c(33.7023497447, 31.0532056728, 28.3929462116, 25.7169240050,
                  23.0173720770, 20.2808184067, 17.4818579854))
-  expect_equal(signif(re[, "Shelf.Life.dics"], 12),
+  expect_equal(signif(re1[, "Shelf.Life.dics"], 12),
                c(32.8209904768, 30.0399757667, 27.2465732221, 24.4371980849,
                  21.6069843973, 18.7493384428, 15.8554616662))
-  expect_equal(signif(re[, "Shelf.Life.dids"], 12),
+  expect_equal(signif(re1[, "Shelf.Life.dids"], 12),
                c(19.9814248519, 18.4029062578, 16.8177772438, 15.2229638050,
                  13.6133111973, 11.9793567488, 10.3030302984))
-  expect_equal(signif(re[, "Shelf.Life.dids.pmse"], 12),
+  expect_equal(signif(re1[, "Shelf.Life.dids.pmse"], 12),
                c(19.6600800851, 18.1137833890, 16.5601981827, 14.9959803788,
                  13.4153149598, 11.8078402523, 11.3444065974))
-  expect_equal(signif(re[, "POI.Model.cics"], 12), rep(27.9249797381, 7))
-  expect_equal(signif(re[, "POI.Model.dics"], 12), rep(22.2667191569, 7))
-  expect_equal(signif(re[, "POI.Model.dids"], 12), rep(15.8448655130, 7))
-  expect_equal(signif(re[, "POI.Model.dids.pmse"], 12), rep(15.6061043981, 7))
+  expect_equal(signif(re1[, "POI.Model.cics"], 12), rep(27.9249797381, 7))
+  expect_equal(signif(re1[, "POI.Model.dics"], 12), rep(22.2667191569, 7))
+  expect_equal(signif(re1[, "POI.Model.dids"], 12), rep(15.8448655130, 7))
+  expect_equal(signif(re1[, "POI.Model.dids.pmse"], 12), rep(15.6061043981, 7))
+
+  expect_equal(signif(re2[, "Shelf.Life.dids"], 12),
+               c(4.49097470563, 3.82712999791, NA, NA, NA, NA))
+  expect_equal(signif(re2[, "Shelf.Life.dids.pmse"], 12),
+               c(4.31135902795, 1.81271654695, 0.91856665721, NA, NA, NA))
+  expect_equal(signif(re2[, "POI.Model.dids"], 12), rep(15.8448655130, 6))
+  expect_equal(signif(re2[, "POI.Model.dids.pmse"], 12), rep(15.6061043981, 6))
 })
 
 test_that("expirest_wisle_estimation_succeeds_with_transformations", {

@@ -823,13 +823,6 @@ get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
     stop("Please specify ivl_side either as \"lower\" or \"upper\".")
   }
 
-  if (ivl_side == "lower" && any(rl < sl)) {
-    stop("If ivl_side is \"lower\" rl must be > sl.")
-  }
-  if (ivl_side == "upper" && any(rl > sl)) {
-    stop("If ivl_side is \"upper\" rl must be < sl.")
-  }
-
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of worst case scenario (wcs) limit(s)
 

@@ -283,18 +283,26 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   }
 
   if (length(sl) == 1) {
-    if (ivl_side == "lower" && !all(rl > sl)) {
-      stop("If ivl_side is \"lower\" rl must be > sl.")
+    if (ivl_side == "lower" && any(signif(rl, sl_sf) < sl)) {
+      stop("If ivl_side is \"lower\" rl must be > sl. \nPlease change ",
+           paste0(rl[signif(rl, sl_sf) < sl], ", "),
+           "in the rl vector, accordingly.")
     }
-    if (ivl_side == "upper" && !all(rl < sl)) {
-      stop("If ivl_side is \"upper\" rl must be < sl.")
+    if (ivl_side == "upper" && any(signif(rl, sl_sf) > sl)) {
+      stop("If ivl_side is \"upper\" rl must be < sl. \nPlease change ",
+           paste0(rl[signif(rl, sl_sf) > sl], ", "),
+           "in the rl vector, accordingly.")
     }
   } else {
-    if (ivl_side == "lower" && !all(rl > sl[1])) {
-      stop("If ivl_side is \"lower\" rl must be > sl.")
+    if (ivl_side == "lower" && any(signif(rl, sl_sf[1]) < sl[1])) {
+      stop("If ivl_side is \"lower\" rl must be > sl. \nPlease change ",
+           paste0(rl[signif(rl, sl_sf[1]) < sl[1]], ", "),
+           "in the rl vector, accordingly.")
     }
-    if (ivl_side == "upper" && !all(rl < sl[2])) {
-      stop("If ivl_side is \"upper\" rl must be < sl.")
+    if (ivl_side == "upper" && any(signif(rl, sl_sf[2]) > sl[2])) {
+      stop("If ivl_side is \"upper\" rl must be < sl. \nPlease change ",
+           paste0(rl[signif(rl, sl_sf[2]) > sl[2]], ", "),
+           "in the rl vector, accordingly.")
     }
   }
 

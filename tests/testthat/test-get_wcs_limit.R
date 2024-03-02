@@ -83,12 +83,4 @@ test_that("get_wcs_limit_fails", {
     get_wcs_limit(rl = 96.995, sl = 94.95, intercept = 100,
                   xform = c("no", "no"), shift = c(0, 0), ivl_side = "middle"),
     "specify ivl_side either as \"lower\" or \"upper\"")
-  expect_error(
-    get_wcs_limit(rl = 94, sl = 95, intercept = 100, xform = c("no", "no"),
-                  shift = c(0, 0), ivl_side = "lower"),
-    "If ivl_side is \"lower\" rl must be > sl")
-  expect_error(
-    get_wcs_limit(rl = 106, sl = 105, intercept = 100, xform = c("no", "no"),
-                  shift = c(0, 0), ivl_side = "upper"),
-    "If ivl_side is \"upper\" rl must be < sl")
 })
