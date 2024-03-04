@@ -546,10 +546,13 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
     mtbs <- "cics"
   }
 
+  # Set model_name to dids if it is n.a.
+  model_name <- ifelse(model_name == "n.a.", "dids", model_name)
+
   # Most appropriate model based on the ANCOVA analysis, or as specified
   # via the mtbs parameter
-  poi_model_name <- paste("POI.Model", model_name, sep = ".")
-  sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
+  poi_model_name <- paste0("POI.Model.", model_name)
+  sl_model_name <- paste0("Shelf.Life.", model_name)
 
   # Checking if estimation of POI.Model or Shelf.Life was successful (for the
   # release limit value that was deemed relevant, i.e. the one specified by
@@ -558,8 +561,8 @@ plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
 
   if (sum(is.na(
     t_exp[rl_index,
-          c(grep(paste("Shelf.Life", model_name, sep = "."), names(t_exp)),
-            grep(paste("POI.Model", model_name, sep = "."), names(t_exp)))]))
+          c(grep(paste0("^Shelf.Life.", model_name, "$"), names(t_exp)),
+            grep(paste0("^POI.Model.", model_name, "$"), names(t_exp)))]))
     > 0) {
     stop("Expiry determination was not successful.")
   }

@@ -40,6 +40,9 @@
 summary.expirest_osle <- function(object, ...) {
   mt <- object[["Model.Type"]]$type.spec
   mtac <- object[["Model.Type"]]$type.acronym
+  itac <- ifelse(object[["Model.Type"]]$type.acronym == "n.a.",
+                 "dids",
+                 object[["Model.Type"]]$type.acronym)
 
   mf <- match.call(expand.dots = TRUE)
   m <- match("digits", names(mf), 0L)
@@ -69,23 +72,23 @@ summary.expirest_osle <- function(object, ...) {
              ")."))
 
   cat("\n\nWorst case intercept: ",
-      ifelse(is.na(object$wc.icpt[mtac]),
+      ifelse(is.na(object$wc.icpt[itac]),
              NA,
-             formatC(as.numeric(object$wc.icpt[mtac]), digits = digits)),
+             formatC(as.numeric(object$wc.icpt[itac]), digits = digits)),
       " (", object[["Variables"]]$response, ")", sep = "")
 
   cat("\nWorst case batch:",
-      ifelse(is.na(object$wc.batch[mtac]),
+      ifelse(is.na(object$wc.batch[itac]),
              NA,
              levels(object[["Data"]]
-                    [, object[["Variables"]]$batch])[object$wc.batch[mtac]]))
+                    [, object[["Variables"]]$batch])[object$wc.batch[itac]]))
 
   cat("\nEstimated shelf life for ",
       mtac,
       " model: ",
-      ifelse(is.na(object[["POI"]][mtac]),
+      ifelse(is.na(object[["POI"]][itac]),
              NA,
-             formatC(object[["POI"]][mtac], digits)),
+             formatC(object[["POI"]][itac], digits)),
       " (", object[["Variables"]]$time, ")", sep = "")
 
   cat("\n\nWorst case intercepts, POIs and batches of all models
@@ -234,6 +237,9 @@ print.plot_expirest_osle <- function(x, ...) {
 summary.expirest_wisle <- function(object, ...) {
   mt <- object[["Model.Type"]]$type.spec
   mtac <- object[["Model.Type"]]$type.acronym
+  itac <- ifelse(object[["Model.Type"]]$type.acronym == "n.a.",
+                 "dids",
+                 object[["Model.Type"]]$type.acronym)
 
   mf <- match.call(expand.dots = TRUE)
   m <- match("digits", names(mf), 0L)
@@ -249,9 +255,9 @@ summary.expirest_wisle <- function(object, ...) {
                                 grep("WCSL", colnames(object[["POI"]])))]
 
   tmp_1 <- tmp_1[, c("Exp.Spec.Report", "Rel.Spec.Report",
-                     colnames(tmp_1)[grep(mtac,
+                     colnames(tmp_1)[grep(itac,
                                           colnames(tmp_1))])]
-  if (mtac %in% c("dids", "dids.pmse")) {
+  if (itac %in% c("dids", "dids.pmse")) {
     colnames(tmp_1) <-
       c("SL", "RL", "wisle", "wisle (pmse)", "osle", "osle (pmse)")
   } else {
@@ -259,16 +265,16 @@ summary.expirest_wisle <- function(object, ...) {
   }
   rownames(tmp_1) <- NULL
 
-  wc_batch <- rep(NA, length(object$wc.batch[[mtac]]))
-  for (i in seq_along(object$wc.batch[[mtac]])) {
-    if (!is.na(object$wc.batch[[mtac]][i]))
+  wc_batch <- rep(NA, length(object$wc.batch[[itac]]))
+  for (i in seq_along(object$wc.batch[[itac]])) {
+    if (!is.na(object$wc.batch[[itac]][i]))
       wc_batch[i] <- levels(object[["Data"]][[object[["Variables"]]$batch]])[
-        object$wc.batch[[mtac]][i]]
+        object$wc.batch[[itac]][i]]
   }
 
   tmp_2 <- data.frame(RL = object[["POI"]][, "Rel.Spec.Report"],
                       Batch = wc_batch,
-                      Intercept = object$wc.icpt[, mtac])
+                      Intercept = object$wc.icpt[, itac])
   rownames(tmp_2) <- NULL
 
   cat("\nSummary of shelf life estimation following the ARGPM
@@ -300,7 +306,7 @@ summary.expirest_wisle <- function(object, ...) {
 
   cat("\nEstimated shelf lives for the",
       mtac)
-  if (mtac != "dids") {
+  if (itac != "dids") {
     cat(" model:\n")
   } else {
     cat(" model (for information, the results of
@@ -312,7 +318,7 @@ summary.expirest_wisle <- function(object, ...) {
   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
   ICH: International Council for Harmonisation;
   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);")
-  if (mtac == "dids") cat("\n  pmse: Pooled mean square error;")
+  if (itac == "dids") cat("\n  pmse: Pooled mean square error;")
   cat("\n  RL: Release Limit;
   SL: Specification Limit;
   wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).")

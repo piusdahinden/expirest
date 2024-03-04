@@ -57,10 +57,10 @@ A list with the following elements is returned:
   the transformed \eqn{x} and/or \eqn{y} variables (specified via the
   \code{xform} parameter).}
 \item{delta.lim}{A numeric value or a numeric vector of the absolute
-  difference(s) between \code{rl} and {sl}, if \code{xform[2] != "no"} on
-  the transformed scale.}
+  difference(s) between \code{rl} and \code{sl}, if \code{xform[2] != "no"}
+  on the transformed scale.}
 \item{delta.lim.orig}{A numeric value or a numeric vector of the absolute
-  difference(s) between \code{rl} and {sl} on the original scale.}
+  difference(s) between \code{rl} and \code{sl} on the original scale.}
 \item{wcs.lim}{A numeric value or a numeric vector of the worst case
   scenario (wcs) limit(s), if \code{xform[2] != "no"} on the transformed
   scale.}

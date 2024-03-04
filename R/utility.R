@@ -777,10 +777,10 @@ get_icpt_list <- function(data, response_vbl, time_vbl, batch_vbl, model_list,
 #'   the transformed \eqn{x} and/or \eqn{y} variables (specified via the
 #'   \code{xform} parameter).}
 #' \item{delta.lim}{A numeric value or a numeric vector of the absolute
-#'   difference(s) between \code{rl} and {sl}, if \code{xform[2] != "no"} on
-#'   the transformed scale.}
+#'   difference(s) between \code{rl} and \code{sl}, if \code{xform[2] != "no"}
+#'   on the transformed scale.}
 #' \item{delta.lim.orig}{A numeric value or a numeric vector of the absolute
-#'   difference(s) between \code{rl} and {sl} on the original scale.}
+#'   difference(s) between \code{rl} and \code{sl} on the original scale.}
 #' \item{wcs.lim}{A numeric value or a numeric vector of the worst case
 #'   scenario (wcs) limit(s), if \code{xform[2] != "no"} on the transformed
 #'   scale.}
@@ -3124,9 +3124,11 @@ get_text_annotation <- function(model, rvu, x_range, y_range, rl_index = NULL,
   xform <- expob[["Limits"]][["xform"]]
   ivl_side <- expob[["Parameters"]][["ivl.side"]]
 
+  # Set model_name to dids if it is n.a.
   model_name <- ifelse(mtbs == "verified",
                        expob[["Model.Type"]][["type.acronym"]],
                        mtbs)
+  model_name <- ifelse(model_name == "n.a.", "dids", model_name)
 
   # Setting of y breaks
   y_breaks <- pretty(y_range, 5)
@@ -3142,9 +3144,9 @@ get_text_annotation <- function(model, rvu, x_range, y_range, rl_index = NULL,
              rl_sf <- expob[["Limits"]][["rl.sf"]] + 1
            }
 
-           poi_model_name <- paste("POI.Model", model_name, sep = ".")
-           sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
-           wcsl_model_name <- paste("WCSL", model_name, sep = ".")
+           poi_model_name <- paste0("POI.Model.", model_name)
+           sl_model_name <- paste0("Shelf.Life.", model_name)
+           wcsl_model_name <- paste0("WCSL.", model_name)
 
            poi_model <- t_exp[rl_index, poi_model_name]
            poi_woca <- t_exp[rl_index, sl_model_name]
@@ -3521,9 +3523,11 @@ get_vlines <- function(model, rl_index = NULL, mtbs = "verified") {
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Extraction of models and of the model type
 
+  # Set model_name to dids if it is n.a.
   model_name <- ifelse(mtbs == "verified",
                        expob[["Model.Type"]][["type.acronym"]],
                        mtbs)
+  model_name <- ifelse(model_name == "n.a.", "dids", model_name)
 
   switch(class(model),
          "expirest_osle" = {
@@ -3532,8 +3536,8 @@ get_vlines <- function(model, rl_index = NULL, mtbs = "verified") {
          "expirest_wisle" = {
            # Most appropriate model based on the ANCOVA analysis, or as
            # specified via the mtbs parameter
-           poi_model_name <- paste("POI.Model", model_name, sep = ".")
-           sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
+           poi_model_name <- paste0("POI.Model.", model_name)
+           sl_model_name <- paste0("Shelf.Life.", model_name)
 
            # POI with the upper or lower confidence or prediction interval of
            # the linear regression model representing the worst case scenario
@@ -3606,11 +3610,6 @@ get_vlines <- function(model, rl_index = NULL, mtbs = "verified") {
 #' segments on a plot prepared by the \code{ggplot()} function from the
 #' \sQuote{\code{ggplot2}} package.
 #'
-#' @param rl A numeric value or a numeric vector that specifies the release
-#'   specification limit(s) for which the corresponding expiry should be
-#'   estimated.
-#' @param sl_model_name A character string that specifies the name of the
-#'   model with the shelf life limit of interest.
 #' @inheritParams get_text_annotation
 #'
 #' @details The function \code{get_segments()} expects various pieces
@@ -3670,12 +3669,14 @@ get_segments <- function(model, x_range, rl_index, mtbs = "verified") {
   xform <- expob[["Limits"]][["xform"]]
   ivl_side <- expob[["Parameters"]][["ivl.side"]]
 
+  # Set model_name to dids if it is n.a.
   model_name <- ifelse(mtbs == "verified",
                        expob[["Model.Type"]][["type.acronym"]],
                        mtbs)
+  model_name <- ifelse(model_name == "n.a.", "dids", model_name)
 
-  sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
-  wcsl_model_name <- paste("WCSL", model_name, sep = ".")
+  sl_model_name <- paste0("Shelf.Life.", model_name)
+  wcsl_model_name <- paste0("WCSL.", model_name)
 
   poi_woca <- t_exp[rl_index, sl_model_name]
   wc_icpt <- expob[["wc.icpt"]][, model_name]
@@ -3846,12 +3847,14 @@ get_arrow <- function(model, x_range, rl_index, mtbs = "verified") {
   xform <- expob[["Limits"]][["xform"]]
   ivl_side <- expob[["Parameters"]][["ivl.side"]]
 
+  # Set model_name to dids if it is n.a.
   model_name <- ifelse(mtbs == "verified",
                        expob[["Model.Type"]][["type.acronym"]],
                        mtbs)
+  model_name <- ifelse(model_name == "n.a.", "dids", model_name)
 
-  sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
-  wcsl_model_name <- paste("WCSL", model_name, sep = ".")
+  sl_model_name <- paste0("Shelf.Life.", model_name)
+  wcsl_model_name <- paste0("WCSL.", model_name)
 
   wc_icpt <- expob[["wc.icpt"]][, model_name]
 

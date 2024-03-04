@@ -611,6 +611,9 @@ plot_expirest_osle <- function(model, show_grouping = "yes",
     mtbs <- "cics"
   }
 
+  # Set model_name to dids if it is n.a.
+  model_name <- ifelse(model_name == "n.a.", "dids", model_name)
+
   # Checking if estimation of POI.Model or Shelf.Life was successful
   t_exp <- expob[["POI"]]
 

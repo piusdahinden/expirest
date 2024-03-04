@@ -29,13 +29,6 @@ individual batch while the \code{dids.pmse} model is the interaction
 model which includes the \eqn{batch} variable as main effect and in the
 interaction term with the \eqn{time} variable (\eqn{batch \times time}),
 i.e. a model where the mean square error is pooled across batches.}
-
-\item{rl}{A numeric value or a numeric vector that specifies the release
-specification limit(s) for which the corresponding expiry should be
-estimated.}
-
-\item{sl_model_name}{A character string that specifies the name of the
-model with the shelf life limit of interest.}
 }
 \value{
 A data frame with the columns \sQuote{Time.1}, \sQuote{Time.2},
