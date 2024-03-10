@@ -132,16 +132,19 @@ gg1 <- plot_expirest_wisle(
   model = res1, rl_index = 1, response_vbl_unit = "\%", x_range = NULL,
   y_range = c(93, 105), scenario = "standard", mtbs = "verified",
   plot_option = "full", ci_app = "line")
-gg1
 
-# Since the element gg1$Graph is a 'ggplot' object it can be used for further
-# manipulation by aid of 'ggplot2' functions.
-if (requireNamespace("ggplot2")) {
-  library(ggplot2)
+\dontrun{
+  gg1
 
-  gg1$Graph + labs(title = "What-if Shelf Life Estimation (WISLE)",
-                   x = "Time [months]", y = "Potency [\% LC]") +
-    scale_x_continuous(limits = c(-5, 31), breaks = seq(0, 30, 6))
+  # Since the element gg1$Graph is a 'ggplot' object it can be used for further
+  # manipulation by aid of 'ggplot2' functions.
+  if (requireNamespace("ggplot2")) {
+    library(ggplot2)
+
+    gg1$Graph + labs(title = "What-if Shelf Life Estimation (WISLE)",
+                     x = "Time [months]", y = "Potency [\% LC]") +
+      scale_x_continuous(limits = c(-5, 31), breaks = seq(0, 30, 6))
+  }
 }
 
 # Repeat this for a different intercept / different slope (dids) model.
@@ -155,7 +158,9 @@ gg2 <- plot_expirest_wisle(
   model = res2, rl_index = 1, response_vbl_unit = "\%", x_range = c(0, 26),
   y_range = c(89, 107),  scenario = "standard",  mtbs = "verified",
   plot_option = "full", ci_app = "ribbon")
-gg2
+\dontrun{
+  gg2
+}
 
 # In case of different intercept / different slope models, individually fit
 # linear models are shown by default, i.e. with the 'mtbs' parameter set
@@ -167,7 +172,9 @@ gg3 <- plot_expirest_wisle(
   model = res2, rl_index = 1, response_vbl_unit = "\%", x_range = c(0, 26),
   y_range = c(89, 107),  scenario = "standard",  mtbs = "dids.pmse",
   plot_option = "full", ci_app = "ribbon")
-gg3
+\dontrun{
+  gg3
+}
 }
 \seealso{
 \code{\link{expirest_wisle}}, \code{\link{expirest_osle}},

@@ -1,12 +1,3 @@
-# Potency stability data (in % of label claim (LC)) of five batches of a drug
-# product obtained over a 24 months period:
-str(exp1)
-
-# 'data.frame':	53 obs. of  3 variables:
-# $ Batch  : Factor w/ 6 levels "b2","b3","b4",..: 1 1 1 1 1 1 1 1 1 1 ...
-# $ Month  : num  0 1 3 3 6 6 12 12 24 24 ...
-# $ Potency: num  101 101.3 99.8 99.2 99.5 ...
-
 # Successful estimations
 # A model with common intercepts / common slopes (cics)
 res1 <-
@@ -53,15 +44,6 @@ res2$POI
 # attr(,"side")
 #     cics      dics dids.pmse      dids
 #  "lower"   "lower"   "lower"   "lower"
-
-# Moisture stability data (% (w/w)) of three batches of a drug product obtained
-# over a 24 months period:
-str(exp3)
-
-# 'data.frame':	33 obs. of  3 variables:
-# $ Batch   : Factor w/ 3 levels "b1","b2","b3": 1 1 1 1 1 1 1 1 1 1 ...
-# $ Month   : num  0 1 2 3 3 6 6 12 12 24 ...
-# $ Moisture: num  2.2 1.7 3.32 2.76 2.43 ...
 
 # Estimation where it is not know a priori which limit is crossed first, i.e.
 # letting the estimation be done for both specification limits.
@@ -118,32 +100,34 @@ res4$POI
 # "NA"      "NA"      "NA"   "lower"
 
 # Unsuccessful estimations
-# Intervals are wider than the specification limits (no intersection).
-res5 <-
-  expirest_osle(
-    data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-    batch_vbl = "Batch", sl = 1.5, sl_sf = 2, srch_range = c(0, 500),
-    sf_option = "tight", ivl = "prediction", ivl_type = "two.sided",
-    ivl_side = "lower")
-res5$POI
+\dontrun{
+  # Intervals are wider than the specification limits (no intersection).
+  res5 <-
+    expirest_osle(
+      data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+      batch_vbl = "Batch", sl = 1.5, sl_sf = 2, srch_range = c(0, 500),
+      sf_option = "tight", ivl = "prediction", ivl_type = "two.sided",
+      ivl_side = "lower")
+  res5$POI
 
-# (Expected) results in res5$POI
-#    cics      dics dids.pmse      dids
-#     NA        NA        NA        NA
-# attr(,"side")
-#    cics      dics dids.pmse      dids
-# "lower"   "lower"   "lower"   "lower"
+  # (Expected) results in res5$POI
+  #    cics      dics dids.pmse      dids
+  #     NA        NA        NA        NA
+  # attr(,"side")
+  #    cics      dics dids.pmse      dids
+  # "lower"   "lower"   "lower"   "lower"
 
-# Estimation may also fail because of an inappropriate 'srch_range' setting.
-res6 <-
-  expirest_osle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
-                response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 5))
-res6$POI
+  # Estimation may also fail because of an inappropriate 'srch_range' setting.
+  res6 <-
+    expirest_osle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
+                  response_vbl = "Potency", time_vbl = "Month",
+                  batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 5))
+  res6$POI
 
-# (Expected) results in res6$POI
-#    cics      dics dids.pmse      dids
-#     NA        NA        NA        NA
-# attr(,"side")
-#    cics      dics dids.pmse      dids
-# "lower"   "lower"   "lower"   "lower"
+  # (Expected) results in res6$POI
+  #    cics      dics dids.pmse      dids
+  #     NA        NA        NA        NA
+  # attr(,"side")
+  #    cics      dics dids.pmse      dids
+  # "lower"   "lower"   "lower"   "lower"
+}

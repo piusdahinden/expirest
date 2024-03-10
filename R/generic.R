@@ -187,7 +187,7 @@ plot.plot_expirest_osle <- function(x, ...) {
 
 print.plot_expirest_osle <- function(x, ...) {
 
-  plot(x = x$Graph, ...)
+  plot.plot_expirest_osle(x = x, ...)
 
   invisible(x)
 }
@@ -402,7 +402,7 @@ plot.plot_expirest_wisle <- function(x, ...) {
 
 print.plot_expirest_wisle <- function(x, ...) {
 
-  plot(x = x$Graph, ...)
+  plot.plot_expirest_wisle(x = x, ...)
 
   invisible(x)
 }

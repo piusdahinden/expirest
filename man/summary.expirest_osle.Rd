@@ -42,15 +42,6 @@ case of the \code{dids} model type, shelf life estimation is done using the
 models obtained from fitting the data of each batch individually.
 }
 \examples{
-# Potency stability data (in \% of label claim (LC)) of five batches of a drug
-# product obtained over a 24 months period:
-str(exp1)
-
-# 'data.frame':	53 obs. of  3 variables:
-# $ Batch  : Factor w/ 6 levels "b2","b3","b4",..: 1 1 1 1 1 1 1 1 1 1 ...
-# $ Month  : num  0 1 3 3 6 6 12 12 24 24 ...
-# $ Potency: num  101 101.3 99.8 99.2 99.5 ...
-
 # Fit models of different type
 res1 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
