@@ -16,7 +16,7 @@ expirest_osle(
   alpha_pool = 0.25,
   xform = c("no", "no"),
   shift = c(0, 0),
-  sf_option = "loose",
+  sf_option = "tight",
   ivl = "confidence",
   ivl_type = "one.sided",
   ivl_side = "lower",
@@ -77,15 +77,13 @@ default is \code{c(0, 0)}.}
 
 \item{sf_option}{A character string that specifies if the limits (\code{rl}
 or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
-either \code{"tight"} or \code{"loose"}, respectively. The option
-\code{"tight"} means that the limits are rounded to the specified number
-of significant figures specified by the parameters \code{rl_sf} and
-\code{sl_sf}. In case of the option \code{"loose"} the limits are rounded
-to the specified number of significant figures (\eqn{n}), followed by the
-subtraction of \eqn{1} from the \eqn{n^{th}} digit and addition of
-\eqn{5} to the \eqn{(n + 1)^{th}} digit if \code{ivl_side} is
-\code{"lower"}, or followed by the addition of \eqn{4} to the
-\eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.}
+either \code{"tight"} or \code{"loose"}, respectively. The default is
+\code{"tight"}. The option \code{"tight"} means that the limits are
+rounded to the number of significant digits specified by the parameters
+\code{rl_sf} and \code{sl_sf}. If \code{sf_option = "loose"}, four on
+the order of the last significant digit + 1 is added if
+\code{ivl_side = "upper"} or five on the order of the last significant
+digit + 1 is subtracted if \code{ivl_side = "upper"}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
 \code{"prediction"} that specifies the type of interval of interest.
@@ -231,7 +229,8 @@ appropriate.
 res1 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                 response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
+                batch_vbl = "Batch", sl = 95, sl_sf = 3,
+                srch_range = c(0, 500), sf_option = "loose")
 res1$Model.Type
 res1$POI
 
@@ -250,11 +249,17 @@ res1$POI
 #     cics      dics dids.pmse      dids
 #  "lower"   "lower"   "lower"   "lower"
 
+# The parameter settings sf_option = "loose" and ivl_side = "lower" (the
+# default setting of ivl_side) cause the specification limit of 95.0
+# (sl_sf = 3, i.e. 3 significant digits) to be reduced by 0.05, i.e. the
+# actual specification limit is 94.95.
+
 # A model with different intercepts / different slopes (dids)
 res2 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
                 response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
+                batch_vbl = "Batch", sl = 95, sl_sf = 3,
+                srch_range = c(0, 500), sf_option = "loose")
 res2$Model.Type
 res2$POI
 
@@ -279,7 +284,7 @@ res3 <-
   expirest_osle(
     data = exp3, response_vbl = "Moisture", time_vbl = "Month",
     batch_vbl = "Batch", sl = c(1.5, 3.5), sl_sf = c(2, 2),
-    srch_range = c(0, 500), sf_option = "tight", ivl = "confidence",
+    srch_range = c(0, 500), sf_option = "loose", ivl = "confidence",
     ivl_type = "two.sided", ivl_side = "both")
 res3$Model.Type
 res3$POI
@@ -294,10 +299,16 @@ res3$POI
 
 # Expected results in res3$POI
 #     cics      dics dids.pmse      dids
-# 45.34604  40.28562  21.73080  21.42596
+# 46.85172  41.84802  22.41808  22.50966
 # attr(,"side")
-#    cics      dics dids.pmse      dids
-# "upper"   "upper"   "upper"   "lower"
+#     cics      dics dids.pmse      dids
+#  "upper"   "upper"   "upper"   "lower"
+
+# The parameter settings sf_option = "loose" and ivl_side = "both" (the
+# default setting of ivl_side) cause the specification limits of 1.5 and 3.5
+# (sl_sf = 2, i.e. 2 significant digits) to be reduced by 0.05 and increased
+# by 0.04, respectively, i.e. the actual specification limits are 1.45 and
+# 3.54, respectively.
 
 # Analysis with a single batch
 res4 <-
@@ -349,7 +360,8 @@ res4$POI
   res6 <-
     expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                   response_vbl = "Potency", time_vbl = "Month",
-                  batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 5))
+                  batch_vbl = "Batch", sl = 95, sl_sf = 3,
+                  srch_range = c(0, 5))
   res6$POI
 
   # (Expected) results in res6$POI

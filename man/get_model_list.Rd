@@ -49,7 +49,7 @@ The function \code{get_model_list()} expects a data frame with
 a response variable, a time variable and a categorical variable which
 usually has factor levels of multiple batches of a drug product that was
 assessed over a certain period of time with respect to the time-dependent
-behavior of characteristic parameters. Using these results, the function
+behaviour of characteristic parameters. Using these results, the function
 fits
 \itemize{
  \item a \emph{common intercept / common slope} model (cics),

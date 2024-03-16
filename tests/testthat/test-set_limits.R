@@ -10,15 +10,20 @@ test_that("set_limits_succeeds", {
   tmp3 <- set_limits(rl = NA, rl_sf = 4, sl = c(95, 105), sl_sf = c(3, 4),
                      sf_option = "loose", xform = c("no", "no"),
                      shift = c(0, 0), ivl_side = "lower")
-  tmp4 <- set_limits(rl = 97, rl_sf = 4, sl = c(95, 105), sl_sf = c(3, 4),
-                     sf_option = "loose", xform = c("log", "log"),
-                     shift = c(1, 1), ivl_side = "lower")
-  tmp5 <- set_limits(rl = 97, rl_sf = 4, sl = c(95, 105), sl_sf = c(3, 4),
-                     sf_option = "loose", xform = c("sqrt", "sqrt"),
+
+  tmp4 <- set_limits(rl = seq(from = 0.52, to = 0.48, by = -0.01),
+                     rl_sf = rep(2, 5), sl = c(0.1, 0.5), sl_sf = rep(1, 2),
+                     sf_option = "loose", xform = c("no", "no"),
+                     shift = c(0, 0), ivl_side = "upper")
+  tmp5 <- set_limits(rl = seq(from = 0.52, to = 0.48, by = -0.01),
+                     rl_sf = rep(2, 5), sl = c(0.1, 0.5), sl_sf = rep(2, 2),
+                     sf_option = "loose", xform = c("no", "no"),
+                     shift = c(0, 0), ivl_side = "both")
+  tmp6 <- set_limits(rl = seq(from = 0.12, to = 0.08, by = -0.01),
+                     rl_sf = rep(4, 5), sl = c(0.1, 0.5), sl_sf = rep(3, 2),
+                     sf_option = "loose", xform = c("no", "no"),
                      shift = c(0, 0), ivl_side = "lower")
-  tmp6 <- set_limits(rl = 97, rl_sf = 4, sl = c(95, 105), sl_sf = c(3, 4),
-                     sf_option = "loose", xform = c("sq", "sq"),
-                     shift = c(0, 0), ivl_side = "lower")
+
   tmp7 <- set_limits(rl = 103, rl_sf = 5, sl = c(95, 105), sl_sf = c(3, 4),
                      sf_option = "tight", xform = c("no", "no"),
                      shift = c(0, 0), ivl_side = "upper")
@@ -44,22 +49,27 @@ test_that("set_limits_succeeds", {
   expect_equal(tmp1[["sl"]], c(94.95, 105.04))
   expect_equal(tmp2[["rl.orig"]], 97)
   expect_equal(tmp2[["rl"]], 96.995)
-  expect_equal(tmp4$rl.trfmd, log(96.995 + 1))
-  expect_equal(tmp4$sl.trfmd, c(log(94.95 + 1), log(105.04 + 1)))
-  expect_equal(tmp5$rl.trfmd, sqrt(96.995))
-  expect_equal(tmp5$sl.trfmd, c(sqrt(94.95), sqrt(105.04)))
-  expect_equal(tmp6$rl.trfmd, 96.995^2)
-  expect_equal(tmp6$sl.trfmd, c(94.95^2, 105.04^2))
+  expect_equal(is.na(tmp3[["rl.orig"]]), TRUE)
+  expect_equal(is.na(tmp3[["rl"]]), TRUE)
+  expect_equal(is.na(tmp3[["rl.trfmd"]]), TRUE)
+
+  expect_equal(tmp4[["rl"]], c(0.524, 0.514, 0.504, 0.494, 0.484))
+  expect_equal(tmp4[["sl"]], c(0.05, 0.54))
+  expect_equal(tmp5[["rl"]], c(0.52, 0.51, 0.50, 0.49, 0.48))
+  expect_equal(tmp5[["sl"]], c(0.095, 0.504))
+  expect_equal(tmp6[["rl"]], c(0.11995, 0.10995, 0.09995, 0.089995, 0.079995))
+  expect_equal(tmp6[["sl"]], c(0.0995, 0.5004))
+
   expect_equal(tmp7[["rl.orig"]], 103)
   expect_equal(tmp7[["rl"]], 103)
   expect_equal(tmp7[["sl.orig"]], c(95, 105))
   expect_equal(tmp7[["sl"]], c(95, 105))
-  expect_equal(tmp8$rl.trfmd, log(103 + 1))
-  expect_equal(tmp8$sl.trfmd, c(log(95 + 1), log(105 + 1)))
-  expect_equal(tmp9$rl.trfmd, sqrt(103))
-  expect_equal(tmp9$sl.trfmd, c(sqrt(95), sqrt(105)))
-  expect_equal(tmp10$rl.trfmd, 103^2)
-  expect_equal(tmp10$sl.trfmd, c(95^2, 105^2))
+  expect_equal(tmp8[["rl.trfmd"]], log(103 + 1))
+  expect_equal(tmp8[["sl.trfmd"]], c(log(95 + 1), log(105 + 1)))
+  expect_equal(tmp9[["rl.trfmd"]], sqrt(103))
+  expect_equal(tmp9[["sl.trfmd"]], c(sqrt(95), sqrt(105)))
+  expect_equal(tmp10[["rl.trfmd"]], 103^2)
+  expect_equal(tmp10[["sl.trfmd"]], c(95^2, 105^2))
 })
 
 test_that("set_limits_fails", {

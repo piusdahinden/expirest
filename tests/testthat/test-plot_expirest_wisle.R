@@ -4,7 +4,7 @@ test_that("plot_expirest_wisle_succeeds", {
   re1 <-
     expirest_wisle(
       data = exp2, response_vbl = "Related", time_vbl = "Month",
-      batch_vbl = "Batch", rl = 0.15, rl_sf = 3, sl = 0.3, sl_sf = 2,
+      batch_vbl = "Batch", rl = 0.15, rl_sf = 2, sl = 0.3, sl_sf = 1,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "upper")
@@ -72,54 +72,54 @@ test_that("plot_expirest_wisle_succeeds", {
       response_vbl_unit = NULL, y_range = c(92, 107),
       x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
       plot_option = "full", ci_app = "ribbon"))
-    suppressWarnings(tmp4l1 <-
+  suppressWarnings(tmp4l1 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "no",
       response_vbl_unit = NULL, y_range = c(92, 107),
       x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
       plot_option = "lean1", ci_app = "ribbon"))
-    suppressWarnings(tmp4l2 <-
+  suppressWarnings(tmp4l2 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "no",
       response_vbl_unit = NULL, y_range = c(92, 107),
       x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
       plot_option = "lean2", ci_app = "ribbon"))
-    suppressWarnings(tmp4b1 <-
+  suppressWarnings(tmp4b1 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "no",
       response_vbl_unit = NULL, y_range = c(92, 107),
       x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
       plot_option = "basic1", ci_app = "ribbon"))
-    suppressWarnings(tmp4b2 <-
+  suppressWarnings(tmp4b2 <-
     plot_expirest_wisle(
       model = re2, rl_index = 1, show_grouping = "no",
       response_vbl_unit = NULL, y_range = c(92, 107),
       x_range = c(-1, 29), scenario = "standard", mtbs = "verified",
       plot_option = "basic2", ci_app = "ribbon"))
-    suppressWarnings(tmp5 <-
+  suppressWarnings(tmp5 <-
     plot_expirest_wisle(
       model = re3, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
       x_range = NULL, scenario = "standard", mtbs = "verified",
       plot_option = "full", ci_app = "line"))
-    suppressWarnings(tmp6 <-
+  suppressWarnings(tmp6 <-
     plot_expirest_wisle(
       model = re4, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
       x_range = NULL, scenario = "standard", mtbs = "verified",
       plot_option = "full", ci_app = "line"))
-    suppressWarnings(tmp7 <-
+  suppressWarnings(tmp7 <-
     plot_expirest_wisle(
       model = re4, rl_index = 1, show_grouping = "no",
       response_vbl_unit = "% (w/w)", y_range = NULL,
       x_range = NULL, scenario = "standard", mtbs = "verified",
       plot_option = "full", ci_app = "line"))
-    tmp8 <-
-      plot_expirest_wisle(
-        model = re5, rl_index = 7, show_grouping = "yes",
-        response_vbl_unit = "%", y_range = c(-0.01, 0.50),
-        x_range = NULL, scenario = "standard", mtbs = "verified",
-        plot_option = "full", ci_app = "ribbon")
+  tmp8 <-
+    plot_expirest_wisle(
+      model = re5, rl_index = 7, show_grouping = "yes",
+      response_vbl_unit = "%", y_range = c(-0.01, 0.50),
+      x_range = NULL, scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
 
   # <-><-><-><->
 
@@ -131,9 +131,9 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(signif(tmp1[["text"]][, "Related"], 5),
                c(0.35000, 0.29822, 0.11222, 0.39000, 0.39000, 0.16400))
   expect_equal(tmp1[["text"]][, "Label"],
-               c("USL: 0.340%", "0.2982% ", "0.1122% ",
+               c("USL: 0.34%", "0.298% ", "0.112% ",
                  "15.7\n(worst case\nscenario)", "19.0\n(standard\nscenario)",
-                 "URL: 0.1540%"))
+                 "URL: 0.154%"))
   expect_equal(tmp1[["text"]][, "Colour"],
                c("black", "red", "royalblue", "forestgreen", "grey50", "grey0"))
 

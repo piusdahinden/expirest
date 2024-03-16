@@ -4,7 +4,7 @@ test_that("plot_expirest_osle_succeeds", {
   re1 <-
     expirest_osle(
       data = exp2, response_vbl = "Related", time_vbl = "Month",
-      batch_vbl = "Batch", sl = 0.3, sl_sf = 2, srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 0.3, sl_sf = 1, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "loose", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "upper")
@@ -75,7 +75,7 @@ test_that("plot_expirest_osle_succeeds", {
 
   expect_equal(signif(tmp1[["text"]][, "Month"], 5), c(20.000, 19.018))
   expect_equal(tmp1[["text"]][, "Related"], c(0.35, 0.39))
-  expect_equal(tmp1[["text"]][, "Label"], c("USL: 0.340%", "19.0"))
+  expect_equal(tmp1[["text"]][, "Label"], c("USL: 0.34%", "19.0"))
   expect_equal(tmp1[["text"]][, "Colour"], c("black", "forestgreen"))
   expect_equal(tmp1[["hlines"]][1, "Related"], 0.34)
   expect_equal(tmp1[["hlines"]][1, "Item"], "USL")

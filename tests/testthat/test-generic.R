@@ -78,7 +78,7 @@ test_that("print_and_plot.plot_expirest_osle_succeeds", {
   re1 <-
     expirest_osle(
       data = exp2, response_vbl = "Related", time_vbl = "Month",
-      batch_vbl = "Batch", sl = 0.3, sl_sf = 2, srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 0.3, sl_sf = 1, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "loose", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "upper")
@@ -98,7 +98,7 @@ test_that("print_and_plot.plot_expirest_osle_succeeds", {
   expect_length(ggre1_2, 7)
   expect_s3_class(ggre1_2$Graph, c("gg", "ggplot"))
   expect_equal(
-    ggre1_2$Graph$layers[[7]]$aes_params$label, c("USL: 0.340%", "19.0"))
+    ggre1_2$Graph$layers[[7]]$aes_params$label, c("USL: 0.34%", "19.0"))
 })
 
 test_that("print_and_thus_summary.expirest_wisle_succeeds", {
@@ -109,7 +109,7 @@ test_that("print_and_thus_summary.expirest_wisle_succeeds", {
   re1 <-
     expirest_wisle(
       data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-      batch_vbl = "Batch", rl = 2.0, rl_sf = 3, sl = 0.5, sl_sf = 2,
+      batch_vbl = "Batch", rl = 2.0, rl_sf = 3, sl = 0.5, sl_sf = 1,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
@@ -153,7 +153,7 @@ test_that("print_and_plot.plot_expirest_wisle_succeeds", {
   re1 <-
     expirest_wisle(
       data = exp2, response_vbl = "Related", time_vbl = "Month",
-      batch_vbl = "Batch", rl = 0.15, rl_sf = 3, sl = 0.3, sl_sf = 2,
+      batch_vbl = "Batch", rl = 0.15, rl_sf = 2, sl = 0.3, sl_sf = 1,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "upper")
@@ -174,6 +174,6 @@ test_that("print_and_plot.plot_expirest_wisle_succeeds", {
   expect_s3_class(ggre1_2$Graph, c("gg", "ggplot"))
   expect_equal(
     ggre1_2$Graph$layers[[6]]$aes_params$label,
-    c("USL: 0.340%", "0.2982% ", "0.1122% ", "15.7\n(worst case\nscenario)",
-      "19.0\n(standard\nscenario)", "URL: 0.1540%"))
+    c("USL: 0.34%", "0.298% ", "0.112% ", "15.7\n(worst case\nscenario)",
+      "19.0\n(standard\nscenario)", "URL: 0.154%"))
 })

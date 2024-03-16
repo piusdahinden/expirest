@@ -148,8 +148,8 @@
 #' \item{Exp.Spec}{The (expiry) specification, i.e. the specification which is
 #'   relevant for the determination of the expiry.}
 #' \item{Rel.Spec}{The calculated release specification.}
-#' \item{Shelf.Life.cics}{The estiamted shelf life of the cics model.}
-#' \item{Shelf.Life.dics}{The estiamted shelf life of the dics model.}
+#' \item{Shelf.Life.cics}{The estimated shelf life of the cics model.}
+#' \item{Shelf.Life.dics}{The estimated shelf life of the dics model.}
 #' \item{Shelf.Life.dids.pmse}{The estimated shelf life of the dids model with
 #'   pooled mean square error (pmse).}
 #' \item{Shelf.Life.dids}{The estimated shelf life of the dids model obtained
@@ -184,7 +184,7 @@
 expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
                            sl, sl_sf, srch_range, alpha = 0.05,
                            alpha_pool = 0.25, xform = c("no", "no"),
-                           shift = c(0, 0), sf_option = "loose",
+                           shift = c(0, 0), sf_option = "tight",
                            ivl = "confidence", ivl_type = "one.sided",
                            ivl_side = "lower", ...) {
   if (!is.data.frame(data)) {

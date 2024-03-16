@@ -36,7 +36,7 @@ res1 <-
   expirest_wisle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 
 # The 'expirest_wisle' object can be passed on to the plot_expirest_wisle()
 # function. This function does not produce any output but returns a

@@ -9,7 +9,7 @@ set_limits(
   rl_sf,
   sl,
   sl_sf,
-  sf_option = "loose",
+  sf_option = "tight",
   xform = c("no", "no"),
   shift = c(0, 0),
   ivl_side = "lower"
@@ -26,15 +26,13 @@ It must have the same length as \code{sl}.}
 
 \item{sf_option}{A character string that specifies if the limits (\code{rl}
 or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
-either \code{"tight"} or \code{"loose"}, respectively. The option
-\code{"tight"} means that the limits are rounded to the specified number
-of significant figures specified by the parameters \code{rl_sf} and
-\code{sl_sf}. In case of the option \code{"loose"} the limits are rounded
-to the specified number of significant figures (\eqn{n}), followed by the
-subtraction of \eqn{1} from the \eqn{n^{th}} digit and addition of
-\eqn{5} to the \eqn{(n + 1)^{th}} digit if \code{ivl_side} is
-\code{"lower"}, or followed by the addition of \eqn{4} to the
-\eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.}
+either \code{"tight"} or \code{"loose"}, respectively. The default is
+\code{"tight"}. The option \code{"tight"} means that the limits are
+rounded to the number of significant digits specified by the parameters
+\code{rl_sf} and \code{sl_sf}. If \code{sf_option = "loose"}, four on
+the order of the last significant digit + 1 is added if
+\code{ivl_side = "upper"} or five on the order of the last significant
+digit + 1 is subtracted if \code{ivl_side = "upper"}.}
 
 \item{xform}{A vector of two character strings that specifies the
 transformation of the response and the time variable. The default is
@@ -76,10 +74,10 @@ A list with the following elements is returned:
   significant figures of the release limit(s). If \code{NA} was  passed in,
   \code{NA} is returned.}
 \item{rl}{A numeric value or a numeric vector of the adjusted (as specified
-  by the \code{sf.option} parameter) release limit(s). If \code{NA} was
+  by the \code{sf_option} parameter) release limit(s). If \code{NA} was
   passed in, \code{NA} is returned.}
 \item{rl.trfmd}{A numeric value or a numeric vector of the adjusted and
-  transformed, if applicable (as specified by the the \code{sf.option}
+  transformed, if applicable (as specified by the the \code{sf_option}
   parameter and the second element of the \code{xform} parameter,
   respectively), release limit(s), otherwise the same as \code{rl}.}
 \item{sl.orig}{A numeric value or a numeric vector of length \code{2} of the
@@ -87,11 +85,11 @@ A list with the following elements is returned:
 \item{sl.sf}{A numeric value or a numeric vector of length \code{2}
   that specifies the significant figures of the specification limit(s).}
 \item{sl}{A numeric value or a numeric vector of length \code{2} of the
-  adjusted (as specified by the \code{sf.option} parameter) specification
+  adjusted (as specified by the \code{sf_option} parameter) specification
   limit(s).}
 \item{sl.trfmd}{A numeric value or a numeric vector of length \code{2} of
   the adjusted and transformed, if applicable (as specified by the the
-  \code{sf.option} parameter and the second element of the \code{xform}
+  \code{sf_option} parameter and the second element of the \code{xform}
   parameter, respectively) specification limit(s), otherwise the same as
   \code{sl}.}
 }

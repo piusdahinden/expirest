@@ -18,7 +18,7 @@ expirest_wisle(
   alpha_pool = 0.25,
   xform = c("no", "no"),
   shift = c(0, 0),
-  sf_option = "loose",
+  sf_option = "tight",
   ivl = "confidence",
   ivl_type = "one.sided",
   ivl_side = "lower",
@@ -87,15 +87,13 @@ default is \code{c(0, 0)}.}
 
 \item{sf_option}{A character string that specifies if the limits (\code{rl}
 or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
-either \code{"tight"} or \code{"loose"}, respectively. The option
-\code{"tight"} means that the limits are rounded to the specified number
-of significant figures specified by the parameters \code{rl_sf} and
-\code{sl_sf}. In case of the option \code{"loose"} the limits are rounded
-to the specified number of significant figures (\eqn{n}), followed by the
-subtraction of \eqn{1} from the \eqn{n^{th}} digit and addition of
-\eqn{5} to the \eqn{(n + 1)^{th}} digit if \code{ivl_side} is
-\code{"lower"}, or followed by the addition of \eqn{4} to the
-\eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.}
+either \code{"tight"} or \code{"loose"}, respectively. The default is
+\code{"tight"}. The option \code{"tight"} means that the limits are
+rounded to the number of significant digits specified by the parameters
+\code{rl_sf} and \code{sl_sf}. If \code{sf_option = "loose"}, four on
+the order of the last significant digit + 1 is added if
+\code{ivl_side = "upper"} or five on the order of the last significant
+digit + 1 is subtracted if \code{ivl_side = "upper"}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
 \code{"prediction"} that specifies the type of interval of interest.
@@ -189,8 +187,8 @@ Structure of the \code{POI} data frame:
 \item{Exp.Spec}{The (expiry) specification, i.e. the specification which is
   relevant for the determination of the expiry.}
 \item{Rel.Spec}{The calculated release specification.}
-\item{Shelf.Life.cics}{The estiamted shelf life of the cics model.}
-\item{Shelf.Life.dics}{The estiamted shelf life of the dics model.}
+\item{Shelf.Life.cics}{The estimated shelf life of the cics model.}
+\item{Shelf.Life.dics}{The estimated shelf life of the dics model.}
 \item{Shelf.Life.dids.pmse}{The estimated shelf life of the dids model with
   pooled mean square error (pmse).}
 \item{Shelf.Life.dids}{The estimated shelf life of the dids model obtained
@@ -311,7 +309,7 @@ res1 <-
   expirest_wisle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 res1$Model.Type
 res1$POI
 
@@ -335,12 +333,18 @@ res1$POI
 # POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
 #        26.2241        24.8003       23.34184            23.66724
 
+# The parameter settings sf_option = "loose" and ivl_side = "lower" (the
+# default setting of ivl_side) cause the specification limit of 95.0
+# (sl_sf = 3, i.e. 3 significant digits) to be reduced by 0.05, i.e. the
+# actual specification limit is 94.95. Analogously, the release limit of 98.0
+# is reduced to 97.95.
+
 # A model with different intercepts / different slopes (dids)
 res2 <-
   expirest_wisle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 res2$Model.Type
 res2$POI
 
@@ -369,7 +373,7 @@ res3 <-
   expirest_wisle(data = exp1[exp1$Batch == "b8", ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 res3$Model.Type
 res3$POI
 
@@ -403,7 +407,8 @@ res3$POI
     expirest_wisle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                    response_vbl = "Potency", time_vbl = "Month",
                    batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 105,
-                   sl_sf = 4, srch_range = c(0, 500), ivl_side = "upper")
+                   sl_sf = 4, srch_range = c(0, 500), sf_option = "loose",
+                   ivl_side = "upper")
   res4$POI
 
   # (Expected) results in res3$POI
@@ -412,7 +417,7 @@ res3$POI
   # Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
   #         NA         NA              NA  107.5669        NA        NA
   # WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
-  #             NA             105   105.04              98    97.95
+  #             NA             105   105.04              98    98.04
   # Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
   #              NA              NA              NA                   NA
   # POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
@@ -423,7 +428,7 @@ res3$POI
     expirest_wisle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                    response_vbl = "Potency", time_vbl = "Month",
                    batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                   sl_sf = 3, srch_range = c(0, 5))
+                   sl_sf = 3, srch_range = c(0, 5), sf_option = "loose")
   res5$POI
 
   # (Expected) results in res4$POI

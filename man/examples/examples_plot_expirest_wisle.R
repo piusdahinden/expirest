@@ -1,18 +1,9 @@
-# Potency stability data (in % of label claim (LC)) of five batches of a drug
-# product obtained over a 24 months period:
-str(exp1)
-
-# 'data.frame':	53 obs. of  3 variables:
-# $ Batch  : Factor w/ 6 levels "b2","b3","b4",..: 1 1 1 1 1 1 1 1 1 1 ...
-# $ Month  : num  0 1 3 3 6 6 12 12 24 24 ...
-# $ Potency: num  101 101.3 99.8 99.2 99.5 ...
-
 # Start by making a "what-if (approach for) shelf life estimation" (wisle)
 res1 <-
   expirest_wisle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 
 # Pass the 'expirest_wisle' object on to the plot_expirest_wisle() function.
 # This function does not produce any output. It returns a 'plot_expirest_wisle'
@@ -42,7 +33,7 @@ res2 <-
   expirest_wisle(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 
 gg2 <- plot_expirest_wisle(
   model = res2, rl_index = 1, response_vbl_unit = "%", x_range = c(0, 26),

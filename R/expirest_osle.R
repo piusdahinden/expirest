@@ -47,15 +47,13 @@
 #'   default is \code{c(0, 0)}.
 #' @param sf_option A character string that specifies if the limits (\code{rl}
 #'   or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
-#'   either \code{"tight"} or \code{"loose"}, respectively. The option
-#'   \code{"tight"} means that the limits are rounded to the specified number
-#'   of significant figures specified by the parameters \code{rl_sf} and
-#'   \code{sl_sf}. In case of the option \code{"loose"} the limits are rounded
-#'   to the specified number of significant figures (\eqn{n}), followed by the
-#'   subtraction of \eqn{1} from the \eqn{n^{th}} digit and addition of
-#'   \eqn{5} to the \eqn{(n + 1)^{th}} digit if \code{ivl_side} is
-#'   \code{"lower"}, or followed by the addition of \eqn{4} to the
-#'   \eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.
+#'   either \code{"tight"} or \code{"loose"}, respectively. The default is
+#'   \code{"tight"}. The option \code{"tight"} means that the limits are
+#'   rounded to the number of significant digits specified by the parameters
+#'   \code{rl_sf} and \code{sl_sf}. If \code{sf_option = "loose"}, four on
+#'   the order of the last significant digit + 1 is added if
+#'   \code{ivl_side = "upper"} or five on the order of the last significant
+#'   digit + 1 is subtracted if \code{ivl_side = "upper"}.
 #' @param ivl A character string of either \code{"confidence"} or
 #'   \code{"prediction"} that specifies the type of interval of interest.
 #'   The default is \code{"confidence"}.
@@ -199,7 +197,7 @@
 expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
                           srch_range, alpha = 0.05, alpha_pool = 0.25,
                           xform = c("no", "no"), shift = c(0, 0),
-                          sf_option = "loose", ivl = "confidence",
+                          sf_option = "tight", ivl = "confidence",
                           ivl_type = "one.sided", ivl_side = "lower", ...) {
   if (!is.data.frame(data)) {
     stop("The data must be provided as data frame.")

@@ -4,7 +4,7 @@ res1 <-
   expirest_wisle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 res1$Model.Type
 res1$POI
 
@@ -28,12 +28,18 @@ res1$POI
 # POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
 #        26.2241        24.8003       23.34184            23.66724
 
+# The parameter settings sf_option = "loose" and ivl_side = "lower" (the
+# default setting of ivl_side) cause the specification limit of 95.0
+# (sl_sf = 3, i.e. 3 significant digits) to be reduced by 0.05, i.e. the
+# actual specification limit is 94.95. Analogously, the release limit of 98.0
+# is reduced to 97.95.
+
 # A model with different intercepts / different slopes (dids)
 res2 <-
   expirest_wisle(data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 res2$Model.Type
 res2$POI
 
@@ -62,7 +68,7 @@ res3 <-
   expirest_wisle(data = exp1[exp1$Batch == "b8", ],
                  response_vbl = "Potency", time_vbl = "Month",
                  batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                 sl_sf = 3, srch_range = c(0, 500))
+                 sl_sf = 3, srch_range = c(0, 500), sf_option = "loose")
 res3$Model.Type
 res3$POI
 
@@ -96,7 +102,8 @@ res3$POI
     expirest_wisle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                    response_vbl = "Potency", time_vbl = "Month",
                    batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 105,
-                   sl_sf = 4, srch_range = c(0, 500), ivl_side = "upper")
+                   sl_sf = 4, srch_range = c(0, 500), sf_option = "loose",
+                   ivl_side = "upper")
   res4$POI
 
   # (Expected) results in res3$POI
@@ -105,7 +112,7 @@ res3$POI
   # Delta.dics Delta.dids Delta.dids.pmse WCSL.cics WCSL.dics WCSL.dids
   #         NA         NA              NA  107.5669        NA        NA
   # WCSL.dids.pmse Exp.Spec.Report Exp.Spec Rel.Spec.Report Rel.Spec
-  #             NA             105   105.04              98    97.95
+  #             NA             105   105.04              98    98.04
   # Shelf.Life.cics Shelf.Life.dics Shelf.Life.dids Shelf.Life.dids.pmse
   #              NA              NA              NA                   NA
   # POI.Model.cics POI.Model.dics POI.Model.dids POI.Model.dids.pmse
@@ -116,7 +123,7 @@ res3$POI
     expirest_wisle(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                    response_vbl = "Potency", time_vbl = "Month",
                    batch_vbl = "Batch", rl = 98, rl_sf = 3, sl = 95,
-                   sl_sf = 3, srch_range = c(0, 5))
+                   sl_sf = 3, srch_range = c(0, 5), sf_option = "loose")
   res5$POI
 
   # (Expected) results in res4$POI

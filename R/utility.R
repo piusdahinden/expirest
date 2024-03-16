@@ -1226,10 +1226,10 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 #'   significant figures of the release limit(s). If \code{NA} was  passed in,
 #'   \code{NA} is returned.}
 #' \item{rl}{A numeric value or a numeric vector of the adjusted (as specified
-#'   by the \code{sf.option} parameter) release limit(s). If \code{NA} was
+#'   by the \code{sf_option} parameter) release limit(s). If \code{NA} was
 #'   passed in, \code{NA} is returned.}
 #' \item{rl.trfmd}{A numeric value or a numeric vector of the adjusted and
-#'   transformed, if applicable (as specified by the the \code{sf.option}
+#'   transformed, if applicable (as specified by the the \code{sf_option}
 #'   parameter and the second element of the \code{xform} parameter,
 #'   respectively), release limit(s), otherwise the same as \code{rl}.}
 #' \item{sl.orig}{A numeric value or a numeric vector of length \code{2} of the
@@ -1237,11 +1237,11 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 #' \item{sl.sf}{A numeric value or a numeric vector of length \code{2}
 #'   that specifies the significant figures of the specification limit(s).}
 #' \item{sl}{A numeric value or a numeric vector of length \code{2} of the
-#'   adjusted (as specified by the \code{sf.option} parameter) specification
+#'   adjusted (as specified by the \code{sf_option} parameter) specification
 #'   limit(s).}
 #' \item{sl.trfmd}{A numeric value or a numeric vector of length \code{2} of
 #'   the adjusted and transformed, if applicable (as specified by the the
-#'   \code{sf.option} parameter and the second element of the \code{xform}
+#'   \code{sf_option} parameter and the second element of the \code{xform}
 #'   parameter, respectively) specification limit(s), otherwise the same as
 #'   \code{sl}.}
 #'
@@ -1249,7 +1249,7 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 #'
 #' @keywords internal
 
-set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
+set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "tight",
                        xform = c("no", "no"), shift = c(0, 0),
                        ivl_side = "lower") {
   if (!is.numeric(rl) && all(!is.na(rl))) {
@@ -1323,31 +1323,49 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "loose",
     # Specification limit(s)
     sl_factor <- 10^(get_n_whole_part(sl) - 1)
     sl_std <- signif(sl / sl_factor, sl_sf)
+    sl_size <- as.numeric(sl < 1)
+    n_zero_sl <- attr(regexpr("(?<=\\.)0+|$",
+                              as.character(format(sl, scientific = FALSE,
+                                                  drop0trailing = TRUE)),
+                              perl = TRUE),
+                      "match.length")
 
     if (length(sl) == 2) {
-      sl[1] <- (sl_std[1] - 5 / 10^sl_sf[1]) * sl_factor[1]
-      sl[2] <- (sl_std[2] + 4 / 10^sl_sf[2]) * sl_factor[2]
+      sl[1] <- (sl_std[1] - 5 / 10^(sl_sf[1] + n_zero_sl[1] + sl_size[1])) *
+        sl_factor[1]
+      sl[2] <- (sl_std[2] + 4 / 10^(sl_sf[2] + n_zero_sl[2] + sl_size[2])) *
+        sl_factor[2]
     } else {
       switch(ivl_side,
              "lower" = {
-               sl <- (sl_std - 5 / 10^sl_sf) * sl_factor
+               sl <- (sl_std - 5 / 10^(sl_sf + n_zero_sl + sl_size)) *
+                 sl_factor
              },
              "upper" = {
-               sl <- (sl_std + 4 / 10^sl_sf) * sl_factor
+               sl <- (sl_std + 4 / 10^(sl_sf + n_zero_sl + sl_size)) *
+                 sl_factor
              })
     }
 
     # Release limit(s)
     rl_factor <- 10^(get_n_whole_part(rl) - 1)
     rl_std <- signif(rl / rl_factor, rl_sf)
+    rl_size <- as.numeric(rl < 1)
+    n_zero_rl <- attr(regexpr("(?<=\\.)0+|$",
+                              as.character(format(rl, scientific = FALSE,
+                                                  drop0trailing = TRUE)),
+                              perl = TRUE),
+                      "match.length")
 
     if (ivl_side != "both") {
       switch(ivl_side,
              "lower" = {
-               rl <- (rl_std - 5 / 10^rl_sf) * rl_factor
+               rl <- (rl_std - 5 / 10^(rl_sf + n_zero_rl + rl_size)) *
+                 rl_factor
              },
              "upper" = {
-               rl <- (rl_std + 4 / 10^rl_sf) * rl_factor
+               rl <- (rl_std + 4 / 10^(rl_sf + n_zero_rl + rl_size)) *
+                 rl_factor
              })
     }
   }
@@ -1651,7 +1669,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 #' a response variable, a time variable and a categorical variable which
 #' usually has factor levels of multiple batches of a drug product that was
 #' assessed over a certain period of time with respect to the time-dependent
-#' behavior of characteristic parameters. Using these results, the function
+#' behaviour of characteristic parameters. Using these results, the function
 #' fits
 #' \itemize{
 #'  \item a \emph{common intercept / common slope} model (cics),
@@ -2639,8 +2657,8 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
 #' \item{Exp.Spec}{The (expiry) specification, i.e. the specification which is
 #'   relevant for the determination of the expiry.}
 #' \item{Rel.Spec}{The calculated release specification.}
-#' \item{Shelf.Life.cics}{The estiamted shelf life of the cics model.}
-#' \item{Shelf.Life.dics}{The estiamted shelf life of the dics model.}
+#' \item{Shelf.Life.cics}{The estimated shelf life of the cics model.}
+#' \item{Shelf.Life.dics}{The estimated shelf life of the dics model.}
 #' \item{Shelf.Life.dids.pmse}{The estimated shelf life of the dids model with
 #'   pooled mean square error (pmse).}
 #' \item{Shelf.Life.dids}{The estimated shelf life of the dids model obtained

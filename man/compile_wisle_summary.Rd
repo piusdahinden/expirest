@@ -108,8 +108,8 @@ Structure of the \code{POI} data frame:
 \item{Exp.Spec}{The (expiry) specification, i.e. the specification which is
   relevant for the determination of the expiry.}
 \item{Rel.Spec}{The calculated release specification.}
-\item{Shelf.Life.cics}{The estiamted shelf life of the cics model.}
-\item{Shelf.Life.dics}{The estiamted shelf life of the dics model.}
+\item{Shelf.Life.cics}{The estimated shelf life of the cics model.}
+\item{Shelf.Life.dics}{The estimated shelf life of the dics model.}
 \item{Shelf.Life.dids.pmse}{The estimated shelf life of the dids model with
   pooled mean square error (pmse).}
 \item{Shelf.Life.dids}{The estimated shelf life of the dids model obtained
