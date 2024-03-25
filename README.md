@@ -30,7 +30,7 @@ The development version is available from
 devtools::install_github("piusdahinden/expirest")
 ```
 
-## Example
+## Examples
 
 ### Example 1
 
@@ -69,28 +69,33 @@ summary(res1)
 #> The best model accepted at a significance level of 0.25 has
 #>  Common intercepts and Common slopes (acronym: cics).
 #> 
-#> Worst case intercept(s): 2.456782
-#> Worst case batch(es): NA
+#> Worst case intercept and batch:
+#>   RL Batch Intercept
+#> 1  3    NA  2.456782
 #> 
-#> Estimated shelf life (lives) for cics model:
-#>       SL RL    wisle     osle
-#> cics 4.5  3 72.50545 96.30552
+#> Estimated shelf lives for the cics model:
+#>    SL RL    wisle     osle
+#> 1 4.5  3 72.50545 96.30552
 #> 
 #> Abbreviations:
-#> ARGPM: Australian Regulatory Guidelines for Prescription Medicines; ICH: International Council for Harmonisation; osle: Ordinary shelf life estimation (i.e. following the ICH guidance); RL: Release Limit; SL: Specification Limit; wisle: What-if (approach for) shelf life estimation (i.e. following ARGPM guidance).
+#>   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
+#>   ICH: International Council for Harmonisation;
+#>   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
+#>   RL: Release Limit;
+#>   SL: Specification Limit;
+#>   wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).
 
 # Prepare graphical representation
 ggres1 <- plot_expirest_wisle(
-      model = res1, rl_index = 1, show_grouping = "no",
-      response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "ribbon")
+      model = res1, rl_index = 1, response_vbl_unit = "% (w/w)",
+      x_range = NULL, y_range = c(0.2, 5.2), scenario = "standard",
+      mtbs = "verified", plot_option = "full", ci_app = "ribbon")
 class(ggres1)
 #> [1] "plot_expirest_wisle"
 plot(ggres1)
 ```
 
-<img src="man/figures/README-example_1-1.png" width="100%" />
+<img src="man/figures/README-example-1-1.png" width="100%" />
 
 ### Example 2
 
@@ -103,8 +108,6 @@ independent measurements are available (corresponding to data shown in
 Tables IV, VI and VIII in LeBlond et al. (2011).
 
 ``` r
-library(expirest)
-
 # Data frame
 str(exp1)
 #> 'data.frame':    53 obs. of  3 variables:
@@ -113,7 +116,7 @@ str(exp1)
 #>  $ Potency: num  101 101.3 99.8 99.2 99.5 ...
 
 # Perform what-if shelf life estimation (wisle) and print a summary
-res1 <- expirest_wisle(
+res2_1 <- expirest_wisle(
       data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
       response_vbl = "Potency", time_vbl = "Month", batch_vbl = "Batch",
       rl = c(98.0, 98.5, 99.0), rl_sf = rep(2, 3), sl = 95, sl_sf = 2,
@@ -121,7 +124,7 @@ res1 <- expirest_wisle(
       xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
 
-summary(res1)
+summary(res2_1)
 #> 
 #> Summary of shelf life estimation following the ARGPM
 #>   guidance "Stability testing for prescription medicines"
@@ -129,31 +132,175 @@ summary(res1)
 #> The best model accepted at a significance level of 0.25 has
 #>  Different intercepts and Different slopes (acronym: dids).
 #> 
-#> Worst case intercept(s): 101.2594 101.2594 101.2594
-#> Worst case batch(es): b8 b8 b8
+#> Worst case intercepts and batches:
+#>     RL Batch Intercept
+#> 1 98.0    b8  101.2594
+#> 2 98.5    b8  101.2594
+#> 3 99.0    b8  101.2594
 #> 
-#> Estimated shelf life (lives) for dids model:
-#>   SL   RL     wisle     osle
-#> 1 95 98.0  7.619661 15.84487
-#> 2 95 98.5  8.997036 15.84487
-#> 3 95 99.0 10.303030 15.84487
+#> Estimated shelf lives for the dids model (for information, the results of
+#>   the model fitted with pooled mean square error (pmse) are also shown:
+#>   SL   RL     wisle wisle (pmse)     osle osle (pmse)
+#> 1 95 98.0  7.619661     7.483223 15.84487     15.6061
+#> 2 95 98.5  8.997036     8.858223 15.84487     15.6061
+#> 3 95 99.0 10.303030    11.344407 15.84487     15.6061
 #> 
 #> Abbreviations:
-#> ARGPM: Australian Regulatory Guidelines for Prescription Medicines; ICH: International Council for Harmonisation; osle: Ordinary shelf life estimation (i.e. following the ICH guidance); RL: Release Limit; SL: Specification Limit; wisle: What-if (approach for) shelf life estimation (i.e. following ARGPM guidance).
+#>   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
+#>   ICH: International Council for Harmonisation;
+#>   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
+#>   pmse: Pooled mean square error;
+#>   RL: Release Limit;
+#>   SL: Specification Limit;
+#>   wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).
 
 # Prepare graphical representation
-ggres1 <- plot_expirest_wisle(
-      model = res1, rl_index = 2, show_grouping = "yes",
-      response_vbl_unit = "%", y_range = c(93, 107),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "ribbon")
-class(ggres1)
+ggres2_1 <- plot_expirest_wisle(
+      model = res2_1, rl_index = 2, response_vbl_unit = "%", x_range = NULL,
+      y_range = c(93, 107), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
+class(ggres2_1)
 #> [1] "plot_expirest_wisle"
-plot(ggres1)
-#> Warning: Removed 4 rows containing missing values (`geom_point()`).
+plot(ggres2_1)
 ```
 
-<img src="man/figures/README-example_2-1.png" width="100%" />
+<img src="man/figures/README-example-2-1-1.png" width="100%" />
+
+Note that if the model type is dids, then by default the results are
+plotted that are obtained by fitting individual regression lines to each
+batch. To get a plot of the dids model with pooled mean square error
+(pmse) instead, use the setting `mtbs = "dids.pmse"`.
+
+``` r
+# Prepare graphical representation of the dids.pmse model
+ggres2_2 <- plot_expirest_wisle(
+      model = res2_1, rl_index = 2, response_vbl_unit = "%", x_range = NULL,
+      y_range = c(93, 107), scenario = "standard", mtbs = "dids.pmse",
+      plot_option = "full", ci_app = "ribbon")
+plot(ggres2_2)
+```
+
+<img src="man/figures/README-example-2-2-1.png" width="100%" />
+
+The examples above were performed with three batches. The assessment can
+be performed with any numbers of batches, even with just one batch. If
+the assessment is performed with a single batch, the results are
+reported as dids model while the results for all other models are NA. As
+an example, the following example was performed with batch b4.
+
+``` r
+# Perform what-if shelf life estimation (wisle) and print a summary
+res2_2 <- expirest_wisle(
+      data = exp1[exp1$Batch == "b4", ],
+      response_vbl = "Potency", time_vbl = "Month", batch_vbl = "Batch",
+      rl = c(98.0, 98.5, 99.0), rl_sf = rep(2, 3), sl = 95, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
+
+summary(res2_2)
+#> 
+#> Summary of shelf life estimation following the ARGPM
+#>   guidance "Stability testing for prescription medicines"
+#> 
+#> The best model accepted at a significance level of 0.25 has
+#>  NA intercepts and NA slopes (acronym: n.a.).
+#> 
+#> Worst case intercepts and batches:
+#>     RL Batch Intercept
+#> 1 98.0    b4  104.0706
+#> 2 98.5    b4  104.0706
+#> 3 99.0    b4  104.0706
+#> 
+#> Estimated shelf lives for the n.a. model (for information, the results of
+#>   the model fitted with pooled mean square error (pmse) are also shown:
+#>   SL   RL    wisle wisle (pmse)     osle osle (pmse)
+#> 1 95 98.0 13.72633           NA 40.79176          NA
+#> 2 95 98.5 16.09778           NA 40.79176          NA
+#> 3 95 99.0 18.40465           NA 40.79176          NA
+#> 
+#> Abbreviations:
+#>   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
+#>   ICH: International Council for Harmonisation;
+#>   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
+#>   pmse: Pooled mean square error;
+#>   RL: Release Limit;
+#>   SL: Specification Limit;
+#>   wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).
+
+# Prepare graphical representation
+ggres2_2 <- plot_expirest_wisle(
+      model = res2_2, rl_index = 2, response_vbl_unit = "%", x_range = NULL,
+      y_range = c(93, 107), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
+plot(ggres2_2)
+```
+
+<img src="man/figures/README-example-2-3-1.png" width="100%" />
+
+### Example 3
+
+The assessments in *Example 1* and *Example 2* were made with the option
+`sf_option = "tight"`. The parameter `sf_option` affects the shelf life
+(*sl*) and release limits (*rl*). The setting `sf_option = "tight"`
+means that of the *sl* and *rl* limits only the number of significant
+digits specified by the parameters `rl_sf` and `sl_sf`, respectively,
+are taken into account. If `sf_option = "loose"`, then the limits are
+widened, i.e. four on the order of the last significant digit + 1 is
+added if `ivl_side = "upper"` or five on the order of the last
+significant digit + 1 is subtracted if `ivl_side = "lower"`. For
+illustration, the following example reproduces *Example 2* with the
+option `sf_option = "loose"`.
+
+``` r
+# Perform what-if shelf life estimation (wisle) and print a summary
+res3 <- expirest_wisle(
+      data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
+      response_vbl = "Potency", time_vbl = "Month", batch_vbl = "Batch",
+      rl = c(98.0, 98.5, 99.0), rl_sf = rep(3, 3), sl = 95, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
+      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
+
+summary(res3)
+#> 
+#> Summary of shelf life estimation following the ARGPM
+#>   guidance "Stability testing for prescription medicines"
+#> 
+#> The best model accepted at a significance level of 0.25 has
+#>  Different intercepts and Different slopes (acronym: dids).
+#> 
+#> Worst case intercepts and batches:
+#>     RL Batch Intercept
+#> 1 98.0    b8  101.2594
+#> 2 98.5    b8  101.2594
+#> 3 99.0    b8  101.2594
+#> 
+#> Estimated shelf lives for the dids model (for information, the results of
+#>   the model fitted with pooled mean square error (pmse) are also shown:
+#>   SL   RL     wisle wisle (pmse)    osle osle (pmse)
+#> 1 95 98.0  8.863085     8.724968 17.0387    16.77679
+#> 2 95 98.5 10.174754    11.221221 17.0387    16.77679
+#> 3 95 99.0 11.440468    11.276686 17.0387    16.77679
+#> 
+#> Abbreviations:
+#>   ARGPM: Australian Regulatory Guidelines for Prescription Medicines;
+#>   ICH: International Council for Harmonisation;
+#>   osle: Ordinary shelf life estimation (i.e. following the ICH guidance);
+#>   pmse: Pooled mean square error;
+#>   RL: Release Limit;
+#>   SL: Specification Limit;
+#>   wisle: What-if (approach for) shelf life estimation (see ARGPM guidance).
+
+# Prepare graphical representation
+ggres3 <- plot_expirest_wisle(
+      model = res3, rl_index = 2, response_vbl_unit = "%", x_range = NULL,
+      y_range = c(93, 107), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
+plot(ggres3)
+```
+
+<img src="man/figures/README-example-3-1-1.png" width="100%" />
 
 ## Literature
 

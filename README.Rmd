@@ -36,12 +36,13 @@ The development version is available from [GitHub](https://github.com/piusdahind
 devtools::install_github("piusdahinden/expirest")
 ```
 
-## Example
+
+## Examples
 
 ### Example 1
 This is a basic example which shows you how to solve a common problem using a data set containing the moisture stability data (% (w/w)) of three batches obtained over a 24 months period of a drug product. A total of *n* = 33 independent measurements are available (corresponding to data shown in Table XIII in LeBlond et al. (2011).
 
-``` {r example_1, message = FALSE}
+``` {r example-1, message = FALSE}
 library(expirest)
 
 # Data frame
@@ -61,10 +62,9 @@ summary(res1)
 
 # Prepare graphical representation
 ggres1 <- plot_expirest_wisle(
-      model = res1, rl_index = 1, show_grouping = "no",
-      response_vbl_unit = "% (w/w)", y_range = c(0.2, 5.2),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "ribbon")
+      model = res1, rl_index = 1, response_vbl_unit = "% (w/w)",
+      x_range = NULL, y_range = c(0.2, 5.2), scenario = "standard",
+      mtbs = "verified", plot_option = "full", ci_app = "ribbon")
 class(ggres1)
 plot(ggres1)
 ```
@@ -73,14 +73,12 @@ plot(ggres1)
 ### Example 2
 The model type in *Example 1* was *common intercept / common slope* (cics). The model type in this example is *different intercept / different slope* (dids). A data set containing the potency stability data (in \% of label claim (LC)) of five batches of a drug product obtained over a 24 months period is used. A total of *n* = 53 independent measurements are available (corresponding to data shown in Tables IV, VI and VIII in LeBlond et al. (2011).
 
-``` {r example_2, message = FALSE}
-library(expirest)
-
+``` {r example-2-1, message = FALSE}
 # Data frame
 str(exp1)
 
 # Perform what-if shelf life estimation (wisle) and print a summary
-res1 <- expirest_wisle(
+res2_1 <- expirest_wisle(
       data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
       response_vbl = "Potency", time_vbl = "Month", batch_vbl = "Batch",
       rl = c(98.0, 98.5, 99.0), rl_sf = rep(2, 3), sl = 95, sl_sf = 2,
@@ -88,16 +86,72 @@ res1 <- expirest_wisle(
       xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
 
-summary(res1)
+summary(res2_1)
 
 # Prepare graphical representation
-ggres1 <- plot_expirest_wisle(
-      model = res1, rl_index = 2, show_grouping = "yes",
-      response_vbl_unit = "%", y_range = c(93, 107),
-      x_range = NULL, scenario = "standard", plot_option = "full",
-      ci_app = "ribbon")
-class(ggres1)
-plot(ggres1)
+ggres2_1 <- plot_expirest_wisle(
+      model = res2_1, rl_index = 2, response_vbl_unit = "%", x_range = NULL,
+      y_range = c(93, 107), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
+class(ggres2_1)
+plot(ggres2_1)
+```
+
+Note that if the model type is dids, then by default the results are plotted that are obtained by fitting individual regression lines to each batch. To get a plot of the dids model with pooled mean square error (pmse) instead, use the setting `mtbs = "dids.pmse"`.
+
+``` {r example-2-2, message = FALSE}
+# Prepare graphical representation of the dids.pmse model
+ggres2_2 <- plot_expirest_wisle(
+      model = res2_1, rl_index = 2, response_vbl_unit = "%", x_range = NULL,
+      y_range = c(93, 107), scenario = "standard", mtbs = "dids.pmse",
+      plot_option = "full", ci_app = "ribbon")
+plot(ggres2_2)
+```
+
+The examples above were performed with three batches. The assessment can be performed with any numbers of batches, even with just one batch. If the assessment is performed with a single batch, the results are reported as dids model while the results for all other models are NA. As an example, the following example was performed with batch b4.
+
+``` {r example-2-3, message = FALSE}
+# Perform what-if shelf life estimation (wisle) and print a summary
+res2_2 <- expirest_wisle(
+      data = exp1[exp1$Batch == "b4", ],
+      response_vbl = "Potency", time_vbl = "Month", batch_vbl = "Batch",
+      rl = c(98.0, 98.5, 99.0), rl_sf = rep(2, 3), sl = 95, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
+
+summary(res2_2)
+
+# Prepare graphical representation
+ggres2_2 <- plot_expirest_wisle(
+      model = res2_2, rl_index = 2, response_vbl_unit = "%", x_range = NULL,
+      y_range = c(93, 107), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
+plot(ggres2_2)
+```
+
+
+### Example 3
+The assessments in *Example 1* and *Example 2* were made with the option `sf_option = "tight"`. The parameter `sf_option` affects the shelf life (*sl*) and release limits (*rl*). The setting `sf_option = "tight"` means that of the *sl* and *rl* limits only the number of significant digits specified by the parameters `rl_sf` and `sl_sf`, respectively, are taken into account. If `sf_option = "loose"`, then the limits are widened, i.e. four on the order of the last significant digit + 1 is added if `ivl_side = "upper"` or five on the order of the last significant digit + 1 is subtracted if `ivl_side = "lower"`. For illustration, the following example reproduces *Example 2* with the option `sf_option = "loose"`.
+
+``` {r example-3-1, message = FALSE}
+# Perform what-if shelf life estimation (wisle) and print a summary
+res3 <- expirest_wisle(
+      data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
+      response_vbl = "Potency", time_vbl = "Month", batch_vbl = "Batch",
+      rl = c(98.0, 98.5, 99.0), rl_sf = rep(3, 3), sl = 95, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
+      ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
+
+summary(res3)
+
+# Prepare graphical representation
+ggres3 <- plot_expirest_wisle(
+      model = res3, rl_index = 2, response_vbl_unit = "%", x_range = NULL,
+      y_range = c(93, 107), scenario = "standard", mtbs = "verified",
+      plot_option = "full", ci_app = "ribbon")
+plot(ggres3)
 ```
 
 

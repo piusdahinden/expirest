@@ -1,7 +1,7 @@
 Type: Package
 Package: expirest
 Title: Expiry Estimation Procedures
-Version: 0.1.5
+Version: 0.1.6.9000
 Authors@R: c(
     person("Pius", "Dahinden", , "pius.dahinden@tillotts.com", role = c("aut", "cre")),
     person("Tillotts Pharma AG", , , "tillotts@tillotts.com", role = c("cph", "fnd"))
@@ -19,11 +19,12 @@ License: GPL (>= 2)
 URL: https://github.com/piusdahinden/expirest
 BugReports: https://github.com/piusdahinden/expirest/issues
 Depends: 
-    R (>= 3.5)
+    R (>= 4.0)
 Imports: 
-    ggplot2, rlang
+    ggplot2, rlang, lifecycle
 Suggests: 
     testthat
 Encoding: UTF-8
+Language: en-GB
 LazyData: true
-RoxygenNote: 7.2.2
+RoxygenNote: 7.3.1
