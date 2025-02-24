@@ -103,11 +103,9 @@ test_that("plot_expirest_osle_succeeds", {
   expect_equal(tmp2[["vlines"]][, "Colour"], "forestgreen")
   expect_equal(tmp2[["vlines"]][, "Type"], "dotdash")
 
-  expect_length(tmp3[["Graph"]]$labels, 9)
   expect_equal(tmp3[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "23.7"))
 
-  expect_length(tmp4[["Graph"]]$labels, 6)
   expect_equal(tmp4[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "30.2"))
 

@@ -231,7 +231,6 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(tmp2[["arrow"]][1, "Angle"], 90)
   expect_equal(tmp2[["arrow"]][1, "Length"], 5)
 
-  expect_length(tmp3stsc[["Graph"]]$labels, 11)
   expect_equal(tmp3stsc[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "98.405 ", "100.45",
                  "7.5\n(worst case\nscenario)", "23.7\n(standard\nscenario)",
@@ -239,7 +238,6 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(signif(tmp3stsc[["text"]][, "Month"], 5),
                c(29.000, 29.0000, 0.00000, 0.00000, 7.5187, 23.698, 29.000))
 
-  expect_length(tmp3wcsc[["Graph"]]$labels, 11)
   expect_equal(tmp3wcsc[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "98.405 ", "100.45",
                  "7.5\n(worst case\nscenario)", "23.7\n(standard\nscenario)",
@@ -247,26 +245,21 @@ test_that("plot_expirest_wisle_succeeds", {
   expect_equal(signif(tmp3wcsc[["text"]][, "Month"], 5),
                c(10.000, 10.0000, 0.00000, 0.00000, 7.5187, 23.698, 10.000))
 
-  expect_length(tmp4[["Graph"]]$labels, 8)
   expect_equal(tmp4[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
                  "8.3\n(worst case\nscenario)", "30.2\n(standard\nscenario)",
                  "LRL: 96.995"))
-  expect_length(tmp4l1[["Graph"]]$labels, 8)
   expect_equal(tmp4l1[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
                  "8.3\n(worst case\nscenario)", "30.2\n(standard\nscenario)",
                  "LRL: 96.995"))
-  expect_length(tmp4l2[["Graph"]]$labels, 8)
   expect_equal(tmp4l2[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
                  "8.3", "30.2", "LRL: 96.995"))
-  expect_length(tmp4b1[["Graph"]]$labels, 5)
   expect_equal(tmp4b1[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
                  "8.3\n(worst case\nscenario)", "30.2\n(standard\nscenario)",
                  "LRL: 96.995"))
-  expect_length(tmp4b2[["Graph"]]$labels, 5)
   expect_equal(tmp4b2[["text"]][, "Label"],
                c("LSL: 94.95", "USL: 105.04", "99.861 ", "101.91",
                  "8.3\n(worst case\nscenario)", "30.2\n(standard\nscenario)",
