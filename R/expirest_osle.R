@@ -190,8 +190,9 @@
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).
 #'
-#' @seealso \code{\link{expirest_wisle}}, \code{\link[stats]{uniroot}},
-#' \code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+#' @seealso \code{\link{expirest_wisle}}, \code{\link{plot_expirest_wisle}},
+#' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
+#' \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 #'
 #' @example man/examples/examples_expirest_osle.R
 #'

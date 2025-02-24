@@ -19,6 +19,7 @@
 #' \item{Error}{An error message, if applicable, or otherwise NULL}
 #'
 #' @keywords internal
+#' @noRd
 
 try_get_model <- function(expr) {
   warning_msg <- error_msg <- NULL
