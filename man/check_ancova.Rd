@@ -46,7 +46,22 @@ model to figure out which kind of linear regression model suits the
 The function \code{check_ancova()} fits an ANCOVA (ANalyis of
 COVAriance) model to the data contained in the provided data frame. Based
 on \code{alpha}, it checks if the intercepts and/or slopes between the
-groups differ significantly or not.
+groups differ significantly or not. \cr
+Three possible models are regarded as appropriate,
+i.e.
+\itemize{
+ \item a \emph{common intercept / common slope} model (cics),
+ \item a \emph{different intercept / common slope} model (dics) or
+ \item a \emph{different intercept / different slope} model (dids).
+}
+The \emph{common intercept / different slope} model (cids) is of limited
+practical relevance because the corresponding model is missing an effect.
+When slopes exhibit significant differences, comparing intercepts becomes
+inconsequential. Moreover, while initial levels of different batches in a
+manufacturing process might be relatively well-controlled, it is improbable
+that these levels are identical. Consequently, if the model probabilities
+associated with the intercepts and slopes suggest the appropriateness of
+the cids model, the decision is taken in favour of a dids model.
 }
 \seealso{
 \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},

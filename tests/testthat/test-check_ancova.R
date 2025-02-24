@@ -1,7 +1,7 @@
 context("ANCOVA model check")
 
 test_that("check_ancova_succeeds", {
-  l_res <- vector(mode = "list", length = 7)
+  l_res <- vector(mode = "list", length = 8)
 
   l_res[[1]] <- check_ancova(data = exp1[exp1$Batch %in% c("b2", "b5", "b7"), ],
                            response_vbl = "Potency", time_vbl = "Month",
@@ -24,15 +24,19 @@ test_that("check_ancova_succeeds", {
   l_res[[7]] <- check_ancova(data = exp1[exp1$Batch == "b2", ],
                              response_vbl = "Potency", time_vbl = "Month",
                              batch_vbl = "Batch", alpha = 0.25)
+  l_res[[8]] <- check_ancova(data = exp11, response_vbl = "release",
+                             time_vbl = "month", batch_vbl = "batch",
+                             alpha = 0.25)
 
   tmp1 <- vapply(l_res, function(x) x[[1]], numeric(2))
   tmp2 <- vapply(l_res, function(x) x[[2]], character(1))
 
   # <-><-><-><->
 
-  expect_equal(tmp1["common.icpt", ], c(1, 0, 0, 0, 1, 0, NA))
-  expect_equal(tmp1["common.slp", ], c(1, 1, 0, 0, 1, 1, NA))
-  expect_equal(tmp2, c("cics", "dics", "dids", "dids", "cics", "dics", "n.a."))
+  expect_equal(tmp1["common.icpt", ], c(1, 0, 0, 0, 1, 0, NA, 0))
+  expect_equal(tmp1["common.slp", ], c(1, 1, 0, 0, 1, 1, NA, 0))
+  expect_equal(tmp2, c("cics", "dics", "dids", "dids", "cics", "dics", "n.a.",
+                       "dids"))
 })
 
 test_that("check_ancova_fails", {

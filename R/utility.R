@@ -1563,7 +1563,22 @@ get_relevant_limits <- function(limits_list, xform = c("no", "no"),
 #' @details The function \code{check_ancova()} fits an ANCOVA (ANalyis of
 #' COVAriance) model to the data contained in the provided data frame. Based
 #' on \code{alpha}, it checks if the intercepts and/or slopes between the
-#' groups differ significantly or not.
+#' groups differ significantly or not. \cr
+#' Three possible models are regarded as appropriate,
+#' i.e.
+#' \itemize{
+#'  \item a \emph{common intercept / common slope} model (cics),
+#'  \item a \emph{different intercept / common slope} model (dics) or
+#'  \item a \emph{different intercept / different slope} model (dids).
+#' }
+#' The \emph{common intercept / different slope} model (cids) is of limited
+#' practical relevance because the corresponding model is missing an effect.
+#' When slopes exhibit significant differences, comparing intercepts becomes
+#' inconsequential. Moreover, while initial levels of different batches in a
+#' manufacturing process might be relatively well-controlled, it is improbable
+#' that these levels are identical. Consequently, if the model probabilities
+#' associated with the intercepts and slopes suggest the appropriateness of
+#' the cids model, the decision is taken in favour of a dids model.
 #'
 #' @return A list of two elements is returned that specifies which model, based
 #'   on the ANCOVA analysis, suits best. The first element (\code{type.spec})
@@ -1641,6 +1656,19 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 
     ifelse(p_batch > alpha, common_icpt <- 1L, common_icpt <- 0L)
     ifelse(p_interaction > alpha, common_slp <- 1L, common_slp <- 0L)
+
+    # In case of a cids model, set the common_icpt parameter to 0 to obtain
+    # a dids model because the cids model is regarded as not relevant
+    # (See # LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102:
+    # Stability Shelf Life Estimation Using Analysis of Covariance.
+    # J Valid Technol (2011) 17(3): 47-68.)
+
+    if (common_icpt == 1 && common_slp == 0) {
+      common_icpt <- 0
+    }
+
+    # ---------
+    # Compile and return results
 
     l_model_type <-
       list(type.spec = setNames(c(common_icpt, common_slp),
