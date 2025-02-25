@@ -1,5 +1,22 @@
 ---
 
+# expirest 0.1.7
+
+- The check_ancova() function was modified to favor the different intercepts /
+  different slopes (dids) model when ANCOVA suggests that the common
+  intercepts / different slopes (cids) model is appropriate, as the cids model
+  is not practically relevant.
+- References to the corresponding plotting functions was added to the help
+  sections of the expirest_osle() and expirest_wisle() function.
+- To the help sections of all internal functions the @noRd tag was added.
+- Remove expect_length() tests that were used for ggplot graph labels. A
+  planned update of ggplot2 would affect these tests because ggplot2 will
+  not populate the plot$labels field before plot building anymore. For this
+  reason, the test assumptions would be violated. The tests are thus removed
+  to prevent errors.
+
+---
+
 # expirest 0.1.6
 
 - So far, exclusively the result from fitting individual models to each batch

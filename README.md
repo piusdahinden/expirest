@@ -6,13 +6,13 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The package supports shelf life estimation for chemically derived
-medicines, either following the standard method proposed by the
-International Council for Harmonisation (ICH), in quality guideline Q1E
-Evaluation of Stability Data or following the worst-case scenario
-consideration (what-if analysis) described in the Australian Regulatory
-Guidelines for Prescription Medicines (ARGPM), guidance on Stability
-testing for prescription medicines.
+The package facilitates shelf life estimation for chemically derived
+medicines by adhering to established methodologies. It supports both the
+standard approach as recommended by the International Council for
+Harmonisation (ICH) in the Q1E Evaluation of Stability Data guideline,
+as well as the worst-case scenario analysis (what-if analysis) detailed
+in the Australian Regulatory Guidelines for Prescription Medicines
+(ARGPM) guidance on stability testing for prescription medicines.
 
 ## Installation
 
@@ -29,6 +29,33 @@ The development version is available from
 # install.packages("devtools")
 devtools::install_github("piusdahinden/expirest")
 ```
+
+## Introduction
+
+The ICH Q1E guideline outlines methods for estimating the retest period
+or shelf life of chemically derived medicines. By analyzing the point in
+time where the 95% confidence limit intersects the acceptance criterion,
+shelf life estimation can be effectively performed. For attributes that
+change over time, different approaches are used: one-sided limits for
+those that increase and two-sided limits for those with uncertain
+changes. Estimations can be applied to single or multiple batches, often
+requiring stability data from at least three batches.
+
+Before conducting shelf life estimation with multiple batches, it is
+crucial to determine the most suitable model and verify if data from all
+batches are poolable. The guideline recommends statistical tests to
+assess whether regression lines from different batches share a common
+intercept and slope. Depending on these tests, three models may be used:
+common intercept / common slope (cics), different intercept / common
+slope (dics), and different intercept / different slope (dids). Pooling
+data only occurs if justified by statistical analysis, using a
+significance level (Type I error) set at 0.25 to enhance the power of
+the test to detect cases where the data should not be pooled.
+
+The fourth possible model, i.e. the common intercept/different slope
+model, is of limited practical relevance because, although initial
+levels of different batches might be well-controlled, they are unlikely
+to be identical.
 
 ## Examples
 
